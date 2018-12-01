@@ -1,4 +1,33 @@
-﻿<html>
+<!DOCTYPE html>
+<html>
+<head>
+    <script src='//jwplayer-8.6.3/jwplayer-8.6.3/src/js'></script>
+    <script>jwplayer.key='YOUR_KEY';</script>
+</head>
+<body>
+    <div id="player">Loading the player...</div>
+    <script>
+       player = jwplayer('player').setup({
+           file: '//livebeta.publika.md/LIVE/1/6810.m3u8',
+
+	width: '100%',
+	height: '100%',
+	mediaid: 'MXJmmsqZ',
+	aspectratio: '16:9',
+	autostart: 'true',
+	primary: 'html5'
+        });
+
+        // Call the API
+        const bumpIt = () => {
+            const vol = player.getVolume();
+            player.setVolume(vol + 10);
+        }
+        bumpIt();
+    </script>
+</body>
+</html>
+<html>
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
