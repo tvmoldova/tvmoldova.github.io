@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src='//jwplayer-8.6.3/jwplayer-8.6.3/src/js'></script>
+<script src="http://tvmoldova.github.io/jwplayer-8.6.3/jwplayer-8.6.3/src/js/jwplayer.js"></script>
+<script src="//livebeta.publika.md/media/assets/js/player/v/7.7.1/jwplayer.js"></script>
+<script src="//livebeta.publika.md/media/assets/js/player/v/7.7.1/livescript.defaults.js"></script>
     <script>jwplayer.key='YOUR_KEY';</script>
 </head>
 <body>
@@ -17,13 +19,6 @@
 	autostart: 'true',
 	primary: 'html5'
         });
-
-        // Call the API
-        const bumpIt = () => {
-            const vol = player.getVolume();
-            player.setVolume(vol + 10);
-        }
-        bumpIt();
     </script>
 </body>
 </html>
