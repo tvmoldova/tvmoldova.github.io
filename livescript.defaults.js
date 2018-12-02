@@ -21,13 +21,13 @@ var jwDefaults = {
   "height": 260,
   "key": "fdyAEi28IPYGWFzm0dVXEZD28FMvMQNb9k9ghAKMjFn4EFjcO6eKPHZvBOo=",
   "mute": false,
-  "ph": 1,
-  "pid": "pVwKf1lf",
-  "playbackRateControls": false,
-  "preload": "none",
-  "repeat": false,
-  "stagevideo": false,
-  "stretching": "uniform",
-  "width": "100%"
+	"ph": 1,
+	"preload": "none",
+	"primary": "html5",
+	"repeat": false,
+	"stagevideo": false,
+	"stretching": "uniform",
+	"visualplaylist": false,
+	"width": "100%"
 };
 jwplayer.defaults = jwDefaults;
