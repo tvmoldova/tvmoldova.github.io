@@ -20,12 +20,6 @@ var jwDefaults = {
   "flashplayer": "//ssl.p.jwpcdn.com/player/v/8.6.3/jwplayer.flash.swf",
   "height": 260,
   "key": "fdyAEi28IPYGWFzm0dVXEZD28FMvMQNb9k9ghAKMjFn4EFjcO6eKPHZvBOo=",
-  "logo": {
-    "file": "https://assets-jpcust.jwpsrv.com/watermarks/oa4nqgVr.png",
-    "hide": true,
-    "margin": "10",
-    "position": "top-right"
-  },
   "mute": false,
   "ph": 1,
   "pid": "pVwKf1lf",
