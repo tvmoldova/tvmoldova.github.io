@@ -8,7 +8,7 @@ var jwDefaults = {
   "controls": true,
   "displaydescription": false,
   "displaytitle": false,
-  "flashplayer": "//ssl.p.jwpcdn.com/player/v/8.6.3/jwplayer.flash.swf",
+  "flashplayer": "//livebeta.publika.md/media/assets/js/player/v/7.7.1/jwplayer.flash.swf",
   "height": 260,
   "key": "fdyAEi28IPYGWFzm0dVXEZD28FMvMQNb9k9ghAKMjFn4EFjcO6eKPHZvBOo=",
   "mute": false,
