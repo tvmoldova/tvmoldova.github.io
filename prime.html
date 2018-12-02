@@ -1,4 +1,17 @@
 <html>
+	<script src="//tvmoldova.github.io/jwplayer-8.6.3/jwplayer-8.6.3/src/js/jwplayer.js"></script>
+ <script src='https://tvmoldova.github.io/livescript.defaults.js'></script>
+
+<div class="cont" id="vastContainer">&nbsp;</div>
+<script>
+var playerInstance = jwplayer("vastContainer");
+playerInstance.setup({
+file: "http://212.0.217.42/live/disk1/N4/SA/01.m3u8",
+width: '100%',
+aspectratio: '16:9',
+volume: 100
+});
+</script>
   <center>
 <link href="http://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
 <script src="http://vjs.zencdn.net/7.1.0/video.js"></script>
