@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <link href="http://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
+<script src="http://vjs.zencdn.net/7.1.0/video.js"></script>
+<script src="http://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+  <style>
+    body{
+      background-color:#1E232C;
+    }
+    #video{
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      margin: auto;
+      max-height: 100%;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" class="video-js vjs-big-play-centered" controls preload="auto" width="1920" height="1080"
+poster="http://icons.iconarchive.com/icons/designbolts/free-multimedia/1024/TV-icon.png"
+data-setup='{}'>
+  <source src="http://212.0.217.42/live/disk1/PrimeHD/SA/01.m3u8" type="application/x-mpegURL" />
+</video>
+</body>
+</html>
