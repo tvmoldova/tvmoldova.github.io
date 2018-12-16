@@ -1,0 +1,27 @@
+﻿<!doctype html>
+<html lang="ro">
+<head>
+
+<script src="http://tvmoldova.github.io/jwplayer-8.6.3/jwplayer-8.6.3/src/js/jwplayer.js" type="text/javascript"></script>
+<script>jwplayer.key="LBgmMilARiXhI/r2babmpxqDoHeooShgLR2acQ=="</script>
+
+</head>
+<body style="margin: 0; padding: 0;">
+
+<div class="cont" id="vastContainer">&nbsp;</div>
+<script>
+var playerInstance = jwplayer("vastContainer");
+playerInstance.setup({
+  image: "https://3.bp.blogspot.com/-XzXNAiIOsj8/Wb5JHN3IZ5I/AAAAAAAAAtI/N5FTeWrkHBYOroE2AyNvGGR4hO9RGMWlwCLcBGAs/s1600/tv8.png",
+  file: "http://live.cdn.tv8.md/TV7/video2.m3u8?token=1",
+width: '100%',
+aspectratio: '16:9',
+  advertising: {
+    client: "vast",
+    tag: "//ro.adocean.pl/ad.xml?id=.sZcF9YgnWYS8Pj1c0G27u6uwMbhtiNOeWjzLSlpuaH.F7"
+  }
+});
+</script>  
+            
+</body>
+</html>
