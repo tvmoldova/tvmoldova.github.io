@@ -1,28 +1,29 @@
-﻿<!DOCTYPE html>
-<html>
+
+<!doctype html>
+<html lang="ro">
 <head>
-    <script src='LINK_TO_YOUR_PLAYER'></script>
-    <script>jwplayer.key='YOUR_KEY';</script>
+
+<script src='http://cdntvrm.ga/jw8/jwplayer.js'></script>
+<script>jwplayer.key="LBgmMilARiXhI/r2babmpxqDoHeooShgLR2acQ=="</script>
+<meta name="referrer" content="no-referrer">
+
 </head>
-<body>
-    <div id="player">Loading the player...</div>
-    <script>
-        // Setup the player
-        const player = jwplayer('player').setup({
-            file: 'LINK_TO_YOUR_FILE.mp4'
-        });
+<body style="margin: 0; padding: 0;">
 
-        // Listen to an event
-        player.on('pause', (event) => {
-            alert('Why did my user pause their video instead of watching it?');
-        });
-
-        // Call the API
-        const bumpIt = () => {
-            const vol = player.getVolume();
-            player.setVolume(vol + 10);
-        }
-        bumpIt();
-    </script>
+<div class="cont" id="vastContainer">&nbsp;</div>
+<script>
+var playerInstance = jwplayer("vastContainer");
+playerInstance.setup({
+  image: "https://4.bp.blogspot.com/-lhAF5LRB0og/V_DSXssROFI/AAAAAAAAAXs/eZAPrCsxKvMQRgjWchFHFahl-Z4lySZ2gCLcB/s1600/prime-tv.png",
+  file: "http://livebeta.publika.md/LIVE/1/6810.m3u8",
+width: '100%',
+aspectratio: '16:9',
+  advertising: {
+    client: "vast",
+    tag: ""
+  }
+});
+</script>  
+            
 </body>
 </html>
