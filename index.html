@@ -1,49 +1,219 @@
-﻿<style class="cp-pen-styles"></style></head><body>
-<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>IPTV Live Плеер</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .video-container {
+      width: 100%;
+      max-width: 1000px;
+      aspect-ratio: 16/9;
+      background: #111;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    #my-video {
+      width: 100%;
+      height: 100%;
+      visibility: hidden; /* Скрыт до выбора канала */
+    }
+    #video-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff0000;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255,0,0,0.5);
+      text-align: center;
+      z-index: 2;
+    }
+    #playlist {
+      width: 100%;
+      max-width: 1000px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .channel {
+      background: #222;
+      padding: 12px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      border: 1px solid #333;
+    }
+    .channel:hover {
+      background: #333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(255,0,0,0.2);
+    }
+    .channel.active {
+      background: #4a0000;
+      font-weight: bold;
+      border: 2px solid #ff0000;
+      box-shadow: 0 0 15px rgba(255,0,0,0.3);
+    }
+    .player-header {
+      width: 100%;
+      max-width: 1000px;
+      text-align: center;
+      margin: 10px 0 20px;
+      color: #ff0000;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255,0,0,0.5);
+    }
+    @media (max-width: 600px) {
+      #playlist {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      .channel {
+        padding: 10px 8px;
+        font-size: 14px;
+      }
+    }
+    .vjs-live-control:has(.vjs-live-display) {
+      color: #ff0000;
+    }
+    .vjs-progress-control {
+      display: none !important;
+    }
 
-<div class="container">
-  <div class="row">
-   <center>
-     <h1>TV BOX</h1>
-    </center>
-    <p>
-    <p>
-    <p>
-    <p>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 1" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-C4Z71gBH1hXy0Y.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 2" href="#"><img class="thumbnail img-responsive" src="http://tvmoldova.github.io/wallper/canal 3-min.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 3" href="http://radio-md.usite.pro/tv/prime-2.html"><img class="thumbnail img-responsive" src="http://tvmoldova.github.io/wallper/ntv-min.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 5" href="#"><img class="thumbnail img-responsive" src="http://tvmoldova.github.io/wallper/ru tv-min.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 5" href="#"><img class="thumbnail img-responsive" src="http://tvmoldova.github.io/wallper/n4-min.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 6" href="#"><img class="thumbnail img-responsive" src="http://tvmoldova.github.io/wallper/tnt-min.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 8" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-ArZvJElKcE.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 9" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-UMvIFtwnf6.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 10" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-55VbjkV4WzmF1nQ.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 11" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-eAIyNqwgSmWuq5C.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 12" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-ejfTHD34Nnr.jpg"></a></div>
-      <div class="col-lg-3 col-sm-4 col-xs-6"><a title="Image 13" href="#"><img class="thumbnail img-responsive" src="http://radio-md.usite.pro/foto/imgonline-com-ua-Resize-EpbH6jv9Wtp.jpg"></a></div>
-   
-    <hr>
-    
-    <hr>
+    /* Стиль индикатора загрузки */
+    .vjs-loading-spinner {
+      border-top-color: #ff0000 !important;
+      border-right-color: #ff0000 !important;
+    }
+
+    /* Скрываем большую кнопку воспроизведения */
+    .video-js .vjs-big-play-button {
+      display: none !important;
+    }
+  </style>
+
+  <!-- Video.js CSS -->
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="player-header"> SPORT LIVE </div>
+
+  <div class="video-container">
+    <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous" controlslist="nodownload noplaybackrate"></video>
+    <div id="video-placeholder">Выберите канал из списка</div>
   </div>
-</div>
-<div tabindex="-1" class="modal fade" id="myModal" role="dialog">
-  <div class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-header">
-		<button class="close" type="button" data-dismiss="modal">×</button>
-		<h3 class="modal-title">Heading</h3>
-	</div>
-	<div class="modal-body">
-		
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-default" data-dismiss="modal">Close</button>
-	</div>
-   </div>
-  </div>
-</div>
+
+  <div id="playlist"></div>
+
+  <!-- Video.js Core -->
+  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+  <!-- Плагины для качества и аудио -->
+  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.3/dist/videojs-hls-quality-selector.min.js"></script>
+
+  <script>
+    const channels = [
+      { name: "Eurosport 1 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_1_IPTV/HLSv4/Eurosport_1_IPTV.m3u8" },
+      { name: "Eurosport 2 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_2_IPTV/HLSv4/Eurosport_2_IPTV.m3u8" },
+      { name: "WE SPORT HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/We_Sport_IPTV/HLSv4/We_Sport_IPTV.m3u8" },
+      { name: "Setanta HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_IPTV/HLSv4/Setanta_IPTV.m3u8" },
+      { name: "Setanta 1 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta1_IPTV/HLSv4/Setanta1_IPTV.m3u8" },
+      { name: "Setanta 2 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_2IPTV/HLSv4/Setanta_2IPTV.m3u8" },
+      { name: "Q Sport HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Q_Sport_IPTV/HLSv4/Q_Sport_IPTV.m3u8" },
+      { name: "KHL Prime HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/KHL_Prime_HD/HLSv4/KHL_Prime_HD.m3u8" }
+    ];
+
+    const player = videojs('my-video', {
+      fluid: true,
+      autoplay: false,
+      muted: true,
+      bigPlayButton: false,  // Отключаем большую кнопку воспроизведения
+      html5: {
+        nativeAudioTracks: false,
+        nativeVideoTracks: false,
+        vhs: {
+          overrideNative: true
+        }
+      },
+      controlBar: {
+        children: [
+          'playToggle',
+          'volumePanel',
+          'liveDisplay',
+          'audioTrackButton',
+          'qualitySelector',
+          'fullscreenToggle'
+        ]
+      }
+    });
+
+    function createPlaylist() {
+      const playlistEl = document.getElementById('playlist');
+      channels.forEach((channel, index) => {
+        const channelEl = document.createElement('div');
+        channelEl.className = 'channel';
+        channelEl.textContent = channel.name;
+        channelEl.onclick = () => loadChannel(index);
+        playlistEl.appendChild(channelEl);
+      });
+    }
+
+    function loadChannel(index) {
+      const placeholder = document.getElementById('video-placeholder');
+      const videoEl = document.getElementById('my-video');
+
+      placeholder.style.display = 'none';
+      videoEl.style.visibility = 'visible';
+
+      player.pause();
+      player.src({
+        src: channels[index].url,
+        type: 'application/x-mpegURL'
+      });
+
+      player.muted(false);
+
+      player.ready(() => {
+        player.hlsQualitySelector({ displayCurrentQuality: true });
+      });
+
+      player.play().catch(() => player.play());
+
+      document.querySelectorAll('.channel').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+
+      // Автозапуск при готовности потока
+      player.one('loadeddata', () => {
+        if (player.paused()) {
+          player.play().catch(() => {});
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      createPlaylist();
+    });
+  </script>
+</body>
+</html>
