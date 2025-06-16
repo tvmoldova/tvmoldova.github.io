@@ -5,7 +5,6 @@
   <title>IPTV Blue Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    /* Все стили остаются без изменений */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -299,6 +298,7 @@
       padding-bottom: 8px;
       border-bottom: 1px solid rgba(100, 255, 218, 0.2);
       width: 100%;
+      grid-column: 1 / -1; /* Важное исправление для скроллинга */
     }
     .error-message {
       color: #ff6b6b;
@@ -556,7 +556,7 @@
       }
     });
 
-    // Упрощенная и оптимизированная функция загрузки плейлиста из первого кода
+    // Упрощенная и оптимизированная функция загрузки плейлиста
     async function loadM3UPlaylist(url) {
       try {
         showProgress(30);
@@ -584,7 +584,7 @@
             const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${i}`;
             
             // Ищем URL следующей строкой
-            if (lines[i+1] && lines[i+1].trim().startsWith('http')) {
+            if (i+1 < lines.length && lines[i+1].trim().startsWith('http')) {
               const urlLine = lines[i+1].trim();
               
               if (!channelsByCategory[currentGroup]) {
@@ -682,4 +682,200 @@
       const playlistEl = document.getElementById('playlist');
       playlistEl.innerHTML = '';
       
-      let fil
+      let filteredChannels = channels;
+      
+      // Фильтрация по поисковому запросу (только для текущей категории)
+      if (searchTerm && currentCategory) {
+        const searchLower = searchTerm.toLowerCase();
+        filteredChannels = channels.filter(channel => 
+          channel.name.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      // Если нет результатов
+      if (filteredChannels.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.textContent = 'Каналы не найдены';
+        playlistEl.appendChild(noResults);
+        return;
+      }
+      
+      // Создаем элементы каналов
+      filteredChannels.forEach(channel => {
+        const channelEl = document.createElement('div');
+        channelEl.className = 'channel';
+        channelEl.textContent = channel.name;
+        channelEl.dataset.category = channel.category;
+        channelEl.onclick = (e) => loadChannel(channel, e);
+        playlistEl.appendChild(channelEl);
+      });
+    }
+
+    // Поиск по всем каналам
+    function searchChannels(query) {
+      const resultsContainer = document.getElementById('playlist');
+      resultsContainer.innerHTML = '';
+      
+      if (!query) {
+        document.getElementById('search-results-header').style.display = 'none';
+        document.getElementById('search-results-count').style.display = 'none';
+        document.getElementById('playlist-container').style.display = 'none';
+        document.getElementById('categories').style.display = 'flex';
+        return;
+      }
+      
+      const searchLower = query.toLowerCase();
+      let resultsCount = 0;
+      
+      // Скрываем категории, показываем результаты поиска
+      document.getElementById('categories').style.display = 'none';
+      document.getElementById('playlist-container').style.display = 'block';
+      document.getElementById('back-button').style.display = 'block';
+      document.getElementById('search-results-header').style.display = 'block';
+      document.getElementById('search-results-count').style.display = 'block';
+      document.getElementById('playlist-header').textContent = 'Результаты поиска';
+      
+      // Собираем результаты по категориям
+      const resultsByCategory = {};
+      
+      Object.keys(allChannels).forEach(category => {
+        const categoryResults = allChannels[category].filter(channel => 
+          channel.name.toLowerCase().includes(searchLower)
+        );
+        
+        if (categoryResults.length > 0) {
+          resultsByCategory[category] = categoryResults;
+          resultsCount += categoryResults.length;
+        }
+      });
+      
+      // Обновляем счетчик результатов
+      document.getElementById('results-count').textContent = resultsCount;
+      
+      // Если нет результатов
+      if (resultsCount === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.textContent = 'Ничего не найдено';
+        resultsContainer.appendChild(noResults);
+        return;
+      }
+      
+      // Отображаем результаты по категориям
+      Object.keys(resultsByCategory).forEach(category => {
+        // Добавляем заголовок категории
+        const categoryHeader = document.createElement('div');
+        categoryHeader.className = 'search-category';
+        categoryHeader.textContent = category;
+        resultsContainer.appendChild(categoryHeader);
+        
+        // Добавляем каналы
+        resultsByCategory[category].forEach(channel => {
+          const channelEl = document.createElement('div');
+          channelEl.className = 'channel';
+          channelEl.textContent = channel.name;
+          channelEl.dataset.category = channel.category;
+          channelEl.onclick = (e) => loadChannel(channel, e);
+          resultsContainer.appendChild(channelEl);
+        });
+      });
+    }
+
+    // Загрузка выбранного канала
+    function loadChannel(channel, event) {
+      const placeholder = document.getElementById('video-placeholder');
+      const videoEl = document.getElementById('my-video');
+
+      placeholder.style.display = 'none';
+      videoEl.style.visibility = 'visible';
+
+      player.pause();
+      player.src({
+        src: channel.url,
+        type: 'application/x-mpegURL'
+      });
+
+      player.muted(false);
+
+      player.ready(() => {
+        if (player.qualityLevels) {
+          player.hlsQualitySelector({ displayCurrentQuality: true });
+        }
+      });
+
+      player.play().catch(() => player.play());
+
+      // Убираем активность у всех каналов
+      document.querySelectorAll('.channel').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Добавляем активность текущему каналу
+      if (event && event.target) {
+        event.target.classList.add('active');
+        // Скроллинг к выбранному каналу
+        event.target.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+      }
+    }
+
+    // Инициализация страницы
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Настройка кнопки "Назад"
+      document.getElementById('back-button').addEventListener('click', () => {
+        // Скрываем плейлист и результаты поиска, показываем категории
+        document.getElementById('playlist-container').style.display = 'none';
+        document.getElementById('categories').style.display = 'flex';
+        document.getElementById('back-button').style.display = 'none';
+        document.getElementById('search-results-header').style.display = 'none';
+        document.getElementById('search-results-count').style.display = 'none';
+        searchTerm = "";
+        document.getElementById('search-input').value = "";
+      });
+
+      // Настройка поиска
+      const searchInput = document.getElementById('search-input');
+      searchInput.addEventListener('input', function() {
+        searchTerm = this.value.trim();
+        
+        if (searchTerm) {
+          // Поиск по всем каналам
+          searchChannels(searchTerm);
+        } else {
+          // Очистка поиска
+          document.getElementById('search-results-header').style.display = 'none';
+          document.getElementById('search-results-count').style.display = 'none';
+          
+          if (currentCategory) {
+            // Если была открыта категория, показываем её
+            loadCategory(currentCategory);
+          } else {
+            // Иначе показываем категории
+            document.getElementById('playlist-container').style.display = 'none';
+            document.getElementById('categories').style.display = 'flex';
+          }
+        }
+      });
+
+      try {
+        // Загружаем плейлист
+        allChannels = await loadM3UPlaylist(playlistUrl);
+        
+        // Проверяем, что плейлист не пустой
+        if (Object.keys(allChannels).length === 0) {
+          throw new Error('Плейлист пуст');
+        }
+        
+        createCategories();
+      } catch (e) {
+        console.error('Critical error:', e);
+        showError(`Критическая ошибка: ${e.message}`);
+        
+        // Используем fallback каналы
+        allChannels = fallbackChannels;
+        createCategories();
+      }
+    });
+  </script>
+</body>
+</html>
