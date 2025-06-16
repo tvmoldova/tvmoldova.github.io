@@ -1,1 +1,708 @@
-gsja
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>IPTV Blue Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: linear-gradient(135deg, #0a192f 0%, #0d1b34 100%);
+      color: #e6f1ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100%;
+      line-height: 1.6;
+      overflow: hidden;
+    }
+    .fixed-top {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 25, 47, 0.95);
+      padding: 15px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .search-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    #search-input {
+      width: 100%;
+      padding: 14px 50px 14px 20px;
+      border-radius: 50px;
+      border: 2px solid #1e2a47;
+      background: rgba(14, 22, 40, 0.8);
+      color: #e6f1ff;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+    }
+    #search-input:focus {
+      border-color: #64ffda;
+      box-shadow: 0 0 20px rgba(100, 255, 218, 0.4);
+    }
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64ffda;
+      font-size: 18px;
+      pointer-events: none;
+    }
+    .video-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: rgba(14, 22, 40, 0.6);
+      margin-bottom: 15px;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      max-height: 50vh;
+    }
+    #my-video {
+      width: 100%;
+      height: 100%;
+      visibility: hidden;
+    }
+    #video-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #64ffda;
+      font-size: 24px;
+      font-weight: 600;
+      text-align: center;
+      z-index: 2;
+      padding: 0 20px;
+      text-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
+      opacity: 0.8;
+      width: 90%;
+    }
+    .scrollable-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .categories {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .category {
+      background: linear-gradient(135deg, rgba(30, 42, 71, 0.7) 0%, rgba(22, 32, 55, 0.7) 100%);
+      padding: 16px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      color: #e6f1ff;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      flex: 1 1 calc(25% - 15px);
+      min-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      backdrop-filter: blur(5px);
+      position: relative;
+      z-index: 1;
+    }
+    .category:hover {
+      background: linear-gradient(135deg, rgba(44, 65, 114, 0.8) 0%, rgba(30, 42, 71, 0.8) 100%);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(100, 255, 218, 0.3);
+      border-color: rgba(100, 255, 218, 0.3);
+    }
+    .category.active {
+      background: linear-gradient(135deg, rgba(26, 117, 255, 0.3) 0%, rgba(10, 25, 47, 0.6) 100%);
+      font-weight: bold;
+      border: 2px solid #64ffda;
+      box-shadow: 0 0 20px rgba(100, 255, 218, 0.4);
+      transform: translateY(-3px);
+    }
+    #playlist-container {
+      width: 100%;
+      display: none;
+      background: rgba(14, 22, 40, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      backdrop-filter: blur(5px);
+      margin-bottom: 30px;
+    }
+    #playlist-header {
+      color: #64ffda;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+      text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+    }
+    #playlist {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .channel {
+      background: linear-gradient(135deg, rgba(30, 42, 71, 0.7) 0%, rgba(22, 32, 55, 0.7) 100%);
+      padding: 15px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      color: #e6f1ff;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+    }
+    .channel:hover {
+      background: linear-gradient(135deg, rgba(44, 65, 114, 0.8) 0%, rgba(30, 42, 71, 0.8) 100%);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(100, 255, 218, 0.3);
+      border-color: rgba(100, 255, 218, 0.3);
+    }
+    .channel.active {
+      background: linear-gradient(135deg, rgba(26, 117, 255, 0.3) 0%, rgba(10, 25, 47, 0.6) 100%);
+      font-weight: bold;
+      border: 2px solid #64ffda;
+      box-shadow: 0 0 20px rgba(100, 255, 218, 0.4);
+      transform: translateY(-3px);
+    }
+    .vjs-live-control:has(.vjs-live-display) {
+      color: #64ffda !important;
+    }
+    .vjs-progress-control {
+      display: none !important;
+    }
+    .vjs-loading-spinner {
+      border-top-color: #64ffda !important;
+      border-right-color: #64ffda !important;
+    }
+    .video-js .vjs-big-play-button {
+      display: none !important;
+    }
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #64ffda;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 10;
+      background: rgba(10, 25, 47, 0.9);
+      padding: 25px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(100, 255, 218, 0.3);
+      border: 1px solid rgba(100, 255, 218, 0.2);
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+    #loading .progress {
+      width: 100%;
+      height: 5px;
+      background: rgba(100, 255, 218, 0.2);
+      border-radius: 3px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    #loading .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #64ffda;
+      transition: width 0.3s ease;
+    }
+    .back-button {
+      display: none;
+      background: linear-gradient(135deg, rgba(30, 42, 71, 0.7) 0%, rgba(22, 32, 55, 0.7) 100%);
+      padding: 14px 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      color: #e6f1ff;
+      font-weight: 600;
+      margin-bottom: 20px;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+    }
+    .back-button:hover {
+      background: linear-gradient(135deg, rgba(44, 65, 114, 0.8) 0%, rgba(30, 42, 71, 0.8) 100%);
+      border-color: rgba(100, 255, 218, 0.3);
+      transform: translateY(-3px);
+    }
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+      color: #8892b0;
+      font-style: italic;
+      font-size: 18px;
+    }
+    .search-results-header {
+      color: #64ffda;
+      font-size: 28px;
+      margin: 20px 0 15px;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+      width: 100%;
+    }
+    .search-results-count {
+      color: #8892b0;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 16px;
+    }
+    .search-category {
+      color: #64ffda;
+      font-size: 20px;
+      margin: 25px 0 15px 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+      width: 100%;
+    }
+    .error-message {
+      color: #ff6b6b;
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 0, 0, 0.1);
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    /* Мобильная альбомная ориентация */
+    @media (max-width: 1000px) and (orientation: landscape) {
+      .fixed-top {
+        padding: 10px;
+      }
+      
+      .video-container {
+        max-height: 40vh;
+      }
+      
+      .categories {
+        gap: 10px;
+      }
+      
+      .category {
+        padding: 12px 10px;
+        font-size: 14px;
+        min-width: auto;
+        flex: 1 1 calc(50% - 10px);
+      }
+      
+      #playlist-container {
+        padding: 15px;
+      }
+      
+      #playlist {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      
+      .channel {
+        padding: 12px 8px;
+        font-size: 13px;
+      }
+      
+      .back-button {
+        padding: 12px 20px;
+        font-size: 14px;
+        margin-bottom: 15px;
+      }
+    }
+
+    /* Вертикальная мобильная ориентация */
+    @media (max-width: 768px) {
+      .fixed-top {
+        padding: 12px;
+      }
+      
+      .categories {
+        gap: 12px;
+      }
+      
+      .category {
+        flex: 1 1 calc(50% - 12px);
+        padding: 14px 10px;
+        font-size: 15px;
+        min-width: 140px;
+      }
+      
+      #playlist {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .channel {
+        padding: 14px 10px;
+        font-size: 14px;
+      }
+      
+      #search-input {
+        padding: 12px 45px 12px 15px;
+        font-size: 15px;
+      }
+      
+      .search-icon {
+        right: 15px;
+        font-size: 16px;
+      }
+      
+      #video-placeholder {
+        font-size: 18px;
+      }
+      
+      .search-results-header {
+        font-size: 22px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .category {
+        flex: 1 1 100%;
+        padding: 15px 12px;
+        font-size: 16px;
+      }
+      
+      #playlist {
+        grid-template-columns: 1fr;
+      }
+      
+      #video-placeholder {
+        font-size: 16px;
+      }
+      
+      #search-input {
+        padding: 12px 40px 12px 15px;
+        font-size: 14px;
+      }
+      
+      .back-button {
+        padding: 12px 15px;
+      }
+      
+      .search-category {
+        font-size: 18px;
+      }
+    }
+
+    /* Очень маленькие экраны */
+    @media (max-width: 350px) {
+      #playlist {
+        grid-template-columns: 1fr;
+      }
+      
+      .channel {
+        padding: 12px 8px;
+        font-size: 14px;
+      }
+      
+      .category {
+        padding: 12px 8px;
+        font-size: 14px;
+      }
+      
+      #video-placeholder {
+        font-size: 14px;
+      }
+    }
+    
+    /* Скроллбар */
+    .scrollable-content::-webkit-scrollbar,
+    #playlist::-webkit-scrollbar {
+      width: 8px;
+    }
+    .scrollable-content::-webkit-scrollbar-track,
+    #playlist::-webkit-scrollbar-track {
+      background: rgba(14, 22, 40, 0.2);
+      border-radius: 4px;
+    }
+    .scrollable-content::-webkit-scrollbar-thumb,
+    #playlist::-webkit-scrollbar-thumb {
+      background: #64ffda;
+      border-radius: 4px;
+    }
+  </style>
+
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="fixed-top">
+    <div class="header-container">
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="Поиск по всем каналам...">
+        <div class="search-icon">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+      
+      <div class="video-container">
+        <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous" controlslist="nodownload noplaybackrate"></video>
+        <div id="video-placeholder">Выберите канал из списка</div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="loading">
+    <div>Загрузка каналов...</div>
+    <div class="progress">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="scrollable-content">
+    <div class="back-button" id="back-button">
+      <i class="fas fa-arrow-left"></i> Назад к категориям
+    </div>
+    
+    <div class="search-results-header" id="search-results-header" style="display:none">Результаты поиска</div>
+    <div class="search-results-count" id="search-results-count" style="display:none">Найдено каналов: <span id="results-count">0</span></div>
+    
+    <div class="categories" id="categories"></div>
+    
+    <div id="playlist-container">
+      <div id="playlist-header">Каналы</div>
+      <div id="playlist"></div>
+    </div>
+    
+    <div id="error-message" class="error-message" style="display:none"></div>
+  </div>
+
+  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.3/dist/videojs-hls-quality-selector.min.js"></script>
+
+  <script>
+    // Используем прокси для обхода CORS
+    const playlistUrl = "https://tvmoldova.github.io/sigma.m3u";
+    const corsProxy = "https://api.allorigins.win/raw?url=";
+    
+    let allChannels = {};
+    let currentCategory = "";
+    let searchTerm = "";
+
+    const player = videojs('my-video', {
+      fluid: true,
+      autoplay: false,
+      muted: true,
+      bigPlayButton: false,
+      html5: {
+        nativeAudioTracks: false,
+        nativeVideoTracks: false,
+        vhs: {
+          overrideNative: true
+        }
+      },
+      controlBar: {
+        children: [
+          'playToggle',
+          'volumePanel',
+          'liveDisplay',
+          'audioTrackButton',
+          'qualitySelector',
+          'fullscreenToggle'
+        ]
+      }
+    });
+
+    // Функция загрузки и парсинга m3u плейлиста
+    async function loadM3UPlaylist(url) {
+      try {
+        // Показываем прогресс загрузки
+        showProgress(30);
+        
+        // Используем прокси для обхода CORS
+        const proxyUrl = corsProxy + encodeURIComponent(url);
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
+        }
+        
+        showProgress(60);
+        const playlistText = await response.text();
+        
+        const channelsByCategory = {};
+        const lines = playlistText.split('\n');
+        let currentGroup = "";
+        let channelCount = 0;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          
+          if (line.startsWith('#EXTINF:')) {
+            // Извлекаем название группы
+            const groupMatch = line.match(/group-title="([^"]+)"/);
+            if (groupMatch && groupMatch[1]) {
+              currentGroup = groupMatch[1];
+            } else {
+              currentGroup = "Другие";
+            }
+            
+            // Извлекаем название канала
+            const nameMatch = line.match(/,(.*)$/);
+            const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${channelCount + 1}`;
+            
+            // Добавляем в категорию
+            if (!channelsByCategory[currentGroup]) {
+              channelsByCategory[currentGroup] = [];
+            }
+            
+            // Ищем URL следующей строкой
+            const urlLine = lines[i+1] ? lines[i+1].trim() : '';
+            if (urlLine && urlLine.startsWith('http')) {
+              channelsByCategory[currentGroup].push({
+                name: channelName,
+                url: urlLine,
+                category: currentGroup
+              });
+              channelCount++;
+              i++; // Пропускаем строку с URL
+            }
+          }
+          
+          // Обновляем прогресс каждые 50 каналов
+          if (channelCount > 0 && channelCount % 50 === 0) {
+            const progress = Math.min(90, 60 + Math.floor((channelCount / 500) * 30));
+            showProgress(progress);
+          }
+        }
+        
+        showProgress(100);
+        return channelsByCategory;
+      } catch (error) {
+        console.error('Ошибка загрузки плейлиста:', error);
+        showError(`Ошибка загрузки: ${error.message}`);
+        return {};
+      }
+    }
+
+    // Показать прогресс загрузки
+    function showProgress(percent) {
+      const progressBar = document.getElementById('progress-bar');
+      if (progressBar) {
+        progressBar.style.width = `${percent}%`;
+      }
+    }
+
+    // Показать сообщение об ошибке
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    // Создание списка категорий
+    function createCategories() {
+      const categoriesEl = document.getElementById('categories');
+      categoriesEl.innerHTML = '';
+      
+      Object.keys(allChannels).forEach(category => {
+        const categoryEl = document.createElement('div');
+        categoryEl.className = 'category';
+        categoryEl.textContent = category;
+        categoryEl.onclick = () => loadCategory(category);
+        categoriesEl.appendChild(categoryEl);
+      });
+      
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    // Загрузка каналов выбранной категории
+    function loadCategory(category) {
+      currentCategory = category;
+      const playlistEl = document.getElementById('playlist');
+      playlistEl.innerHTML = '';
+      
+      // Скрываем категории и результаты поиска, показываем плейлист и кнопку "Назад"
+      document.getElementById('categories').style.display = 'none';
+      document.getElementById('playlist-container').style.display = 'block';
+      document.getElementById('back-button').style.display = 'block';
+      document.getElementById('search-results-header').style.display = 'none';
+      document.getElementById('search-results-count').style.display = 'none';
+      document.getElementById('error-message').style.display = 'none';
+      
+      // Устанавливаем заголовок
+      document.getElementById('playlist-header').textContent = category;
+      
+      // Убираем активность у всех категорий
+      document.querySelectorAll('.category').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Добавляем активность текущей категории
+      document.querySelectorAll('.category').forEach(el => {
+        if (el.textContent === category) {
+          el.classList.add('active');
+        }
+      });
+      
+      // Отображаем каналы
+      displayChannels(allChannels[category]);
+    }
+
+    // Отображение каналов с учетом фильтрации
+    function displayChannels(channels) {
+      const playlistEl = document.getElementById('playlist');
+      playlistEl.innerHTML = '';
+      
+      let filteredChannels = channels;
+      
+      // Фильтрация по поисковому запросу (только для текущей категории)
+      if (searchTerm && currentCategory) {
+        const searchLower = searchTerm.toLowerCase();
+        filteredChannels = channels.filter(channel => 
+          channel.name.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      // Если нет результатов
+      if (filteredChannels.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.textContent = 'Каналы не найдены';
+        playlistEl.appendChild(noResults);
+        return;
+      
