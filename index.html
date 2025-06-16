@@ -5,6 +5,7 @@
   <title>IPTV Blue Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    /* Все стили остаются без изменений */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -512,10 +513,21 @@
   <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.3/dist/videojs-hls-quality-selector.min.js"></script>
 
   <script>
-    // Используем прокси для обхода CORS
+    // Fallback каналы из первого кода
+    const fallbackChannels = {
+      "Спорт": [
+        { name: "Eurosport 1 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_1_IPTV/HLSv4/Eurosport_1_IPTV.m3u8", category: "Спорт" },
+        { name: "Eurosport 2 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_2_IPTV/HLSv4/Eurosport_2_IPTV.m3u8", category: "Спорт" },
+        { name: "WE SPORT HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/We_Sport_IPTV/HLSv4/We_Sport_IPTV.m3u8", category: "Спорт" },
+        { name: "Setanta HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_IPTV/HLSv4/Setanta_IPTV.m3u8", category: "Спорт" },
+        { name: "Setanta 1 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta1_IPTV/HLSv4/Setanta1_IPTV.m3u8", category: "Спорт" },
+        { name: "Setanta 2 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_2IPTV/HLSv4/Setanta_2IPTV.m3u8", category: "Спорт" },
+        { name: "Q Sport HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Q_Sport_IPTV/HLSv4/Q_Sport_IPTV.m3u8", category: "Спорт" },
+        { name: "KHL Prime HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/KHL_Prime_HD/HLSv4/KHL_Prime_HD.m3u8", category: "Спорт" }
+      ]
+    };
+
     const playlistUrl = "https://tvmoldova.github.io/sigma.m3u";
-    const corsProxy = "https://api.allorigins.win/raw?url=";
-    
     let allChannels = {};
     let currentCategory = "";
     let searchTerm = "";
@@ -544,27 +556,18 @@
       }
     });
 
-    // Функция загрузки и парсинга m3u плейлиста
+    // Упрощенная и оптимизированная функция загрузки плейлиста из первого кода
     async function loadM3UPlaylist(url) {
       try {
-        // Показываем прогресс загрузки
         showProgress(30);
-        
-        // Используем прокси для обхода CORS
-        const proxyUrl = corsProxy + encodeURIComponent(url);
-        const response = await fetch(proxyUrl);
-        
-        if (!response.ok) {
-          throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
-        }
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         showProgress(60);
         const playlistText = await response.text();
-        
         const channelsByCategory = {};
         const lines = playlistText.split('\n');
-        let currentGroup = "";
-        let channelCount = 0;
+        let currentGroup = "Другие";
 
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
@@ -574,36 +577,28 @@
             const groupMatch = line.match(/group-title="([^"]+)"/);
             if (groupMatch && groupMatch[1]) {
               currentGroup = groupMatch[1];
-            } else {
-              currentGroup = "Другие";
             }
             
             // Извлекаем название канала
             const nameMatch = line.match(/,(.*)$/);
-            const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${channelCount + 1}`;
-            
-            // Добавляем в категорию
-            if (!channelsByCategory[currentGroup]) {
-              channelsByCategory[currentGroup] = [];
-            }
+            const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${i}`;
             
             // Ищем URL следующей строкой
-            const urlLine = lines[i+1] ? lines[i+1].trim() : '';
-            if (urlLine && urlLine.startsWith('http')) {
+            if (lines[i+1] && lines[i+1].trim().startsWith('http')) {
+              const urlLine = lines[i+1].trim();
+              
+              if (!channelsByCategory[currentGroup]) {
+                channelsByCategory[currentGroup] = [];
+              }
+              
               channelsByCategory[currentGroup].push({
                 name: channelName,
                 url: urlLine,
                 category: currentGroup
               });
-              channelCount++;
+              
               i++; // Пропускаем строку с URL
             }
-          }
-          
-          // Обновляем прогресс каждые 50 каналов
-          if (channelCount > 0 && channelCount % 50 === 0) {
-            const progress = Math.min(90, 60 + Math.floor((channelCount / 500) * 30));
-            showProgress(progress);
           }
         }
         
@@ -611,8 +606,8 @@
         return channelsByCategory;
       } catch (error) {
         console.error('Ошибка загрузки плейлиста:', error);
-        showError(`Ошибка загрузки: ${error.message}`);
-        return {};
+        showError('Ошибка загрузки плейлиста. Используем резервные каналы');
+        return fallbackChannels;
       }
     }
 
@@ -631,7 +626,6 @@
         errorEl.textContent = message;
         errorEl.style.display = 'block';
       }
-      document.getElementById('loading').style.display = 'none';
     }
 
     // Создание списка категорий
@@ -688,21 +682,4 @@
       const playlistEl = document.getElementById('playlist');
       playlistEl.innerHTML = '';
       
-      let filteredChannels = channels;
-      
-      // Фильтрация по поисковому запросу (только для текущей категории)
-      if (searchTerm && currentCategory) {
-        const searchLower = searchTerm.toLowerCase();
-        filteredChannels = channels.filter(channel => 
-          channel.name.toLowerCase().includes(searchLower)
-        );
-      }
-      
-      // Если нет результатов
-      if (filteredChannels.length === 0) {
-        const noResults = document.createElement('div');
-        noResults.className = 'no-results';
-        noResults.textContent = 'Каналы не найдены';
-        playlistEl.appendChild(noResults);
-        return;
-      
+      let fil
