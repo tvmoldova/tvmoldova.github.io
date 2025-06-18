@@ -114,17 +114,6 @@
       text-align: center;
       opacity: 0.8;
     }
-    #error-message {
-      position: absolute;
-      top: 60%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #ff6b6b;
-      font-weight: bold;
-      text-align: center;
-      display: none;
-      width: 90%;
-    }
     .content-container {
       flex: 1;
       overflow-y: auto;
@@ -275,7 +264,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #e6f1ff;
+      color: #e6f1ff; /* Единый цвет для всех иконок */
     }
     
     /* Центрирование текста LIVE */
@@ -295,12 +284,12 @@
       content: "\f121";
       font-size: 1.5em;
       line-height: 1.8;
-      color: #e6f1ff;
+      color: #e6f1ff; /* Единый цвет */
       transition: color 0.3s ease;
     }
     
     .vjs-pip-button.vjs-pip-active .vjs-icon-placeholder::before {
-      color: #64ffda;
+      color: #64ffda; /* Акцентный цвет при активности */
     }
     
     /* Выравнивание всех кнопок */
@@ -348,7 +337,6 @@
       <div class="video-container">
         <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous" controlslist="nodownload noplaybackrate"></video>
         <div id="video-placeholder">Выберите канал из списка</div>
-        <div id="error-message"></div>
         <div class="pip-indicator" id="pip-indicator">Картинка в картинке активна</div>
       </div>
     </div>
@@ -443,8 +431,7 @@
         nativeAudioTracks: false,
         nativeVideoTracks: false,
         vhs: {
-          overrideNative: true,
-          withCredentials: false
+          overrideNative: true
         }
       },
       controlBar: {
@@ -458,19 +445,6 @@
           'fullscreenToggle'
         ]
       }
-    });
-
-    // Обработка ошибок плеера
-    player.on('error', function() {
-      const error = player.error();
-      console.error('Ошибка воспроизведения:', error);
-      
-      const errorMessage = document.getElementById('error-message');
-      errorMessage.textContent = 'Ошибка загрузки видео. Попробуйте другой канал.';
-      errorMessage.style.display = 'block';
-      
-      // Показать плейсхолдер
-      document.getElementById('video-placeholder').style.display = 'block';
     });
 
     // Обработка событий Picture-in-Picture
@@ -496,16 +470,10 @@
       }
     });
 
-    // Улучшенный парсер плейлиста
     async function loadM3UPlaylist(url) {
       try {
-        const response = await fetch(url, {
-          mode: 'cors',
-          credentials: 'omit'
-        });
-        
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
         const playlistText = await response.text();
         const channelsByCategory = {};
         const lines = playlistText.split('\n');
@@ -548,7 +516,7 @@
             }
           }
           // Обработка URL канала
-          else if (line.startsWith('http') || line.startsWith('//') || line.startsWith('/')) {
+          else if (line.startsWith('http') || line.startsWith('//')) {
             if (currentChannel) {
               let urlLine = line;
               
@@ -557,12 +525,11 @@
                 urlLine = 'https:' + urlLine;
               }
               else if (urlLine.startsWith('/')) {
-                // Важное исправление для относительных путей
                 urlLine = baseUrl + urlLine;
               }
               
               // Автоматическое исправление протокола
-              if (window.location.protocol === 'https:' && urlLine.startsWith('http://')) {
+              if (urlLine.startsWith('http://')) {
                 urlLine = 'https' + urlLine.substring(4);
               }
               
@@ -704,48 +671,26 @@
 
     function loadChannel(channel, event) {
       const placeholder = document.getElementById('video-placeholder');
-      const errorMessage = document.getElementById('error-message');
       const videoEl = document.getElementById('my-video');
-      
       placeholder.style.display = 'none';
-      errorMessage.style.display = 'none';
       videoEl.style.visibility = 'visible';
 
       // Автоматическое исправление протокола
       let streamUrl = channel.url;
-      if (window.location.protocol === 'https:') {
-        // Принудительно заменяем http на https
-        streamUrl = streamUrl.replace('http://', 'https://');
-        
-        // Исправляем URL с двойным слешем
-        if (streamUrl.startsWith('https:////')) {
-          streamUrl = streamUrl.replace('https:////', 'https://');
-        }
+      if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
+        streamUrl = 'https' + streamUrl.substring(4);
       }
 
-      console.log('Loading channel:', channel.name, 'URL:', streamUrl);
-      
       player.pause();
-      player.src({ 
-        src: streamUrl, 
-        type: 'application/x-mpegURL',
-        withCredentials: false
-      });
+      player.src({ src: streamUrl, type: 'application/x-mpegURL' });
       player.muted(false);
-      
-      // Пробуем воспроизвести с обработкой ошибок
-      const playPromise = player.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.error('Ошибка воспроизведения:', error);
-          errorMessage.textContent = 'Ошибка загрузки видео. Попробуйте другой канал.';
-          errorMessage.style.display = 'block';
-          placeholder.style.display = 'block';
-        });
-      }
+      player.ready(() => {
+        if (player.qualityLevels) {
+          player.hlsQualitySelector({ displayCurrentQuality: true });
+        }
+      });
+      player.play().catch(() => player.play());
 
-      // Подсветка выбранного канала
       document.querySelectorAll('.channel').forEach(el => el.classList.remove('active'));
       if (event && event.target) {
         event.target.classList.add('active');
@@ -778,14 +723,7 @@
         }
       });
 
-      // Загрузка плейлиста с CORS параметрами
-      try {
-        allChannels = await loadM3UPlaylist(playlistUrl);
-      } catch (error) {
-        console.error('Ошибка загрузки плейлиста:', error);
-        allChannels = fallbackChannels;
-      }
-      
+      allChannels = await loadM3UPlaylist(playlistUrl);
       if (Object.keys(allChannels).length === 0) allChannels = fallbackChannels;
       createCategories();
     });
