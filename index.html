@@ -114,6 +114,17 @@
       text-align: center;
       opacity: 0.8;
     }
+    #error-message {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff6b6b;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+      width: 90%;
+    }
     .content-container {
       flex: 1;
       overflow-y: auto;
@@ -325,13 +336,6 @@
     .categories, #playlist {
       animation: fadeIn 0.3s ease-in-out;
     }
-    
-    /* Стиль для сообщения об ошибке */
-    .error-message {
-      color: #ff6b6b;
-      font-weight: bold;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
@@ -344,8 +348,8 @@
       <div class="video-container">
         <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous" controlslist="nodownload noplaybackrate"></video>
         <div id="video-placeholder">Выберите канал из списка</div>
+        <div id="error-message"></div>
         <div class="pip-indicator" id="pip-indicator">Картинка в картинке активна</div>
-        <div id="error-message" class="error-message" style="display: none;"></div>
       </div>
     </div>
 
@@ -440,7 +444,7 @@
         nativeVideoTracks: false,
         vhs: {
           overrideNative: true,
-          withCredentials: false // Отключаем передачу куки
+          withCredentials: false
         }
       },
       controlBar: {
@@ -492,11 +496,12 @@
       }
     });
 
+    // Улучшенный парсер плейлиста
     async function loadM3UPlaylist(url) {
       try {
         const response = await fetch(url, {
-          mode: 'cors', // Явно указываем режим CORS
-          credentials: 'omit' // Не отправляем куки
+          mode: 'cors',
+          credentials: 'omit'
         });
         
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -512,16 +517,19 @@
           const line = lines[i].trim();
           if (!line) continue;
 
+          // Обработка группового заголовка
           if (line.startsWith('#EXTINF')) {
             currentGroup = "Другие";
             currentChannel = {};
             
+            // Извлекаем группу из атрибутов
             const groupMatch = line.match(/group-title\s*=\s*"([^"]+)"/i) || 
                                line.match(/group-title\s*=\s*'([^']+)'/i);
             if (groupMatch && groupMatch[1]) {
               currentGroup = groupMatch[1].trim();
             }
             
+            // Извлекаем название канала
             const nameMatch = line.match(/,(.*)$/);
             const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${i}`;
             
@@ -531,6 +539,7 @@
               category: currentGroup
             };
           }
+          // Обработка группового заголовка в формате #EXTGRP
           else if (line.startsWith('#EXTGRP:')) {
             const groupName = line.substring(8).trim();
             if (groupName && currentChannel) {
@@ -538,19 +547,22 @@
               currentChannel.category = groupName;
             }
           }
-          else if (line.startsWith('http') || line.startsWith('//')) {
+          // Обработка URL канала
+          else if (line.startsWith('http') || line.startsWith('//') || line.startsWith('/')) {
             if (currentChannel) {
               let urlLine = line;
               
+              // Преобразование относительных URL
               if (urlLine.startsWith('//')) {
                 urlLine = 'https:' + urlLine;
               }
               else if (urlLine.startsWith('/')) {
+                // Важное исправление для относительных путей
                 urlLine = baseUrl + urlLine;
               }
               
-              // Принудительное исправление протокола для GitHub Pages
-              if (urlLine.startsWith('http://')) {
+              // Автоматическое исправление протокола
+              if (window.location.protocol === 'https:' && urlLine.startsWith('http://')) {
                 urlLine = 'https' + urlLine.substring(4);
               }
               
@@ -699,7 +711,7 @@
       errorMessage.style.display = 'none';
       videoEl.style.visibility = 'visible';
 
-      // Автоматическое исправление протокола для GitHub Pages
+      // Автоматическое исправление протокола
       let streamUrl = channel.url;
       if (window.location.protocol === 'https:') {
         // Принудительно заменяем http на https
@@ -717,7 +729,7 @@
       player.src({ 
         src: streamUrl, 
         type: 'application/x-mpegURL',
-        withCredentials: false // Отключаем передачу куки
+        withCredentials: false
       });
       player.muted(false);
       
