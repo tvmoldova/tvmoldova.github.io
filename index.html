@@ -17,6 +17,7 @@
       background: linear-gradient(135deg, #0a192f 0%, #0d1b34 100%);
       color: #e6f1ff;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
     }
     .app-wrapper {
       display: flex;
@@ -168,9 +169,13 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      transition: all 0.2s ease;
+    }
+    .category:hover {
+      background: rgba(100, 255, 218, 0.15);
     }
     .category.active {
-      background: #64ffda22;
+      background: rgba(100, 255, 218, 0.25);
       border-color: #64ffda;
     }
     #playlist-container {
@@ -193,14 +198,20 @@
       padding: 8px;
       border-radius: 5px;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .channel:hover {
+      background: rgba(100, 255, 218, 0.15);
     }
     .channel.active {
-      background: #64ffda22;
+      background: rgba(100, 255, 218, 0.25);
     }
     .search-category {
       font-size: 14px;
       color: #64ffda;
       margin-top: 10px;
+      padding: 5px 0;
+      border-bottom: 1px solid #64ffda44;
     }
     
     /* Стили для PiP индикатора */
@@ -218,14 +229,15 @@
       backdrop-filter: blur(5px);
     }
     
-    /* ПЕРЕРАБОТАННЫЕ СТИЛИ ПАНЕЛИ УПРАВЛЕНИЯ */
+    /* ОБНОВЛЕННЫЕ СТИЛИ ПАНЕЛИ УПРАВЛЕНИЯ */
     .video-js .vjs-control-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       height: 3.5em;
       padding: 0 10px;
-      background: rgba(0, 0, 0, 0.7) !important;
+      background: rgba(14, 22, 40, 0.9) !important;
+      backdrop-filter: blur(5px);
     }
     
     .video-js .vjs-control {
@@ -252,6 +264,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #e6f1ff; /* Единый цвет для всех иконок */
     }
     
     /* Центрирование текста LIVE */
@@ -262,6 +275,7 @@
       justify-content: center;
       height: 100%;
       text-align: center;
+      color: #64ffda;
     }
     
     /* Стили для кнопки PiP */
@@ -270,12 +284,12 @@
       content: "\f121";
       font-size: 1.5em;
       line-height: 1.8;
-      color: #fff;
+      color: #e6f1ff; /* Единый цвет */
       transition: color 0.3s ease;
     }
     
     .vjs-pip-button.vjs-pip-active .vjs-icon-placeholder::before {
-      color: #64ffda;
+      color: #64ffda; /* Акцентный цвет при активности */
     }
     
     /* Выравнивание всех кнопок */
@@ -291,6 +305,25 @@
     
     .vjs-volume-panel {
       align-items: center;
+    }
+    
+    /* СКРЫТИЕ ПАНЕЛИ УПРАВЛЕНИЯ ПРИ ЗАГРУЗКЕ */
+    .vjs-control-bar {
+      display: none !important;
+    }
+    
+    .video-js.vjs-has-started .vjs-control-bar {
+      display: flex !important;
+    }
+    
+    /* Анимации */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .categories, #playlist {
+      animation: fadeIn 0.3s ease-in-out;
     }
   </style>
 </head>
@@ -345,7 +378,7 @@
     let allChannels = {};
     let currentCategory = "";
     let searchTerm = "";
-    let wasPlayingBeforePiP = false; // Состояние воспроизведения перед PiP
+    let wasPlayingBeforePiP = false;
 
     // Создаем кастомную кнопку для Picture-in-Picture
     const Button = videojs.getComponent('Button');
@@ -370,7 +403,6 @@
             console.error('Ошибка выхода из PiP:', error);
           });
         } else {
-          // Сохраняем состояние воспроизведения перед входом в PiP
           wasPlayingBeforePiP = !this.player().paused();
           videoElement.requestPictureInPicture().catch(error => {
             console.error('Ошибка входа в PiP:', error);
@@ -390,7 +422,6 @@
     }
     videojs.registerComponent('PipButton', PipButton);
 
-    // Создаем плеер
     const player = videojs('my-video', {
       fluid: true,
       autoplay: false,
@@ -430,7 +461,6 @@
           document.getElementById('pip-indicator').style.display = 'none';
           player.controlBar.getChild('pipButton').updateIcon();
           
-          // Возобновляем воспроизведение, если оно было активным
           if (wasPlayingBeforePiP && player.paused()) {
             player.play().catch(error => {
               console.log('Ошибка при возобновлении воспроизведения:', error);
@@ -455,16 +485,19 @@
           const line = lines[i].trim();
           if (!line) continue;
 
+          // Обработка группового заголовка
           if (line.startsWith('#EXTINF')) {
             currentGroup = "Другие";
             currentChannel = {};
             
+            // Извлекаем группу из атрибутов
             const groupMatch = line.match(/group-title\s*=\s*"([^"]+)"/i) || 
                                line.match(/group-title\s*=\s*'([^']+)'/i);
             if (groupMatch && groupMatch[1]) {
               currentGroup = groupMatch[1].trim();
             }
             
+            // Извлекаем название канала
             const nameMatch = line.match(/,(.*)$/);
             const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${i}`;
             
@@ -474,6 +507,7 @@
               category: currentGroup
             };
           }
+          // Обработка группового заголовка в формате #EXTGRP
           else if (line.startsWith('#EXTGRP:')) {
             const groupName = line.substring(8).trim();
             if (groupName && currentChannel) {
@@ -481,10 +515,12 @@
               currentChannel.category = groupName;
             }
           }
+          // Обработка URL канала
           else if (line.startsWith('http') || line.startsWith('//')) {
             if (currentChannel) {
               let urlLine = line;
               
+              // Преобразование относительных URL
               if (urlLine.startsWith('//')) {
                 urlLine = 'https:' + urlLine;
               }
@@ -492,6 +528,7 @@
                 urlLine = baseUrl + urlLine;
               }
               
+              // Автоматическое исправление протокола
               if (urlLine.startsWith('http://')) {
                 urlLine = 'https' + urlLine.substring(4);
               }
@@ -638,6 +675,7 @@
       placeholder.style.display = 'none';
       videoEl.style.visibility = 'visible';
 
+      // Автоматическое исправление протокола
       let streamUrl = channel.url;
       if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
         streamUrl = 'https' + streamUrl.substring(4);
@@ -651,7 +689,7 @@
           player.hlsQualitySelector({ displayCurrentQuality: true });
         }
       });
-      player.play().catch(error => console.error('Ошибка воспроизведения:', error));
+      player.play().catch(() => player.play());
 
       document.querySelectorAll('.channel').forEach(el => el.classList.remove('active'));
       if (event && event.target) {
