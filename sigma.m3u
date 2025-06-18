@@ -1,6 +1,6 @@
 #EXTM3U
 #EXTINF:-1 tvg-id="1" group-title="Федеральные",Первый канал
-http://cdntv.online/high/xm1hzalq26/1.m3u8
+https://cdntv.online/high/xm1hzalq26/1.m3u8
 #EXTINF:-1 tvg-id="2" group-title="Федеральные",Россия 1
 http://cdntv.online/high/xm1hzalq26/2.m3u8
 #EXTINF:-1 tvg-id="3" group-title="Федеральные",Матч! ТВ
