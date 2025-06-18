@@ -202,6 +202,96 @@
       color: #64ffda;
       margin-top: 10px;
     }
+    
+    /* Стили для PiP индикатора */
+    .pip-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(5px);
+    }
+    
+    /* ПЕРЕРАБОТАННЫЕ СТИЛИ ПАНЕЛИ УПРАВЛЕНИЯ */
+    .video-js .vjs-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 3.5em;
+      padding: 0 10px;
+      background: rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    .video-js .vjs-control {
+      flex: 0 0 auto;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+    
+    .video-js .vjs-button {
+      width: auto !important;
+      min-width: 36px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .video-js .vjs-icon-placeholder:before {
+      line-height: 1.8;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Центрирование текста LIVE */
+    .vjs-live-control {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+    }
+    
+    /* Стили для кнопки PiP */
+    .vjs-pip-button .vjs-icon-placeholder::before {
+      font-family: 'VideoJS';
+      content: "\f121";
+      font-size: 1.5em;
+      line-height: 1.8;
+      color: #fff;
+      transition: color 0.3s ease;
+    }
+    
+    .vjs-pip-button.vjs-pip-active .vjs-icon-placeholder::before {
+      color: #64ffda;
+    }
+    
+    /* Выравнивание всех кнопок */
+    .vjs-play-control,
+    .vjs-volume-panel,
+    .vjs-pip-button,
+    .vjs-fullscreen-control,
+    .vjs-quality-selector,
+    .vjs-audio-track-button {
+      flex: 0 0 auto;
+      height: 100%;
+    }
+    
+    .vjs-volume-panel {
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -214,6 +304,7 @@
       <div class="video-container">
         <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous" controlslist="nodownload noplaybackrate"></video>
         <div id="video-placeholder">Выберите канал из списка</div>
+        <div class="pip-indicator" id="pip-indicator">Картинка в картинке активна</div>
       </div>
     </div>
 
@@ -254,7 +345,52 @@
     let allChannels = {};
     let currentCategory = "";
     let searchTerm = "";
+    let wasPlayingBeforePiP = false; // Состояние воспроизведения перед PiP
 
+    // Создаем кастомную кнопку для Picture-in-Picture
+    const Button = videojs.getComponent('Button');
+    class PipButton extends Button {
+      constructor(player, options) {
+        super(player, options);
+        this.addClass('vjs-pip-button');
+        this.controlText('Картинка в картинке');
+        this.updateIcon();
+      }
+      
+      handleClick() {
+        const videoElement = this.player().tech().el();
+        
+        if (!videoElement || !document.pictureInPictureEnabled) {
+          alert('Picture-in-Picture не поддерживается вашим браузером');
+          return;
+        }
+        
+        if (document.pictureInPictureElement) {
+          document.exitPictureInPicture().catch(error => {
+            console.error('Ошибка выхода из PiP:', error);
+          });
+        } else {
+          // Сохраняем состояние воспроизведения перед входом в PiP
+          wasPlayingBeforePiP = !this.player().paused();
+          videoElement.requestPictureInPicture().catch(error => {
+            console.error('Ошибка входа в PiP:', error);
+          });
+        }
+      }
+      
+      updateIcon() {
+        if (document.pictureInPictureElement) {
+          this.addClass('vjs-pip-active');
+          this.controlText('Закрыть картинку в картинке');
+        } else {
+          this.removeClass('vjs-pip-active');
+          this.controlText('Картинка в картинке');
+        }
+      }
+    }
+    videojs.registerComponent('PipButton', PipButton);
+
+    // Создаем плеер
     const player = videojs('my-video', {
       fluid: true,
       autoplay: false,
@@ -274,8 +410,33 @@
           'liveDisplay',
           'audioTrackButton',
           'qualitySelector',
+          'pipButton',
           'fullscreenToggle'
         ]
+      }
+    });
+
+    // Обработка событий Picture-in-Picture
+    player.ready(() => {
+      const videoElement = player.tech().el();
+      
+      if (videoElement) {
+        videoElement.addEventListener('enterpictureinpicture', () => {
+          document.getElementById('pip-indicator').style.display = 'block';
+          player.controlBar.getChild('pipButton').updateIcon();
+        });
+        
+        videoElement.addEventListener('leavepictureinpicture', () => {
+          document.getElementById('pip-indicator').style.display = 'none';
+          player.controlBar.getChild('pipButton').updateIcon();
+          
+          // Возобновляем воспроизведение, если оно было активным
+          if (wasPlayingBeforePiP && player.paused()) {
+            player.play().catch(error => {
+              console.log('Ошибка при возобновлении воспроизведения:', error);
+            });
+          }
+        });
       }
     });
 
@@ -287,38 +448,62 @@
         const channelsByCategory = {};
         const lines = playlistText.split('\n');
         let currentGroup = "Другие";
+        let currentChannel = null;
+        let baseUrl = new URL(url).origin;
 
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
-          
           if (!line) continue;
-          
-          if (line.startsWith('#EXTINF:')) {
+
+          if (line.startsWith('#EXTINF')) {
             currentGroup = "Другие";
+            currentChannel = {};
             
-            const groupMatch = line.match(/group-title="([^"]+)"/);
+            const groupMatch = line.match(/group-title\s*=\s*"([^"]+)"/i) || 
+                               line.match(/group-title\s*=\s*'([^']+)'/i);
             if (groupMatch && groupMatch[1]) {
-              currentGroup = groupMatch[1];
+              currentGroup = groupMatch[1].trim();
             }
             
             const nameMatch = line.match(/,(.*)$/);
             const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${i}`;
             
-            if (i + 1 < lines.length) {
-              const urlLine = lines[i + 1].trim();
-              if (urlLine && urlLine.startsWith('http')) {
-                if (!channelsByCategory[currentGroup]) {
-                  channelsByCategory[currentGroup] = [];
-                }
-                
-                channelsByCategory[currentGroup].push({
-                  name: channelName,
-                  url: urlLine,
-                  category: currentGroup
-                });
-                
-                i++;
+            currentChannel = {
+              name: channelName,
+              url: "",
+              category: currentGroup
+            };
+          }
+          else if (line.startsWith('#EXTGRP:')) {
+            const groupName = line.substring(8).trim();
+            if (groupName && currentChannel) {
+              currentGroup = groupName;
+              currentChannel.category = groupName;
+            }
+          }
+          else if (line.startsWith('http') || line.startsWith('//')) {
+            if (currentChannel) {
+              let urlLine = line;
+              
+              if (urlLine.startsWith('//')) {
+                urlLine = 'https:' + urlLine;
               }
+              else if (urlLine.startsWith('/')) {
+                urlLine = baseUrl + urlLine;
+              }
+              
+              if (urlLine.startsWith('http://')) {
+                urlLine = 'https' + urlLine.substring(4);
+              }
+              
+              currentChannel.url = urlLine;
+              
+              if (!channelsByCategory[currentGroup]) {
+                channelsByCategory[currentGroup] = [];
+              }
+              
+              channelsByCategory[currentGroup].push(currentChannel);
+              currentChannel = null;
             }
           }
         }
@@ -453,15 +638,20 @@
       placeholder.style.display = 'none';
       videoEl.style.visibility = 'visible';
 
+      let streamUrl = channel.url;
+      if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
+        streamUrl = 'https' + streamUrl.substring(4);
+      }
+
       player.pause();
-      player.src({ src: channel.url, type: 'application/x-mpegURL' });
+      player.src({ src: streamUrl, type: 'application/x-mpegURL' });
       player.muted(false);
       player.ready(() => {
         if (player.qualityLevels) {
           player.hlsQualitySelector({ displayCurrentQuality: true });
         }
       });
-      player.play().catch(() => player.play());
+      player.play().catch(error => console.error('Ошибка воспроизведения:', error));
 
       document.querySelectorAll('.channel').forEach(el => el.classList.remove('active'));
       if (event && event.target) {
