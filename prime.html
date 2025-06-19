@@ -1,30 +1,138 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <link href="http://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
-<script src="http://vjs.zencdn.net/7.1.0/video.js"></script>
-<script src="http://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+  <meta charset="UTF-8">
+  <title>CDN TV Player</title>
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet">
   <style>
-    body{
-      background-color:#1E232C;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    #video{
-      position: absolute;
-      top: 0px;
-      right: 0px;
-      bottom: 0px;
-      left: 0px;
-      margin: auto;
-      max-height: 100%;
-      max-width: 100%;
+    body {
+      background: #0d1b34;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+      color: #64ffda;
+    }
+    .player-container {
+      background: #1e2a47;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+    .channel-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .channel-btn {
+      background: #223;
+      color: #e6f1ff;
+      border: 1px solid #64ffda44;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .channel-btn:hover {
+      background: rgba(100, 255, 218, 0.15);
     }
   </style>
 </head>
 <body>
-  <video id="video" class="video-js vjs-big-play-centered" controls preload="auto" width="1920" height="1080"
-poster="http://icons.iconarchive.com/icons/designbolts/free-multimedia/1024/TV-icon.png"
-data-setup='{}'>
-  <source src="http://212.0.217.42/live/disk1/PrimeHD/SA/01.m3u8" type="application/x-mpegURL" />
-</video>
+  <div class="container">
+    <h1>CDN TV Player</h1>
+    
+    <div class="player-container">
+      <video
+        id="player"
+        class="video-js vjs-default-skin vjs-big-play-centered"
+        controls
+        preload="auto"
+        width="100%"
+        height="500"
+      >
+        <p class="vjs-no-js">
+          Для просмотра видео включите JavaScript
+        </p>
+      </video>
+    </div>
+    
+    <div class="channel-list" id="channelList">
+      <button class="channel-btn" data-url="https://cdntv.online/high/xm1hzalq26/1.m3u8">Первый канал</button>
+      <button class="channel-btn" data-url="https://cdntv.online/high/xm1hzalq26/2.m3u8">Россия 1</button>
+      <button class="channel-btn" data-url="https://cdntv.online/high/xm1hzalq26/3.m3u8">Матч! ТВ</button>
+      <button class="channel-btn" data-url="https://cdntv.online/high/xm1hzalq26/4.m3u8">НТВ</button>
+      <button class="channel-btn" data-url="https://cdntv.online/high/xm1hzalq26/5.m3u8">Пятый канал</button>
+    </div>
+  </div>
+
+  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+  <script>
+    // Инициализация плеера
+    const player = videojs('player', {
+      fluid: true,
+      responsive: true,
+      playbackRates: [0.5, 1, 1.5, 2],
+      html5: {
+        vhs: {
+          overrideNative: true,
+          withCredentials: false
+        }
+      }
+    });
+
+    // Обработка ошибок
+    player.on('error', (e) => {
+      console.error('Player error:', player.error());
+      alert(`Ошибка воспроизведения: ${player.error().message}`);
+    });
+
+    // Загрузка канала
+    function loadChannel(url) {
+      player.src({
+        src: url,
+        type: 'application/x-mpegURL',
+        withCredentials: false
+      });
+      
+      player.ready(() => {
+        player.play().catch(e => {
+          console.error('Play failed:', e);
+          alert('Не удалось начать воспроизведение. Попробуйте другой канал.');
+        });
+      });
+    }
+
+    // Назначение обработчиков для кнопок
+    document.querySelectorAll('.channel-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.dataset.url;
+        console.log('Loading channel:', url);
+        loadChannel(url);
+      });
+    });
+
+    // Автозагрузка первого канала
+    window.addEventListener('load', () => {
+      const firstBtn = document.querySelector('.channel-btn');
+      if (firstBtn) {
+        loadChannel(firstBtn.dataset.url);
+      }
+    });
+  </script>
 </body>
 </html>
