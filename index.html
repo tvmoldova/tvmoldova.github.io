@@ -374,7 +374,7 @@
       ]
     };
 
-    const playlistUrl = "https://05a36a16eb9a.yourlistbest.net/playlists/uplist/6d3f2c95857b704e4e0faf8a748aeff6/playlist.m3u8";
+    const playlistUrl = "https://tvmoldova.github.io/sigma.m3u";
     let allChannels = {};
     let currentCategory = "";
     let searchTerm = "";
@@ -481,20 +481,30 @@
         let currentChannel = null;
         let baseUrl = new URL(url).origin;
 
+        // Функция для парсинга атрибутов из строки #EXTINF
+        const parseAttributes = (line) => {
+          const attrPart = line.slice(line.indexOf(':') + 1, line.indexOf(','));
+          const attrPattern = /([\w-]+)\s*=\s*"([^"]*)"/g;
+          const attrs = {};
+          let match;
+          while ((match = attrPattern.exec(attrPart)) !== null) {
+            attrs[match[1]] = match[2];
+          }
+          return attrs;
+        };
+
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
 
-          // Обработка группового заголовка
           if (line.startsWith('#EXTINF')) {
             currentGroup = "Другие";
             currentChannel = {};
             
-            // Извлекаем группу из атрибутов
-            const groupMatch = line.match(/group-title\s*=\s*"([^"]+)"/i) || 
-                               line.match(/group-title\s*=\s*'([^']+)'/i);
-            if (groupMatch && groupMatch[1]) {
-              currentGroup = groupMatch[1].trim();
+            // Парсим атрибуты
+            const attrs = parseAttributes(line);
+            if (attrs['group-title']) {
+              currentGroup = attrs['group-title'].trim();
             }
             
             // Извлекаем название канала
@@ -510,13 +520,15 @@
           // Обработка группового заголовка в формате #EXTGRP
           else if (line.startsWith('#EXTGRP:')) {
             const groupName = line.substring(8).trim();
-            if (groupName && currentChannel) {
+            if (groupName) {
               currentGroup = groupName;
-              currentChannel.category = groupName;
+              if (currentChannel) {
+                currentChannel.category = groupName;
+              }
             }
           }
           // Обработка URL канала
-          else if (line.startsWith('http') || line.startsWith('//')) {
+          else if (line.startsWith('http') || line.startsWith('//') || line.startsWith('/')) {
             if (currentChannel) {
               let urlLine = line;
               
@@ -529,7 +541,7 @@
               }
               
               // Автоматическое исправление протокола
-              if (urlLine.startsWith('http://')) {
+              if (window.location.protocol === 'https:' && urlLine.startsWith('http://')) {
                 urlLine = 'https' + urlLine.substring(4);
               }
               
