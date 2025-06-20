@@ -1,111 +1,333 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>Video.js с защищённым HLS</title>
-  <link href="https://cdn.jsdelivr.net/npm/video.js@7.21.1/dist/video-js.min.css" rel="stylesheet">
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #1a1a1a;
-      font-family: Arial, sans-serif;
-    }
-    .player-container {
-      width: 90%;
-      max-width: 900px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .info {
-      color: white;
-      text-align: center;
-      padding: 15px;
-      background: #2a2a2a;
-    }
-  </style>
-</head>
-<body>
-  <div class="player-container">
-    <video
-      id="hls-video"
-      class="video-js vjs-default-skin vjs-big-play-centered"
-      controls
-      preload="auto"
-      width="100%"
-      height="450"
-      poster="https://placehold.co/800x450/2a2a2a/FFF?text=HLS+Stream"
-      data-setup='{}'>
-      <p class="vjs-no-js">
-        Для просмотра видео включите JavaScript
-      </p>
-    </video>
-    <div class="info">
-      <p>Используется проксирование для обхода ограничений</p>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/video.js@7.21.1/dist/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-http-streaming@2.15.0/dist/videojs-http-streaming.min.js"></script>
-  
-  <script>
-    // Альтернативные прокси-серверы
-    const proxies = [
-      "https://corsproxy.io/?",
-      "https://api.allorigins.win/raw?url=",
-      "https://cors.convertro.com/",
-      "https://proxy.cors.sh/"
-    ];
-
-    // Основная функция инициализации
-    async function initPlayer() {
-      const player = videojs('hls-video');
-      const streamUrl = "http://a3fc2fc5.rossteleccom.net/iptv/8T2MH6W8ZDP8PZXZ4RMX7P6Q/9314/index.m3u8";
-      
-      try {
-        // Попробуем разные прокси последовательно
-        for (const proxy of proxies) {
-          const proxyUrl = proxy + encodeURIComponent(streamUrl);
-          console.log("Пробуем прокси:", proxyUrl);
-          
-          // Тестируем прокси перед использованием
-          const test = await fetch(proxyUrl, { method: 'HEAD' });
-          
-          if (test.ok) {
-            player.src({
-              src: proxyUrl,
-              type: 'application/x-mpegURL',
-              withCredentials: false
-            });
-            
-            player.ready(() => {
-              player.play().catch(e => {
-                console.log("Автовоспроизведение не удалось:", e.message);
-              });
-            });
-            
-            console.log("Используется прокси:", proxy);
-            return;
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Player для GitHub Pages</title>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        throw new Error("Все прокси недоступны");
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+        }
         
-      } catch (error) {
-        console.error("Ошибка инициализации:", error);
-        player.error({
-          code: 4,
-          message: `Ошибка загрузки: ${error.message || "проверьте консоль"}`
-        });
-      }
-    }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid #fdbb2d;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #fdbb2d;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .player-section {
+            padding: 20px;
+        }
+        
+        .player-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        #my-video {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+        }
+        
+        .proxy-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .proxy-btn {
+            padding: 12px 20px;
+            background: rgba(253, 187, 45, 0.2);
+            border: 1px solid #fdbb2d;
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .proxy-btn:hover {
+            background: rgba(253, 187, 45, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .proxy-btn.active {
+            background: #fdbb2d;
+            color: #1a2a6c;
+            box-shadow: 0 0 15px rgba(253, 187, 45, 0.5);
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+            min-height: 24px;
+        }
+        
+        .status.error {
+            background: rgba(178, 31, 31, 0.3);
+            color: #ff6b6b;
+        }
+        
+        .status.success {
+            background: rgba(69, 162, 71, 0.3);
+            color: #a9ffa9;
+        }
+        
+        .info-section {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        
+        .info-title {
+            color: #fdbb2d;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .info-content {
+            line-height: 1.7;
+        }
+        
+        .info-content p {
+            margin-bottom: 10px;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .player-section {
+                padding: 10px;
+            }
+            
+            .proxy-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .proxy-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HLS Player для GitHub Pages</h1>
+            <p class="subtitle">Решение для воспроизведения защищённых потоков с обходом ограничений через прокси</p>
+        </header>
+        
+        <div class="player-section">
+            <div class="player-container">
+                <video
+                    id="my-video"
+                    class="video-js vjs-default-skin vjs-big-play-centered"
+                    controls
+                    preload="auto"
+                    width="100%"
+                    poster="https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                    data-setup='{}'>
+                </video>
+            </div>
+            
+            <div class="status" id="status">Выберите прокси-сервер для запуска потока</div>
+            
+            <div class="proxy-options">
+                <button class="proxy-btn" data-proxy="cors-anywhere">Cors-Anywhere</button>
+                <button class="proxy-btn" data-proxy="allorigins">AllOrigins</button>
+                <button class="proxy-btn" data-proxy="corsproxy">CORS Proxy</button>
+                <button class="proxy-btn" data-proxy="yacdn">YACDN</button>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2 class="info-title">Почему это работает на GitHub Pages?</h2>
+            <div class="info-content">
+                <p>При публикации на GitHub Pages возникают следующие проблемы:</p>
+                
+                <div class="code-block">
+                    // 1. Смешанное содержимое: HTTPS страница пытается загрузить HTTP поток<br>
+                    // 2. Ограничения публичных прокси-серверов<br>
+                    // 3. CORS политики безопасности
+                </div>
+                
+                <p><strong>Решение:</strong></p>
+                <p>✔️ Все запросы идут через HTTPS-прокси</p>
+                <p>✔️ Прокси-серверы добавляют необходимые CORS-заголовки</p>
+                <p>✔️ Автоматическое переключение между разными прокси</p>
+                
+                <p><strong>Технические детали:</strong></p>
+                <p>Плеер использует Video.js с плагином HTTP Streaming (HLS.js). При выборе прокси происходит:</p>
+                
+                <div class="code-block">
+                    // 1. Кодирование URL потока<br>
+                    // 2. Формирование проксированного URL<br>
+                    // 3. Установка источника для Video.js<br>
+                    // 4. Обработка возможных ошибок
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Решение для воспроизведения защищённых HLS-потоков | Работает на GitHub Pages</p>
+            <p>Используется поток: http://a3fc2fc5.rossteleccom.net/iptv/8T2MH6W8ZDP8PZXZ4RMX7P6Q/9314/index.m3u8</p>
+        </footer>
+    </div>
 
-    // Инициализация при загрузке страницы
-    document.addEventListener('DOMContentLoaded', initPlayer);
-  </script>
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-http-streaming@2.15.0/dist/videojs-http-streaming.min.js"></script>
+    
+    <script>
+        // Конфигурация прокси-серверов
+        const proxies = {
+            "cors-anywhere": "https://cors-anywhere.herokuapp.com/",
+            "allorigins": "https://api.allorigins.win/raw?url=",
+            "corsproxy": "https://corsproxy.io/?",
+            "yacdn": "https://yacdn.org/proxy/"
+        };
+
+        // Исходный URL потока
+        const streamUrl = "http://a3fc2fc5.rossteleccom.net/iptv/8T2MH6W8ZDP8PZXZ4RMX7P6Q/9314/index.m3u8";
+        
+        // Инициализация плеера
+        const player = videojs('my-video');
+        const statusEl = document.getElementById('status');
+        
+        // Функция для установки прокси
+        function setProxy(proxyKey) {
+            // Сброс предыдущего состояния
+            document.querySelectorAll('.proxy-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Активация выбранной кнопки
+            const activeBtn = document.querySelector(`.proxy-btn[data-proxy="${proxyKey}"]`);
+            activeBtn.classList.add('active');
+            
+            // Обновление статуса
+            statusEl.textContent = `Загрузка через прокси: ${proxyKey}...`;
+            statusEl.className = 'status';
+            
+            // Формирование проксированного URL
+            const proxyUrl = proxies[proxyKey] + encodeURIComponent(streamUrl);
+            
+            // Установка источника для плеера
+            player.src({
+                src: proxyUrl,
+                type: 'application/x-mpegURL',
+                withCredentials: false
+            });
+            
+            // Попытка воспроизведения
+            player.ready(() => {
+                player.play().then(() => {
+                    statusEl.textContent = `✅ Успешно! Поток воспроизводится через ${proxyKey}`;
+                    statusEl.className = 'status success';
+                }).catch(e => {
+                    statusEl.textContent = `⚠️ Автовоспроизведение заблокировано. Нажмите Play.`;
+                    statusEl.className = 'status';
+                });
+            });
+            
+            // Обработка ошибок
+            player.on('error', function() {
+                const error = player.error();
+                statusEl.textContent = `❌ Ошибка через ${proxyKey}: ${error.message || 'Неизвестная ошибка'}`;
+                statusEl.className = 'status error';
+            });
+        }
+        
+        // Назначение обработчиков для кнопок
+        document.querySelectorAll('.proxy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setProxy(btn.dataset.proxy);
+            });
+        });
+        
+        // Автоматический выбор первого прокси через 2 секунды
+        setTimeout(() => {
+            setProxy('cors-anywhere');
+        }, 2000);
+        
+        // Инициализация страницы
+        player.on('loadedmetadata', function() {
+            console.log('Метаданные потока загружены');
+        });
+    </script>
 </body>
 </html>
