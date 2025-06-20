@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HLS Player для GitHub Pages</title>
+    <title>Автоматический прокси-селектор для HLS</title>
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -14,50 +25,64 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
             min-height: 100vh;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #fff;
+            color: var(--dark);
         }
         
         .container {
-            max-width: 1000px;
             width: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow);
             margin-top: 20px;
-            backdrop-filter: blur(10px);
         }
         
         header {
             text-align: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-bottom: 2px solid #fdbb2d;
+            padding: 30px;
+            background: var(--dark);
+            color: white;
+            position: relative;
         }
         
         h1 {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
-            color: #fdbb2d;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.9;
             max-width: 800px;
             margin: 0 auto;
             line-height: 1.6;
         }
         
-        .player-section {
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
             padding: 20px;
+            gap: 20px;
+        }
+        
+        .player-section {
+            flex: 3;
+            min-width: 300px;
         }
         
         .player-container {
@@ -65,122 +90,216 @@
             overflow: hidden;
             border-radius: 10px;
             background: #000;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow);
         }
         
-        #my-video {
+        #video-player {
             width: 100%;
             height: auto;
             max-height: 70vh;
         }
         
-        .proxy-options {
+        .proxy-section {
+            flex: 2;
+            min-width: 300px;
+            background: rgba(236, 240, 241, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .section-title {
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .proxy-list {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .proxy-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        
+        .proxy-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .proxy-item.active {
+            border-left: 4px solid var(--success);
+            background: rgba(46, 204, 113, 0.1);
+        }
+        
+        .proxy-item.error {
+            border-left: 4px solid var(--danger);
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .proxy-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .proxy-info {
+            flex: 1;
+        }
+        
+        .proxy-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .proxy-status {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .proxy-speed {
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .status-section {
+            padding: 20px;
+            background: var(--light);
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .status-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .status-content {
+            font-size: 1.1rem;
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: var(--shadow);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .status-content.success {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .status-content.error {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-content.loading {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--primary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
             margin-top: 20px;
             justify-content: center;
         }
         
-        .proxy-btn {
-            padding: 12px 20px;
-            background: rgba(253, 187, 45, 0.2);
-            border: 1px solid #fdbb2d;
-            border-radius: 30px;
-            color: #fff;
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .proxy-btn:hover {
-            background: rgba(253, 187, 45, 0.4);
-            transform: translateY(-2px);
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
         
-        .proxy-btn.active {
-            background: #fdbb2d;
-            color: #1a2a6c;
-            box-shadow: 0 0 15px rgba(253, 187, 45, 0.5);
+        .btn-success {
+            background: var(--success);
+            color: white;
         }
         
-        .status {
-            text-align: center;
-            padding: 15px;
-            margin-top: 15px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            font-size: 1.1rem;
-            min-height: 24px;
+        .btn-danger {
+            background: var(--danger);
+            color: white;
         }
         
-        .status.error {
-            background: rgba(178, 31, 31, 0.3);
-            color: #ff6b6b;
-        }
-        
-        .status.success {
-            background: rgba(69, 162, 71, 0.3);
-            color: #a9ffa9;
-        }
-        
-        .info-section {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-        
-        .info-title {
-            color: #fdbb2d;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            text-align: center;
-        }
-        
-        .info-content {
-            line-height: 1.7;
-        }
-        
-        .info-content p {
-            margin-bottom: 10px;
-        }
-        
-        .code-block {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 0.95rem;
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
+            color: white;
+            background: var(--dark);
+            width: 100%;
             margin-top: 20px;
-            opacity: 0.8;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        .tech-list {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tech-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
             font-size: 0.9rem;
         }
         
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .player-section {
-                padding: 10px;
-            }
-            
-            .proxy-options {
+            .content {
                 flex-direction: column;
-                align-items: center;
             }
             
-            .proxy-btn {
-                width: 100%;
-                max-width: 300px;
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
             }
         }
     </style>
@@ -188,64 +307,64 @@
 <body>
     <div class="container">
         <header>
-            <h1>HLS Player для GitHub Pages</h1>
-            <p class="subtitle">Решение для воспроизведения защищённых потоков с обходом ограничений через прокси</p>
+            <div class="logo">
+                <i class="fas fa-satellite-dish"></i>
+            </div>
+            <h1>Автоматический прокси-селектор</h1>
+            <p class="subtitle">Интеллектуальная система для воспроизведения защищенных HLS-потоков</p>
         </header>
         
-        <div class="player-section">
-            <div class="player-container">
-                <video
-                    id="my-video"
-                    class="video-js vjs-default-skin vjs-big-play-centered"
-                    controls
-                    preload="auto"
-                    width="100%"
-                    poster="https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                    data-setup='{}'>
-                </video>
-            </div>
-            
-            <div class="status" id="status">Выберите прокси-сервер для запуска потока</div>
-            
-            <div class="proxy-options">
-                <button class="proxy-btn" data-proxy="cors-anywhere">Cors-Anywhere</button>
-                <button class="proxy-btn" data-proxy="allorigins">AllOrigins</button>
-                <button class="proxy-btn" data-proxy="corsproxy">CORS Proxy</button>
-                <button class="proxy-btn" data-proxy="yacdn">YACDN</button>
-            </div>
-        </div>
-        
-        <div class="info-section">
-            <h2 class="info-title">Почему это работает на GitHub Pages?</h2>
-            <div class="info-content">
-                <p>При публикации на GitHub Pages возникают следующие проблемы:</p>
-                
-                <div class="code-block">
-                    // 1. Смешанное содержимое: HTTPS страница пытается загрузить HTTP поток<br>
-                    // 2. Ограничения публичных прокси-серверов<br>
-                    // 3. CORS политики безопасности
+        <div class="content">
+            <div class="player-section">
+                <div class="player-container">
+                    <video
+                        id="video-player"
+                        class="video-js vjs-default-skin vjs-big-play-centered"
+                        controls
+                        preload="auto"
+                        width="100%"
+                        height="500"
+                        poster="https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                        data-setup='{"liveui": true}'>
+                    </video>
                 </div>
                 
-                <p><strong>Решение:</strong></p>
-                <p>✔️ Все запросы идут через HTTPS-прокси</p>
-                <p>✔️ Прокси-серверы добавляют необходимые CORS-заголовки</p>
-                <p>✔️ Автоматическое переключение между разными прокси</p>
-                
-                <p><strong>Технические детали:</strong></p>
-                <p>Плеер использует Video.js с плагином HTTP Streaming (HLS.js). При выборе прокси происходит:</p>
-                
-                <div class="code-block">
-                    // 1. Кодирование URL потока<br>
-                    // 2. Формирование проксированного URL<br>
-                    // 3. Установка источника для Video.js<br>
-                    // 4. Обработка возможных ошибок
+                <div class="status-section">
+                    <div class="status-title">Статус подключения</div>
+                    <div class="status-content" id="status">
+                        <i class="fas fa-sync fa-spin"></i> Инициализация системы...
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="btn-scan">
+                            <i class="fas fa-sync"></i> Повторить сканирование
+                        </button>
+                        <button class="btn btn-success" id="btn-play" disabled>
+                            <i class="fas fa-play"></i> Воспроизвести
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="proxy-section">
+                <div class="section-title">
+                    <i class="fas fa-server"></i> Доступные прокси-серверы
+                </div>
+                <div class="proxy-list" id="proxy-list">
+                    <!-- Прокси будут добавлены динамически -->
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>Решение для воспроизведения защищённых HLS-потоков | Работает на GitHub Pages</p>
-            <p>Используется поток: http://a3fc2fc5.rossteleccom.net/iptv/8T2MH6W8ZDP8PZXZ4RMX7P6Q/9314/index.m3u8</p>
+            <p>Автоматическая система подбора прокси для HLS-потоков | Работает на GitHub Pages</p>
+            <div class="tech-list">
+                <div class="tech-item">Video.js</div>
+                <div class="tech-item">HLS.js</div>
+                <div class="tech-item">JavaScript</div>
+                <div class="tech-item">CSS3</div>
+                <div class="tech-item">HTML5</div>
+            </div>
         </footer>
     </div>
 
@@ -254,37 +373,208 @@
     
     <script>
         // Конфигурация прокси-серверов
-        const proxies = {
-            "cors-anywhere": "https://cors-anywhere.herokuapp.com/",
-            "allorigins": "https://api.allorigins.win/raw?url=",
-            "corsproxy": "https://corsproxy.io/?",
-            "yacdn": "https://yacdn.org/proxy/"
-        };
+        const proxies = [
+            {
+                id: 'cors-anywhere',
+                name: 'Cors-Anywhere',
+                url: 'https://cors-anywhere.herokuapp.com/',
+                icon: 'fas fa-globe',
+                pingUrl: 'https://cors-anywhere.herokuapp.com/http://example.com',
+                speed: 0,
+                status: 'pending'
+            },
+            {
+                id: 'allorigins',
+                name: 'AllOrigins',
+                url: 'https://api.allorigins.win/raw?url=',
+                icon: 'fas fa-shield-alt',
+                pingUrl: 'https://api.allorigins.win/raw?url=http://example.com',
+                speed: 0,
+                status: 'pending'
+            },
+            {
+                id: 'corsproxy',
+                name: 'CORS Proxy',
+                url: 'https://corsproxy.io/?',
+                icon: 'fas fa-bolt',
+                pingUrl: 'https://corsproxy.io/?http://example.com',
+                speed: 0,
+                status: 'pending'
+            },
+            {
+                id: 'yacdn',
+                name: 'YACDN',
+                url: 'https://yacdn.org/proxy/',
+                icon: 'fas fa-rocket',
+                pingUrl: 'https://yacdn.org/proxy/http://example.com',
+                speed: 0,
+                status: 'pending'
+            },
+            {
+                id: 'thingproxy',
+                name: 'ThingProxy',
+                url: 'https://thingproxy.freeboard.io/fetch/',
+                icon: 'fas fa-cogs',
+                pingUrl: 'https://thingproxy.freeboard.io/fetch/http://example.com',
+                speed: 0,
+                status: 'pending'
+            }
+        ];
 
         // Исходный URL потока
         const streamUrl = "http://a3fc2fc5.rossteleccom.net/iptv/8T2MH6W8ZDP8PZXZ4RMX7P6Q/9314/index.m3u8";
         
         // Инициализация плеера
-        const player = videojs('my-video');
+        const player = videojs('video-player');
         const statusEl = document.getElementById('status');
+        const proxyListEl = document.getElementById('proxy-list');
+        const btnScan = document.getElementById('btn-scan');
+        const btnPlay = document.getElementById('btn-play');
         
-        // Функция для установки прокси
-        function setProxy(proxyKey) {
-            // Сброс предыдущего состояния
-            document.querySelectorAll('.proxy-btn').forEach(btn => {
-                btn.classList.remove('active');
+        let activeProxy = null;
+        let testInProgress = false;
+        
+        // Функция обновления статуса
+        function updateStatus(text, type) {
+            statusEl.innerHTML = text;
+            statusEl.className = 'status-content';
+            if (type) statusEl.classList.add(type);
+        }
+        
+        // Функция для отображения прокси-серверов
+        function renderProxyList() {
+            proxyListEl.innerHTML = '';
+            
+            proxies.forEach(proxy => {
+                const proxyItem = document.createElement('div');
+                proxyItem.className = `proxy-item ${proxy.status}`;
+                proxyItem.dataset.id = proxy.id;
+                
+                let statusText = '';
+                let speedText = '';
+                
+                if (proxy.status === 'success') {
+                    statusText = `<span class="proxy-speed">${proxy.speed} мс</span> - Рабочий`;
+                } else if (proxy.status === 'error') {
+                    statusText = 'Недоступен';
+                } else {
+                    statusText = 'Проверка...';
+                }
+                
+                proxyItem.innerHTML = `
+                    <div class="proxy-icon">
+                        <i class="${proxy.icon}"></i>
+                    </div>
+                    <div class="proxy-info">
+                        <div class="proxy-name">${proxy.name}</div>
+                        <div class="proxy-status">${statusText} ${speedText}</div>
+                    </div>
+                    ${proxy.status === 'success' ? '<i class="fas fa-check-circle" style="color: var(--success); font-size: 1.5rem;"></i>' : ''}
+                    ${proxy.status === 'error' ? '<i class="fas fa-times-circle" style="color: var(--danger); font-size: 1.5rem;"></i>' : ''}
+                `;
+                
+                if (proxy.status === 'success') {
+                    proxyItem.addEventListener('click', () => setActiveProxy(proxy.id));
+                }
+                
+                proxyListEl.appendChild(proxyItem);
+            });
+        }
+        
+        // Функция тестирования прокси
+        async function testProxy(proxy) {
+            if (testInProgress) return;
+            
+            proxy.status = 'testing';
+            renderProxyList();
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(proxy.pingUrl, { method: 'HEAD' });
+                const endTime = Date.now();
+                
+                if (response.ok) {
+                    proxy.speed = endTime - startTime;
+                    proxy.status = 'success';
+                    updateStatus(`Прокси <strong>${proxy.name}</strong> доступен (${proxy.speed} мс)`, 'success');
+                    
+                    if (!activeProxy || proxy.speed < activeProxy.speed) {
+                        setActiveProxy(proxy.id);
+                    }
+                } else {
+                    proxy.status = 'error';
+                    updateStatus(`Прокси ${proxy.name} недоступен (ошибка ${response.status})`, 'error');
+                }
+            } catch (error) {
+                proxy.status = 'error';
+                updateStatus(`Ошибка подключения к ${proxy.name}: ${error.message}`, 'error');
+            }
+            
+            renderProxyList();
+        }
+        
+        // Функция тестирования всех прокси
+        function testAllProxies() {
+            if (testInProgress) return;
+            
+            testInProgress = true;
+            updateStatus('<i class="fas fa-sync fa-spin"></i> Тестирование прокси-серверов...', 'loading');
+            btnScan.disabled = true;
+            
+            // Сброс статусов
+            proxies.forEach(proxy => {
+                proxy.status = 'pending';
+                proxy.speed = 0;
             });
             
-            // Активация выбранной кнопки
-            const activeBtn = document.querySelector(`.proxy-btn[data-proxy="${proxyKey}"]`);
-            activeBtn.classList.add('active');
+            renderProxyList();
             
-            // Обновление статуса
-            statusEl.textContent = `Загрузка через прокси: ${proxyKey}...`;
-            statusEl.className = 'status';
+            // Запуск тестов параллельно
+            const testPromises = proxies.map(proxy => testProxy(proxy));
             
-            // Формирование проксированного URL
-            const proxyUrl = proxies[proxyKey] + encodeURIComponent(streamUrl);
+            // Обработка завершения всех тестов
+            Promise.all(testPromises).then(() => {
+                testInProgress = false;
+                btnScan.disabled = false;
+                
+                const workingProxies = proxies.filter(p => p.status === 'success');
+                
+                if (workingProxies.length === 0) {
+                    updateStatus('❌ Ни один прокси-сервер не доступен. Попробуйте позже.', 'error');
+                } else {
+                    updateStatus(`✅ Найдено рабочих прокси: ${workingProxies.length}`, 'success');
+                }
+            });
+        }
+        
+        // Установка активного прокси
+        function setActiveProxy(proxyId) {
+            const proxy = proxies.find(p => p.id === proxyId);
+            
+            if (!proxy || proxy.status !== 'success') return;
+            
+            activeProxy = proxy;
+            
+            // Обновление UI
+            document.querySelectorAll('.proxy-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = document.querySelector(`.proxy-item[data-id="${proxyId}"]`);
+            if (activeItem) activeItem.classList.add('active');
+            
+            // Активация кнопки воспроизведения
+            btnPlay.disabled = false;
+            updateStatus(`Выбран прокси: <strong>${proxy.name}</strong> (${proxy.speed} мс)`, 'success');
+        }
+        
+        // Воспроизведение через выбранный прокси
+        function playWithProxy() {
+            if (!activeProxy) return;
+            
+            updateStatus(`<i class="fas fa-sync fa-spin"></i> Подключение через ${activeProxy.name}...`, 'loading');
+            
+            const proxyUrl = activeProxy.url + encodeURIComponent(streamUrl);
             
             // Установка источника для плеера
             player.src({
@@ -296,38 +586,31 @@
             // Попытка воспроизведения
             player.ready(() => {
                 player.play().then(() => {
-                    statusEl.textContent = `✅ Успешно! Поток воспроизводится через ${proxyKey}`;
-                    statusEl.className = 'status success';
+                    updateStatus(`✅ Успешно! Воспроизводится через ${activeProxy.name}`, 'success');
                 }).catch(e => {
-                    statusEl.textContent = `⚠️ Автовоспроизведение заблокировано. Нажмите Play.`;
-                    statusEl.className = 'status';
+                    updateStatus(`⚠️ Автовоспроизведение заблокировано. Нажмите Play.`, 'success');
                 });
             });
             
             // Обработка ошибок
             player.on('error', function() {
                 const error = player.error();
-                statusEl.textContent = `❌ Ошибка через ${proxyKey}: ${error.message || 'Неизвестная ошибка'}`;
-                statusEl.className = 'status error';
+                updateStatus(`❌ Ошибка воспроизведения: ${error.message || 'Неизвестная ошибка'}`, 'error');
             });
         }
         
-        // Назначение обработчиков для кнопок
-        document.querySelectorAll('.proxy-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                setProxy(btn.dataset.proxy);
-            });
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Начальное тестирование прокси
+            testAllProxies();
+            
+            // Обработчики кнопок
+            btnScan.addEventListener('click', testAllProxies);
+            btnPlay.addEventListener('click', playWithProxy);
         });
         
-        // Автоматический выбор первого прокси через 2 секунды
-        setTimeout(() => {
-            setProxy('cors-anywhere');
-        }, 2000);
-        
-        // Инициализация страницы
-        player.on('loadedmetadata', function() {
-            console.log('Метаданные потока загружены');
-        });
+        // Автообновление каждые 5 минут
+        setInterval(testAllProxies, 5 * 60 * 1000);
     </script>
 </body>
 </html>
