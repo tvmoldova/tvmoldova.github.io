@@ -313,25 +313,34 @@
       animation: fadeIn 0.3s ease-in-out;
     }
     
-    /* Стили для кнопки трансляции Chromecast */
-    .vjs-chromecast-button {
-      display: flex !important;
+    /* ОБНОВЛЕННЫЙ СТИЛЬ КНОПКИ CHROMECAST (УМЕНЬШЕНА НА 40%) */
+    .vjs-chromecast-button .vjs-icon-placeholder::before {
+      content: "" !important;
+      font-family: inherit !important;
+    }
+    
+    .vjs-chromecast-button .vjs-icon-placeholder {
+      display: flex;
       align-items: center;
       justify-content: center;
+      width: 16px;  /* Уменьшено с 24px до 16px (на 40%) */
+      height: 16px; /* Уменьшено с 24px до 16px (на 40%) */
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zM21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>') center/contain no-repeat;
+      transform: scale(0.9); /* Дополнительное плавное уменьшение */
+      transition: transform 0.2s ease;
     }
     
-    .vjs-chromecast-button .vjs-icon-placeholder::before {
-      font-family: 'Font Awesome 6 Free';
-      content: "\f1fe"; /* Иконка трансляции */
-      font-weight: 900;
-      font-size: 1.5em;
-      line-height: 1.8;
-      color: #e6f1ff;
-      transition: color 0.3s ease;
+    .vjs-chromecast-button:hover .vjs-icon-placeholder {
+      transform: scale(1.0);
     }
     
-    .vjs-chromecast-button.vjs-chromecast-casting .vjs-icon-placeholder::before {
-      color: #64ffda; /* Акцентный цвет при активности */
+    .vjs-chromecast-button.vjs-chromecast-casting .vjs-icon-placeholder {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2364ffda" d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zM21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>');
+    }
+    
+    /* Корректировка отступов для Chromecast кнопки */
+    .vjs-chromecast-button {
+      margin: 0 5px !important;
     }
   </style>
 </head>
@@ -394,6 +403,9 @@
     let currentCategory = "";
     let searchTerm = "";
     let wasPlayingBeforePiP = false;
+    
+    // Прокси-сервер для обхода ограничений CORS
+    const PROXY_SERVER = "https://tattoo-twiki-fundamentals-radius.trycloudflare.com/proxy?url=";
 
     // Создаем кастомную кнопку для Picture-in-Picture
     const Button = videojs.getComponent('Button');
@@ -707,15 +719,24 @@
         streamUrl = 'https' + streamUrl.substring(4);
       }
 
+      // Проксирование URL через Cloudflare Worker
+      const proxiedUrl = PROXY_SERVER + encodeURIComponent(streamUrl);
+
       player.pause();
-      player.src({ src: streamUrl, type: 'application/x-mpegURL' });
+      player.src({ src: proxiedUrl, type: 'application/x-mpegURL' });
       player.muted(false);
       player.ready(() => {
         if (player.qualityLevels) {
           player.hlsQualitySelector({ displayCurrentQuality: true });
         }
       });
-      player.play().catch(() => player.play());
+      
+      // Попытка воспроизведения с обработкой ошибок
+      player.play().catch(error => {
+        console.error('Ошибка воспроизведения:', error);
+        // Повторная попытка через 1 секунду
+        setTimeout(() => player.play(), 1000);
+      });
 
       document.querySelectorAll('.channel').forEach(el => el.classList.remove('active'));
       if (event && event.target) {
