@@ -1,0 +1,215 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="1" group-title="Природа и Наука",National Geographic
+https://pilot.multiscreen.moldtelecom.md/live/eds/National_geographic_IPTV/HLSv4/National_geographic_IPTV.m3u8
+#EXTINF:-1 tvg-id="2" group-title="Природа и Наука",Discovery HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Discovery_channel/HLSv4/Discovery_channel.m3u8
+#EXTINF:-1 tvg-id="3" group-title="Природа и Наука",BigPlanetHD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Big_Planet_HD_IPTV/HLSv4/Big_Planet_HD_IPTV.m3u8
+#EXTINF:-1 tvg-id="4" group-title="Природа и Наука",ID HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/ID_IPTV/HLSv4/ID_IPTV.m3u8
+#EXTINF:-1 tvg-id="5" group-title="Природа и Наука",TERRA HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/TERRA_HD/HLSv4/TERRA_HD.m3u8
+#EXTINF:-1 tvg-id="6" group-title="Природа и Наука",Travel+Adventure HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Travel_adventure_IPTV/HLSv4/Travel_adventure_IPTV.m3u8
+#EXTINF:-1 tvg-id="7" group-title="Природа и Наука",Живая природа HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Zhivaia_Priroda_HD/HLSv4/Zhivaia_Priroda_HD.m3u8
+#EXTINF:-1 tvg-id="8" group-title="Природа и Наука",Живая Планета
+https://pilot.multiscreen.moldtelecom.md/live/eds/Zhivaya_Planeta_IPTV/HLSv4/Zhivaya_Planeta_IPTV.m3u8
+#EXTINF:-1 tvg-id="9" group-title="Природа и Наука",History 2 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/History2/HLSv4/History2.m3u8
+#EXTINF:-1 tvg-id="10" group-title="Природа и Наука",History HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/History_HD_IPTV/HLSv4/History_HD_IPTV.m3u8
+#EXTINF:-1 tvg-id="11" group-title="Природа и Наука",Animal Planet HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Animal_planetIPTV/HLSv4/Animal_planetIPTV.m3u8
+#EXTINF:-1 tvg-id="12" group-title="Природа и Наука",Travel Mix HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Travel_Mix_IPTV/HLSv4/Travel_Mix_IPTV.m3u8
+#EXTINF:-1 tvg-id="13" group-title="Природа и Наука",Prima World HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Prima_World_HD/HLSv4/Prima_World_HD.m3u8
+#EXTINF:-1 tvg-id="14" group-title="Общие",Moldova 1 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Moldova1_IPTV/HLSv4/Moldova1_IPTV.m3u8
+#EXTINF:-1 tvg-id="15" group-title="Общие",Jurnal TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Jurnaltv_IPTV/HLSv4/Jurnaltv_IPTV.m3u8
+#EXTINF:-1 tvg-id="16" group-title="Общие",PRO TV Chisinau HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Protv_chisinau_IPTV/HLSv4/Protv_chisinau_IPTV.m3u8
+#EXTINF:-1 tvg-id="17" group-title="Общие",TV 8 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Tv8_IPTV/HLSv4/Tv8_IPTV.m3u8
+#EXTINF:-1 tvg-id="18" group-title="Общие",Next TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/NextTV/HLSv4/NextTV.m3u8
+#EXTINF:-1 tvg-id="19" group-title="Общие",R Live TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/R_Live_IPTV/HLSv4/R_Live_IPTV.m3u8
+#EXTINF:-1 tvg-id="20" group-title="Общие",Vocea Basarabiei HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Vocea_Basarabiei_IPTV/HLSv4/Vocea_Basarabiei_IPTV.m3u8
+#EXTINF:-1 tvg-id="21" group-title="Общие",TVR Moldova HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Tvr_moldova_IPTV/HLSv6_ahsbdak3asdn8/Tvr_moldova_IPTV.m3u8
+#EXTINF:-1 tvg-id="22" group-title="Общие",Kanal D HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kanal_D/HLSv4/Kanal_D.m3u8
+#EXTINF:-1 tvg-id="23" group-title="Общие",ONE TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Legal_TV_IPTV/HLSv4/Legal_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="24" group-title="Общие",THT/Exclusiv TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Tht_exclusivtv_IPTV/HLSv4/Tht_exclusivtv_IPTV.m3u8
+#EXTINF:-1 tvg-id="25" group-title="Общие",7 TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/7_TV/HLSv4/7_TV.m3u8
+#EXTINF:-1 tvg-id="26" group-title="Общие",FREEDOM
+https://pilot.multiscreen.moldtelecom.md/live/eds/UA_TV_IPTV/HLSv4/UA_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="27" group-title="Общие",STAR TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/GN_TV_IPTV/HLSv4/GN_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="28" group-title="Общие",Premiera TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/PremieraTV/HLSv4/PremieraTV.m3u8
+#EXTINF:-1 tvg-id="29" group-title="Общие",TV5 Monde Europe
+https://pilot.multiscreen.moldtelecom.md/live/eds/TV5_Monde/HLSv4/TV5_Monde.m3u8
+#EXTINF:-1 tvg-id="30" group-title="Общие",N4 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/N4/HLSv4/N4.m3u8
+#EXTINF:-1 tvg-id="31" group-title="Общие",CTC Int
+https://pilot.multiscreen.moldtelecom.md/live/eds/CTC_International/HLSv4/CTC_International.m3u8
+#EXTINF:-1 tvg-id="32" group-title="Общие",THT Int HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/THT_International/HLSv4/THT_International.m3u8
+#EXTINF:-1 tvg-id="33" group-title="Общие",Prima TV Moldova HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Prima_TV_Moldova/HLSv4/Prima_TV_Moldova.m3u8
+#EXTINF:-1 tvg-id="34" group-title="Общие",GLOBAL 24 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Ren_moldova_IPTV/HLSv4/Ren_moldova_IPTV.m3u8
+#EXTINF:-1 tvg-id="35" group-title="Общие",Agro TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Agro_TVIPTV/HLSv4/Agro_TVIPTV.m3u8
+#EXTINF:-1 tvg-id="36" group-title="Общие",TVC 21
+https://pilot.multiscreen.moldtelecom.md/live/eds/TVC21_IPTV/HLSv4/TVC21_IPTV.m3u8
+#EXTINF:-1 tvg-id="37" group-title="Общие",Cinema 1 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Cinema_IPTV/HLSv4/Cinema_IPTV.m3u8
+#EXTINF:-1 tvg-id="38" group-title="Общие",1+1 Марафон
+https://pilot.multiscreen.moldtelecom.md/live/eds/1plus1_IPTV/HLSv4/1plus1_IPTV.m3u8
+#EXTINF:-1 tvg-id="39" group-title="Общие",Privesc.eu HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Privesc_eu_IPTV/HLSv4/Privesc_eu_IPTV.m3u8
+#EXTINF:-1 tvg-id="40" group-title="Общие",Axial TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Axial_TV_IPTV/HLSv4/Axial_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="41" group-title="Общие",Canal 5 International HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Canal5_IPTV/HLSv4/Canal5_IPTV.m3u8
+#EXTINF:-1 tvg-id="42" group-title="Общие",GRT
+https://pilot.multiscreen.moldtelecom.md/live/eds/GRT_IPTV/HLSv4/GRT_IPTV.m3u8
+#EXTINF:-1 tvg-id="43" group-title="Фильмы и Сериалы",Кино ТВ HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinotv_IPTV/HLSv6_ahsbdak3asdn8/Kinotv_IPTV.m3u8
+#EXTINF:-1 tvg-id="44" group-title="Фильмы и Сериалы",Кинохит HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinohit_IPTV/HLSv4/Kinohit_IPTV.m3u8
+#EXTINF:-1 tvg-id="45" group-title="Фильмы и Сериалы",Киносемья HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinosemya_IPTV/HLSv6_ahsbdak3asdn8/Kinosemya_IPTV.m3u8
+#EXTINF:-1 tvg-id="46" group-title="Фильмы и Сериалы",PremieraHD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinopremiera_IPTV/HLSv4/Kinopremiera_IPTV.m3u8
+#EXTINF:-1 tvg-id="47" group-title="Фильмы и Сериалы",Киномикс HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinomix_IPTV/HLSv6_ahsbdak3asdn8/Kinomix_IPTV.m3u8
+#EXTINF:-1 tvg-id="48" group-title="Фильмы и Сериалы",Наше новое кино HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Nashe_Novoe_IPTV/HLSv4/Nashe_Novoe_IPTV.m3u8
+#EXTINF:-1 tvg-id="49" group-title="Фильмы и Сериалы",Acasa
+https://pilot.multiscreen.moldtelecom.md/live/eds/PRO_2_IPTV/HLSv4/PRO_2_IPTV.m3u8
+#EXTINF:-1 tvg-id="50" group-title="Фильмы и Сериалы",Сапфир HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Sapfir/HLSv6_ahsbdak3asdn8/Sapfir.m3u8
+#EXTINF:-1 tvg-id="51" group-title="Фильмы и Сериалы",Кинокомедия HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinocomedia_IPTV/HLSv4/Kinocomedia_IPTV.m3u8
+#EXTINF:-1 tvg-id="52" group-title="Фильмы и Сериалы",Индийское кино
+https://pilot.multiscreen.moldtelecom.md/live/eds/Indijskoe_kino_IPTV/HLSv4/Indijskoe_kino_IPTV.m3u8
+#EXTINF:-1 tvg-id="53" group-title="Фильмы и Сериалы",Fox
+https://pilot.multiscreen.moldtelecom.md/live/eds/Fox_IPTV/HLSv4/Fox_IPTV.m3u8
+#EXTINF:-1 tvg-id="54" group-title="Фильмы и Сериалы",Fox life
+https://pilot.multiscreen.moldtelecom.md/live/eds/Fox_Life_IPTV/HLSv4/Fox_Life_IPTV.m3u8
+#EXTINF:-1 tvg-id="55" group-title="Фильмы и Сериалы",Star Cinema HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Star_cinema_IPTV/HLSv4/Star_cinema_IPTV.m3u8
+#EXTINF:-1 tvg-id="56" group-title="Фильмы и Сериалы",Star Family HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Star_Family_IPTV/HLSv4/Star_Family_IPTV.m3u8
+#EXTINF:-1 tvg-id="57" group-title="Фильмы и Сериалы",Dorama HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Dorama_HD_IPTV/HLSv4/Dorama_HD_IPTV.m3u8
+#EXTINF:-1 tvg-id="58" group-title="Фильмы и Сериалы",Mujskoe HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Mujskoe_Kino_IPTV/HLSv4/Mujskoe_Kino_IPTV.m3u8
+#EXTINF:-1 tvg-id="59" group-title="Фильмы и Сериалы",Plan B
+https://pilot.multiscreen.moldtelecom.md/live/eds/Plan_B_IPTV/HLSv4/Plan_B_IPTV.m3u8
+#EXTINF:-1 tvg-id="60" group-title="Фильмы и Сериалы",Киносвидание HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinosvidanie_IPTV/HLSv6_ahsbdak3asdn8/Kinosvidanie_IPTV.m3u8
+#EXTINF:-1 tvg-id="62" group-title="Фильмы и Сериалы",Родное кино
+https://pilot.multiscreen.moldtelecom.md/live/eds/Rodnoe_Kino/HLSv6_ahsbdak3asdn8/Rodnoe_Kino.m3u8
+#EXTINF:-1 tvg-id="63" group-title="Фильмы и Сериалы",Дом Кино HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Dom_Kino_HD_IPTV/HLSv4/Dom_Kino_HD_IPTV.m3u8
+#EXTINF:-1 tvg-id="64" group-title="Фильмы и Сериалы",Film.Ua Drama
+https://pilot.multiscreen.moldtelecom.md/live/eds/Film_Ua_Drama_IPTV/HLSv4/Film_Ua_Drama_IPTV.m3u8
+#EXTINF:-1 tvg-id="65" group-title="Фильмы и Сериалы",BOLT
+https://pilot.multiscreen.moldtelecom.md/live/eds/BOLT_IPTV/HLSv4/BOLT_IPTV.m3u8
+#EXTINF:-1 tvg-id="66" group-title="Фильмы и Сериалы",Red HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Sony_Red/HLSv4/Sony_Red.m3u8
+#EXTINF:-1 tvg-id="67" group-title="Фильмы и Сериалы",Black HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Sony_Black/HLSv4/Sony_Black.m3u8
+#EXTINF:-1 tvg-id="68" group-title="Фильмы и Сериалы",Sci-Fi HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Sci_Fi_Backup/HLSv4/Sci_Fi_Backup.m3u8
+#EXTINF:-1 tvg-id="69" group-title="Фильмы и Сериалы",Kinoman
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kinoman/HLSv4/Kinoman.m3u8
+#EXTINF:-1 tvg-id="70" group-title="Фильмы и Сериалы",Romance HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Romance/HLSv4/Romance.m3u8
+#EXTINF:-1 tvg-id="71" group-title="Фильмы и Сериалы",Cinemaraton HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Cinemaraton/HLSv4/Cinemaraton.m3u8
+#EXTINF:-1 tvg-id="72" group-title="Фильмы и Сериалы",National TV
+https://pilot.multiscreen.moldtelecom.md/live/eds/National_TV_IPTV/HLSv4/National_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="73" group-title="Образ Жизни",TLC HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/TLC/HLSv4/TLC.m3u8
+#EXTINF:-1 tvg-id="74" group-title="Образ Жизни",HGTV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/HGTV/HLSv4/HGTV.m3u8
+#EXTINF:-1 tvg-id="75" group-title="Образ Жизни",Пятница Int
+https://pilot.multiscreen.moldtelecom.md/live/eds/Piatnita_INT/HLSv4/Piatnita_INT.m3u8
+#EXTINF:-1 tvg-id="76" group-title="Образ Жизни",Food Network HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Food_Network/HLSv4/Food_Network.m3u8
+#EXTINF:-1 tvg-id="77" group-title="Образ Жизни",Кухня ТВ
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kuhnya_TV_IPTV/HLSv4/Kuhnya_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="78" group-title="Образ Жизни",Бобер HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Bober_HD_IPTV/HLSv4/Bober_HD_IPTV.m3u8
+#EXTINF:-1 tvg-id="79" group-title="Образ Жизни",Ohota i Ribalca HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Ohota_I_rib_IPTV/HLSv4/Ohota_I_rib_IPTV.m3u8
+#EXTINF:-1 tvg-id="80" group-title="Образ Жизни",Авто плюс HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Avtoplius_IPTV/HLSv4/Avtoplius_IPTV.m3u8
+#EXTINF:-1 tvg-id="81" group-title="Образ Жизни",Сарафан
+https://pilot.multiscreen.moldtelecom.md/live/eds/Sarafan_IPTV/HLSv4/Sarafan_IPTV.m3u8
+#EXTINF:-1 tvg-id="82" group-title="Образ Жизни",Kvartal TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Kvartal_TV_IPTV/HLSv4/Kvartal_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="83" group-title="Образ Жизни",Peret
+https://pilot.multiscreen.moldtelecom.md/live/eds/Peret_INT/HLSv4/Peret_INT.m3u8
+#EXTINF:-1 tvg-id="84" group-title="Образ Жизни",THT 4 Int
+https://pilot.multiscreen.moldtelecom.md/live/eds/THT_4/HLSv4/THT_4.m3u8
+#EXTINF:-1 tvg-id="85" group-title="Образ Жизни",Fashion TV HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Fashion_TV_IPTV/HLSv4/Fashion_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="86" group-title="Образ Жизни",Время HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Vremya_HD_IPTV/HLSv4/Vremya_HD_IPTV.m3u8
+#EXTINF:-1 tvg-id="87" group-title="Образ Жизни",ТВ 3 Int
+https://pilot.multiscreen.moldtelecom.md/live/eds/TV_3_INT/HLSv4/TV_3_INT.m3u8
+#EXTINF:-1 tvg-id="88" group-title="Образ Жизни",Домашний Int
+https://pilot.multiscreen.moldtelecom.md/live/eds/Domashni_INT/HLSv4/Domashni_INT.m3u8
+#EXTINF:-1 tvg-id="89" group-title="Мультики",Minimax
+https://pilot.multiscreen.moldtelecom.md/live/eds/Minimax_IPTV/HLSv4/Minimax_IPTV.m3u8
+#EXTINF:-1 tvg-id="90" group-title="Мультики",Gurinel HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Gurineltv_IPTV/HLSv4/Gurineltv_IPTV.m3u8
+#EXTINF:-1 tvg-id="91" group-title="Мультики",M-MULT HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Bravotv_IPTV/HLSv4/Bravotv_IPTV.m3u8
+#EXTINF:-1 tvg-id="92" group-title="Мультики",Nickelodeon
+https://pilot.multiscreen.moldtelecom.md/live/eds/Nickelodeon_ro_IPTV/HLSv4/Nickelodeon_ro_IPTV.m3u8
+#EXTINF:-1 tvg-id="93" group-title="Мультики",Disney Channel
+https://pilot.multiscreen.moldtelecom.md/live/eds/Disney_channel_IPTV/HLSv4/Disney_channel_IPTV.m3u8
+#EXTINF:-1 tvg-id="94" group-title="Мультики",Cartoonito
+https://pilot.multiscreen.moldtelecom.md/live/eds/Boomerang_IPTV/HLSv4/Boomerang_IPTV.m3u8
+#EXTINF:-1 tvg-id="95" group-title="Мультики",Nick Jr.
+https://pilot.multiscreen.moldtelecom.md/live/eds/Nickelodeon_jr_IPTV/HLSv4/Nickelodeon_jr_IPTV.m3u8
+#EXTINF:-1 tvg-id="96" group-title="Мультики",Cartoon Network (RO)
+https://pilot.multiscreen.moldtelecom.md/live/eds/Cartoon_Network_TCM_IPTV/HLSv4/Cartoon_Network_TCM_IPTV.m3u8
+#EXTINF:-1 tvg-id="97" group-title="Мультики",Cartoon Network (RU)
+https://pilot.multiscreen.moldtelecom.md/live/eds/Cartoon_Network_IPTV/HLSv4/Cartoon_Network_IPTV.m3u8
+#EXTINF:-1 tvg-id="98" group-title="Мультики",CTC Kids
+https://pilot.multiscreen.moldtelecom.md/live/eds/CTC_Kids_IPTV/HLSv4/CTC_Kids_IPTV.m3u8
+#EXTINF:-1 tvg-id="99" group-title="Мультики",Duck TV
+https://pilot.multiscreen.moldtelecom.md/live/eds/Duck_TV_IPTV/HLSv4/Duck_TV_IPTV.m3u8
+#EXTINF:-1 tvg-id="100" group-title="Мультики",Nickelodeon HD (RU)
+https://pilot.multiscreen.moldtelecom.md/live/eds/Nickelodeon_ru_IPTV/HLSv4/Nickelodeon_ru_IPTV.m3u8
+#EXTINF:-1 tvg-id="101" group-title="Спорт",Eurosport 1 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_1_IPTV/HLSv4/Eurosport_1_IPTV.m3u8
+#EXTINF:-1 tvg-id="102" group-title="Спорт",Eurosport 2 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_2_IPTV/HLSv4/Eurosport_2_IPTV.m3u8
+#EXTINF:-1 tvg-id="103" group-title="Спорт",WE SPORT HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/We_Sport_IPTV/HLSv4/We_Sport_IPTV.m3u8
+#EXTINF:-1 tvg-id="104" group-title="Спорт",Setanta HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_IPTV/HLSv4/Setanta_IPTV.m3u8
+#EXTINF:-1 tvg-id="105" group-title="Спорт",Setanta 1 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta1_IPTV/HLSv4/Setanta1_IPTV.m3u8
+#EXTINF:-1 tvg-id="106" group-title="Спорт",Setanta 2 HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_2IPTV/HLSv4/Setanta_2IPTV.m3u8
+#EXTINF:-1 tvg-id="107" group-title="Спорт",Q Sport HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/Q_Sport_IPTV/HLSv4/Q_Sport_IPTV.m3u8
+#EXTINF:-1 tvg-id="108" group-title="Спорт",KHL Prime HD
+https://pilot.multiscreen.moldtelecom.md/live/eds/KHL_Prime_HD/HLSv4/KHL_Prime_HD.m3u8
