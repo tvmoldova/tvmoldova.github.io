@@ -5,6 +5,7 @@
   <title>Tv Box</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -264,7 +265,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #e6f1ff; /* Единый цвет для всех иконок */
+      color: #e6f1ff;
     }
     
     /* Центрирование текста LIVE */
@@ -284,27 +285,12 @@
       content: "\f121";
       font-size: 1.5em;
       line-height: 1.8;
-      color: #e6f1ff; /* Единый цвет */
+      color: #e6f1ff;
       transition: color 0.3s ease;
     }
     
     .vjs-pip-button.vjs-pip-active .vjs-icon-placeholder::before {
-      color: #64ffda; /* Акцентный цвет при активности */
-    }
-    
-    /* Выравнивание всех кнопок */
-    .vjs-play-control,
-    .vjs-volume-panel,
-    .vjs-pip-button,
-    .vjs-fullscreen-control,
-    .vjs-quality-selector,
-    .vjs-audio-track-button {
-      flex: 0 0 auto;
-      height: 100%;
-    }
-    
-    .vjs-volume-panel {
-      align-items: center;
+      color: #64ffda;
     }
     
     /* СКРЫТИЕ ПАНЕЛИ УПРАВЛЕНИЯ ПРИ ЗАГРУЗКЕ */
@@ -324,6 +310,40 @@
     
     .categories, #playlist {
       animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    /* ОБНОВЛЕННЫЙ СТИЛЬ КНОПКИ CHROMECAST */
+    .vjs-chromecast-button .vjs-icon-placeholder::before {
+      content: "" !important;
+      font-family: inherit !important;
+    }
+    
+    .vjs-chromecast-button .vjs-icon-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zM21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>') center/contain no-repeat;
+      transform: scale(0.9);
+      transition: transform 0.2s ease;
+    }
+    
+    .vjs-chromecast-button:hover .vjs-icon-placeholder {
+      transform: scale(1.0);
+    }
+    
+    .vjs-chromecast-button.vjs-chromecast-casting .vjs-icon-placeholder {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2364ffda" d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zM21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>');
+    }
+    
+    .vjs-chromecast-button {
+      margin: 0 5px !important;
+    }
+    
+    /* Стили для адаптивной панели управления */
+    .vjs-control-bar .vjs-control.hidden-control {
+      display: none !important;
     }
   </style>
 </head>
@@ -360,6 +380,12 @@
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.3/dist/videojs-hls-quality-selector.min.js"></script>
+  <script src="https://unpkg.com/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.js"></script>
+  <script>
+    window.SILVERMINE_VIDEOJS_CHROMECAST_CONFIG = { preloadWebComponents: true };
+  </script>
+  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  
   <script>
     const fallbackChannels = {
       "Спорт": [
@@ -374,7 +400,7 @@
       ]
     };
 
-    const playlistUrl = "https://tvmoldova.github.io/sigma.m3u";
+    const playlistUrl = "https://tvmoldova.github.io/boy.m3u";
     let allChannels = {};
     let currentCategory = "";
     let searchTerm = "";
@@ -422,7 +448,85 @@
     }
     videojs.registerComponent('PipButton', PipButton);
 
+    // Функция для адаптации панели управления
+    function adaptControlBar() {
+      const controlBar = player.controlBar?.el();
+      if (!controlBar) return;
+
+      // Порядок скрытия элементов (от наименее важного к более важному)
+      const priorityList = [
+        '.vjs-live-display',        // Надпись "LIVE"
+        '.vjs-pip-button',          // Кнопка PiP
+        '.vjs-chromecast-button',   // Кнопка Chromecast
+        '.vjs-quality-selector',    // Выбор качества
+        '.vjs-audio-track-button',  // Выбор аудиодорожки
+        '.vjs-volume-panel',        // Панель громкости
+        '.vjs-fullscreen-control'   // Полноэкранный режим
+      ];
+
+      // Шаг 1: Показать все элементы
+      priorityList.forEach(selector => {
+        const element = controlBar.querySelector(selector);
+        if (element) element.classList.remove('hidden-control');
+      });
+
+      // Шаг 2: Проверить, помещаются ли все элементы
+      const visibleElements = Array.from(controlBar.children).filter(el => {
+        return window.getComputedStyle(el).display !== 'none' && 
+               !el.classList.contains('hidden-control');
+      });
+
+      // Рассчитать общую ширину
+      let totalWidth = 0;
+      visibleElements.forEach(el => {
+        const style = window.getComputedStyle(el);
+        totalWidth += el.offsetWidth + 
+                      parseFloat(style.marginLeft) + 
+                      parseFloat(style.marginRight);
+      });
+
+      const availableWidth = controlBar.offsetWidth;
+
+      // Если все помещается - завершить
+      if (totalWidth <= availableWidth) return;
+
+      // Шаг 3: Скрывать элементы по приоритету, пока не поместится
+      for (const selector of priorityList) {
+        const element = controlBar.querySelector(selector);
+        if (!element) continue;
+
+        element.classList.add('hidden-control');
+        
+        // Пересчитать ширину после скрытия
+        totalWidth = 0;
+        visibleElements.forEach(el => {
+          if (!el.classList.contains('hidden-control')) {
+            const style = window.getComputedStyle(el);
+            totalWidth += el.offsetWidth + 
+                          parseFloat(style.marginLeft) + 
+                          parseFloat(style.marginRight);
+          }
+        });
+
+        // Если после скрытия элемента все помещается - остановиться
+        if (totalWidth <= availableWidth) break;
+      }
+    }
+
+    // Функция для оптимизации частоты вызовов
+    function debounce(func, delay) {
+      let timeout;
+      return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(func, delay);
+      };
+    }
+
     const player = videojs('my-video', {
+      techOrder: ['chromecast', 'html5'],
+      plugins: {
+        chromecast: {}
+      },
       fluid: true,
       autoplay: false,
       muted: true,
@@ -442,30 +546,60 @@
           'audioTrackButton',
           'qualitySelector',
           'pipButton',
+          'chromecastButton',
           'fullscreenToggle'
         ]
       }
     });
 
-    // Обработка событий Picture-in-Picture
     player.ready(() => {
+      // Обработка событий PiP
       const videoElement = player.tech().el();
       
       if (videoElement) {
         videoElement.addEventListener('enterpictureinpicture', () => {
           document.getElementById('pip-indicator').style.display = 'block';
-          player.controlBar.getChild('pipButton').updateIcon();
+          const pipButton = player.controlBar.getChild('pipButton');
+          if (pipButton && typeof pipButton.updateIcon === 'function') {
+            pipButton.updateIcon();
+          }
         });
         
         videoElement.addEventListener('leavepictureinpicture', () => {
           document.getElementById('pip-indicator').style.display = 'none';
-          player.controlBar.getChild('pipButton').updateIcon();
+          const pipButton = player.controlBar.getChild('pipButton');
+          if (pipButton && typeof pipButton.updateIcon === 'function') {
+            pipButton.updateIcon();
+          }
           
           if (wasPlayingBeforePiP && player.paused()) {
             player.play().catch(error => {
               console.log('Ошибка при возобновлении воспроизведения:', error);
             });
           }
+        });
+      }
+
+      // Инициализация адаптивной панели
+      adaptControlBar();
+      
+      // Оптимизация обработки событий
+      const debouncedAdapt = debounce(adaptControlBar, 100);
+      
+      // События, требующие пересчета панели
+      window.addEventListener('resize', debouncedAdapt);
+      player.on('loadedmetadata', debouncedAdapt);
+      player.on('controlsenabled', debouncedAdapt);
+      player.on('controlsdisabled', debouncedAdapt);
+      
+      // Наблюдатель за изменениями в панели управления
+      const observer = new MutationObserver(debouncedAdapt);
+      if (player.controlBar.el()) {
+        observer.observe(player.controlBar.el(), {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class']
         });
       }
     });
@@ -481,18 +615,6 @@
         let currentChannel = null;
         let baseUrl = new URL(url).origin;
 
-        // Функция для парсинга атрибутов из строки #EXTINF
-        const parseAttributes = (line) => {
-          const attrPart = line.slice(line.indexOf(':') + 1, line.indexOf(','));
-          const attrPattern = /([\w-]+)\s*=\s*"([^"]*)"/g;
-          const attrs = {};
-          let match;
-          while ((match = attrPattern.exec(attrPart)) !== null) {
-            attrs[match[1]] = match[2];
-          }
-          return attrs;
-        };
-
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
@@ -501,13 +623,12 @@
             currentGroup = "Другие";
             currentChannel = {};
             
-            // Парсим атрибуты
-            const attrs = parseAttributes(line);
-            if (attrs['group-title']) {
-              currentGroup = attrs['group-title'].trim();
+            const groupMatch = line.match(/group-title\s*=\s*"([^"]+)"/i) || 
+                               line.match(/group-title\s*=\s*'([^']+)'/i);
+            if (groupMatch && groupMatch[1]) {
+              currentGroup = groupMatch[1].trim();
             }
             
-            // Извлекаем название канала
             const nameMatch = line.match(/,(.*)$/);
             const channelName = nameMatch ? nameMatch[1].trim() : `Канал ${i}`;
             
@@ -517,22 +638,17 @@
               category: currentGroup
             };
           }
-          // Обработка группового заголовка в формате #EXTGRP
           else if (line.startsWith('#EXTGRP:')) {
             const groupName = line.substring(8).trim();
-            if (groupName) {
+            if (groupName && currentChannel) {
               currentGroup = groupName;
-              if (currentChannel) {
-                currentChannel.category = groupName;
-              }
+              currentChannel.category = groupName;
             }
           }
-          // Обработка URL канала
-          else if (line.startsWith('http') || line.startsWith('//') || line.startsWith('/')) {
+          else if (line.startsWith('http') || line.startsWith('//')) {
             if (currentChannel) {
               let urlLine = line;
               
-              // Преобразование относительных URL
               if (urlLine.startsWith('//')) {
                 urlLine = 'https:' + urlLine;
               }
@@ -540,8 +656,7 @@
                 urlLine = baseUrl + urlLine;
               }
               
-              // Автоматическое исправление протокола
-              if (window.location.protocol === 'https:' && urlLine.startsWith('http://')) {
+              if (urlLine.startsWith('http://')) {
                 urlLine = 'https' + urlLine.substring(4);
               }
               
@@ -687,7 +802,6 @@
       placeholder.style.display = 'none';
       videoEl.style.visibility = 'visible';
 
-      // Автоматическое исправление протокола
       let streamUrl = channel.url;
       if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
         streamUrl = 'https' + streamUrl.substring(4);
