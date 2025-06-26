@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Live Stream через VLC → HLS → Video.js</title>
+  
+  <!-- Подключаем Video.js -->
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+  
+  <!-- HTTP Streaming (HLS) для браузеров: -->
+  <script src="https://cdn.jsdelivr.net/npm/videojs-http-streaming@2.1.6/dist/videojs-http-streaming.min.js"></script>
+</head>
+<body>
+  <video
+    id="live-video"
+    class="video-js vjs-fluid"
+    controls
+    autoplay
+    width="640" height="360"
+    data-setup='{}'
+  >
+    <!-- Safari/iOS будут валидно обрабатывать напрямую .m3u8 -->
+    <source src="http://a3fc2fc5.rossteleccom.net/iptv/8T2MH6W8ZDP8PZXZ4RMX7P6Q/10029/index.m3u8" type="application/vnd.apple.mpegurl" />
+  </video>
+
+  <script>
+    const player = videojs('live-video');
+    player.play();
+  </script>
+</body>
+</html>
