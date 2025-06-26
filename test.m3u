@@ -1,4 +1,5 @@
 #EXTM3U
+
 #EXTINF:-1 tvg-id="NatGeo.md" tvg-logo="https://example.com/logo1.png" group-title="Документальные",National Geographic (Moldova)
 https://pilot.multiscreen.moldtelecom.md/live/eds/National_geographic_IPTV/HLSv4/National_geographic_IPTV.m3u8
 
