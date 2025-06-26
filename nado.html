@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Live Stream через VLC → HLS → Video.js</title>
-  
-  <!-- Подключаем Video.js -->
-  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-  
-  <!-- HTTP Streaming (HLS) для браузеров: -->
-  <script src="https://cdn.jsdelivr.net/npm/videojs-http-streaming@2.1.6/dist/videojs-http-streaming.min.js"></script>
+  <meta charset="utf-8">
+  <title>Прямой HLS-поток</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body { background: black; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    video { width: 100%; max-width: 720px; height: auto; border: 2px solid #0f0; }
+  </style>
 </head>
 <body>
-  <video
-    id="live-video"
-    class="video-js vjs-fluid"
-    controls
-    autoplay
-    width="640" height="360"
-    data-setup='{}'
-  >
-    <!-- Safari/iOS будут валидно обрабатывать напрямую .m3u8 -->
-    <source src="http://cdntv.online/high/xm1hzalq26/76.m3u8" type="application/vnd.apple.mpegurl" />
-  </video>
+  <video id="video" controls autoplay></video>
 
   <script>
-    const player = videojs('live-video');
-    player.play();
+    const video = document.getElementById('video');
+    const streamURL = 'http://r1.cdntv.online/high/xm1hzalq26/10.m3u8';
+
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(streamURL);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        video.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamURL;
+      video.addEventListener('loadedmetadata', function () {
+        video.play();
+      });
+    } else {
+      alert('Ваш браузер не поддерживает HLS');
+    }
   </script>
 </body>
 </html>
