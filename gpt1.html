@@ -30,7 +30,7 @@
             position: relative;
             border-radius: 4px;
             overflow: hidden;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+            background: #000;
         }
         
         #videoContainer {
@@ -111,7 +111,7 @@
         }
     </style>
     
-    <!-- Перехватчик сетевых запросов (сохранен как в оригинале) -->
+    <!-- Перехватчик сетевых запросов (полностью сохранен как в оригинале) -->
     <script>
         window.m3u8Url = null;
         
@@ -217,7 +217,11 @@
             // Очищаем предыдущий экземпляр
             if (hiddenPlayer) {
                 document.getElementById('plok').innerHTML = '';
+                hiddenPlayer = null;
             }
+            
+            // Сбрасываем URL перед новым запуском
+            window.m3u8Url = null;
             
             // Создаем экземпляр Playerjs в скрытом контейнере
             hiddenPlayer = new Playerjs({
@@ -282,7 +286,7 @@
             // Удаляем постер
             document.querySelector('.poster-overlay').style.display = 'none';
             
-            // Инициализируем Video.js только после получения M3U8
+            // Ключевое исправление: инициализируем Video.js ТОЛЬКО после получения M3U8
             videoPlayer = videojs('customVideoPlayer', {
                 controls: true,
                 autoplay: true,
@@ -332,6 +336,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Добавляем обработчик на кнопку воспроизведения
             document.querySelector('.play-button').addEventListener('click', initPlayer);
+            
+            // Важное исправление: НЕ инициализируем Video.js заранее
+            // Тег video остается неинициализированным до получения M3U8
         });
     </script>
 </body>
