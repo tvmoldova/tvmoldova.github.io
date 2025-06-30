@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Детектор M3U8 потоков</title>
+    <title>Детектор M3U8 Потоков</title>
     <style>
         * {
             box-sizing: border-box;
@@ -250,6 +250,106 @@
     </div>
 
     <script>
+        // ============== ВСТРОЕННЫЙ SERVICE WORKER ==============
+        function registerEmbeddedServiceWorker() {
+            const swCode = `
+                self.addEventListener('install', (event) => {
+                    self.skipWaiting();
+                    console.log('[SW] Установлен');
+                });
+
+                self.addEventListener('activate', (event) => {
+                    event.waitUntil(self.clients.claim());
+                    console.log('[SW] Активирован');
+                });
+
+                self.addEventListener('message', (event) => {
+                    const { type, url } = event.data;
+                    if (type === 'START_MONITORING') {
+                        startMonitoring(url, event.source);
+                    }
+                    if (type === 'STOP_MONITORING') {
+                        stopMonitoring();
+                    }
+                });
+
+                let activeClient = null;
+
+                async function startMonitoring(targetUrl, client) {
+                    activeClient = client;
+                    try {
+                        // Отправляем статус клиенту
+                        sendMessageToClient('STATUS', 'Начало мониторинга...');
+                        
+                        // Создаем виртуальную страницу
+                        const clientWindow = await self.clients.get(client.id);
+                        if (!clientWindow) {
+                            throw new Error('Не удалось получить клиентское окно');
+                        }
+
+                        // Загружаем целевую страницу
+                        const response = await fetch(targetUrl);
+                        const html = await response.text();
+                        
+                        // Отправляем HTML клиенту для анализа
+                        sendMessageToClient('PAGE_CONTENT', html);
+                        
+                        // Анализируем HTML на наличие M3U8
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        findM3U8InDOM(doc);
+
+                    } catch (error) {
+                        sendMessageToClient('ERROR', error.message);
+                    }
+                }
+
+                function findM3U8InDOM(doc) {
+                    // Поиск в тегах
+                    const elements = doc.querySelectorAll('script, video, iframe, source, link');
+                    elements.forEach(el => {
+                        const src = el.src || el.href;
+                        if (src && src.includes('.m3u8')) {
+                            sendMessageToClient('M3U8_DETECTED', src);
+                        }
+                    });
+
+                    // Поиск в тексте контента
+                    const scripts = doc.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        const content = script.textContent;
+                        const matches = content.match(/(https?:\/\/[^\s'"]+\.m3u8[^\s'"]*)/gi) || [];
+                        matches.forEach(url => sendMessageToClient('M3U8_DETECTED', url));
+                    });
+                }
+
+                function stopMonitoring() {
+                    activeClient = null;
+                    sendMessageToClient('STATUS', 'Мониторинг остановлен');
+                }
+
+                function sendMessageToClient(type, data) {
+                    if (activeClient) {
+                        activeClient.postMessage({ type, data });
+                    }
+                }
+            `;
+
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            return navigator.serviceWorker.register(swUrl, { scope: './' })
+                .then(registration => {
+                    console.log('Service Worker зарегистрирован');
+                    return registration;
+                })
+                .catch(error => {
+                    console.error('Ошибка регистрации SW:', error);
+                    throw error;
+                });
+        }
+
+        // ============== ОСНОВНОЙ СКРИПТ СТРАНИЦЫ ==============
         document.addEventListener('DOMContentLoaded', () => {
             const urlInput = document.getElementById('urlInput');
             const startBtn = document.getElementById('startBtn');
@@ -266,45 +366,6 @@
             let detectedStreams = new Set();
             let isMonitoring = false;
             
-            // Инициализация Service Worker
-            async function initServiceWorker() {
-                if (!('serviceWorker' in navigator)) {
-                    throw new Error('Service Workers не поддерживаются в вашем браузере');
-                }
-                
-                try {
-                    const registration = await navigator.serviceWorker.register('/m3u8-detector-sw.js', {
-                        scope: '/',
-                    });
-                    
-                    console.log('Service Worker зарегистрирован:', registration);
-                    return registration;
-                } catch (error) {
-                    console.error('Ошибка регистрации Service Worker:', error);
-                    throw error;
-                }
-            }
-            
-            // Отправка сообщения в Service Worker
-            function sendMessageToSW(message) {
-                if (!navigator.serviceWorker.controller) {
-                    throw new Error('Service Worker не активен');
-                }
-                
-                return new Promise((resolve, reject) => {
-                    const channel = new MessageChannel();
-                    channel.port1.onmessage = event => {
-                        if (event.data.error) {
-                            reject(event.data.error);
-                        } else {
-                            resolve(event.data);
-                        }
-                    };
-                    
-                    navigator.serviceWorker.controller.postMessage(message, [channel.port2]);
-                });
-            }
-            
             // Запуск мониторинга
             async function startMonitoring() {
                 const url = urlInput.value.trim();
@@ -314,55 +375,82 @@
                 }
                 
                 try {
-                    status.classList.add('active');
-                    statusText.textContent = 'Регистрация Service Worker...';
-                    progress.style.width = '20%';
-                    
-                    await initServiceWorker();
-                    
-                    statusText.textContent = 'Запуск мониторинга сети...';
-                    progress.style.width = '40%';
-                    
-                    // Запускаем мониторинг через Service Worker
-                    await sendMessageToSW({
-                        type: 'START_MONITORING',
-                        url: url
-                    });
-                    
-                    isMonitoring = true;
-                    statusText.textContent = 'Мониторинг активен. Загружаем страницу...';
-                    progress.style.width = '60%';
+                    // Сброс состояния
+                    detectedStreams.clear();
+                    resultsList.innerHTML = '';
+                    streamCount.textContent = 'Найдено: 0';
+                    playerContainer.style.display = 'none';
                     
                     // Обновление UI
+                    status.classList.add('active');
+                    statusText.textContent = 'Инициализация...';
+                    progress.style.width = '20%';
                     startBtn.disabled = true;
+                    
+                    // Регистрация Service Worker
+                    statusText.textContent = 'Регистрация Service Worker...';
+                    progress.style.width = '40%';
+                    await registerEmbeddedServiceWorker();
+                    
+                    // Активация мониторинга
+                    statusText.textContent = 'Мониторинг активен. Анализ страницы...';
+                    progress.style.width = '60%';
+                    isMonitoring = true;
                     resultsContainer.classList.add('active');
                     
-                    // Слушаем сообщения от Service Worker
+                    // Подписка на сообщения от Service Worker
                     navigator.serviceWorker.addEventListener('message', event => {
                         const { type, data } = event.data;
                         
-                        if (type === 'NETWORK_REQUEST') {
-                            progress.style.width = '80%';
-                            statusText.textContent = 'Анализ сетевых запросов...';
-                            
-                            if (data.url.includes('.m3u8')) {
-                                addStream(data.url);
-                            }
+                        if (type === 'M3U8_DETECTED') {
+                            addStream(data);
                         }
-                        
-                        if (type === 'PAGE_LOADED') {
-                            progress.style.width = '100%';
-                            statusText.textContent = 'Страница загружена. Мониторинг активен...';
-                            setTimeout(() => {
-                                status.classList.remove('active');
-                            }, 3000);
+                        else if (type === 'STATUS') {
+                            statusText.textContent = data;
+                        }
+                        else if (type === 'PAGE_CONTENT') {
+                            analyzePageContent(data);
                         }
                     });
                     
+                    // Запуск мониторинга в SW
+                    const sw = navigator.serviceWorker.controller;
+                    if (sw) {
+                        sw.postMessage({ 
+                            type: 'START_MONITORING', 
+                            url: url 
+                        });
+                    }
+                    
+                    progress.style.width = '100%';
+                    setTimeout(() => status.classList.remove('active'), 3000);
+                    
                 } catch (error) {
-                    console.error('Ошибка мониторинга:', error);
                     statusText.textContent = `Ошибка: ${error.message}`;
+                    startBtn.disabled = false;
                 }
+            }
+            
+            // Анализ контента страницы
+            function analyzePageContent(html) {
+                statusText.textContent = 'Анализ HTML...';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Поиск в HTML
+                const elements = doc.querySelectorAll('[src*=".m3u8"], [href*=".m3u8"]');
+                elements.forEach(el => {
+                    const url = el.src || el.href;
+                    if (url) addStream(url);
+                });
+                
+                // Поиск в JavaScript
+                const scripts = doc.querySelectorAll('script');
+                scripts.forEach(script => {
+                    const content = script.textContent;
+                    const matches = content.match(/(https?:\/\/[^\s'"]+\.m3u8[^\s'"]*)/gi) || [];
+                    matches.forEach(url => addStream(url));
+                });
             }
             
             // Добавление потока в список
@@ -385,63 +473,67 @@
                     </div>
                 `;
                 
-                resultsList.prepend(streamItem);
+                resultsList.appendChild(streamItem);
                 streamCount.textContent = `Найдено: ${detectedStreams.size}`;
                 
-                // Анимация нового элемента
-                streamItem.animate([
-                    { opacity: 0, transform: 'translateY(20px)' },
-                    { opacity: 1, transform: 'translateY(0)' }
-                ], {
-                    duration: 500,
-                    easing: 'ease-out'
-                });
+                // Анимация
+                streamItem.style.opacity = '0';
+                setTimeout(() => {
+                    streamItem.style.transition = 'opacity 0.5s';
+                    streamItem.style.opacity = '1';
+                }, 10);
             }
             
             // Воспроизведение потока
             window.playStream = function(url) {
-                playerContainer.classList.add('active');
+                playerContainer.style.display = 'block';
                 
                 if (Hls.isSupported()) {
                     const hls = new Hls();
                     hls.loadSource(url);
                     hls.attachMedia(videoPlayer);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        videoPlayer.play();
+                        videoPlayer.play().catch(e => {
+                            console.error('Ошибка воспроизведения:', e);
+                            alert('Ошибка запуска видео: ' + e.message);
+                        });
                     });
                 } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
                     videoPlayer.src = url;
                     videoPlayer.addEventListener('loadedmetadata', () => {
-                        videoPlayer.play();
+                        videoPlayer.play().catch(e => {
+                            console.error('Ошибка воспроизведения:', e);
+                            alert('Ошибка запуска видео: ' + e.message);
+                        });
                     });
                 } else {
-                    alert('Ваш браузер не поддерживает воспроизведение HLS потоков');
+                    alert('Ваш браузер не поддерживает HLS-потоки');
                 }
             };
             
-            // Копирование в буфер обмена
+            // Копирование в буфер
             window.copyToClipboard = function(text) {
                 navigator.clipboard.writeText(text)
-                    .then(() => {
-                        alert('Ссылка скопирована в буфер обмена!');
-                    })
-                    .catch(err => {
-                        console.error('Ошибка копирования: ', err);
-                        alert('Не удалось скопировать ссылку');
-                    });
+                    .then(() => alert('Ссылка скопирована!'))
+                    .catch(err => console.error('Ошибка копирования:', err));
             };
             
             // Остановка мониторинга
-            async function stopMonitoring() {
+            function stopMonitoring() {
                 if (!isMonitoring) return;
                 
-                try {
-                    await sendMessageToSW({ type: 'STOP_MONITORING' });
-                    isMonitoring = false;
-                    statusText.textContent = 'Мониторинг остановлен';
-                    startBtn.disabled = false;
-                } catch (error) {
-                    console.error('Ошибка остановки мониторинга:', error);
+                isMonitoring = false;
+                startBtn.disabled = false;
+                status.classList.add('active');
+                statusText.textContent = 'Мониторинг остановлен';
+                
+                setTimeout(() => status.classList.remove('active'), 2000);
+                
+                // Отправка команды в SW
+                if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({ 
+                        type: 'STOP_MONITORING' 
+                    });
                 }
             }
             
@@ -449,12 +541,12 @@
             startBtn.addEventListener('click', startMonitoring);
             stopBtn.addEventListener('click', stopMonitoring);
             
-            // Примеры URL для тестирования
+            // Автозаполнение для теста
             urlInput.value = 'https://hls-js.netlify.app/demo/';
         });
     </script>
     
-    <!-- Подключаем HLS.js для воспроизведения потоков -->
+    <!-- Подключаем HLS.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </body>
 </html>
