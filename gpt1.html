@@ -1,240 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="utf-8" />
     <title>Тест плеера: Мужское кино</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Стили Video.js -->
-    <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Video.js стили -->
+    <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet" />
+
     <style>
         body {
             margin: 0;
-            padding: 0;
             background-color: #000;
             color: #fff;
             font-family: Arial, sans-serif;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
         }
+
         #player {
             max-width: 800px;
-            height: 100vh;
-            margin: 0 auto;
+            width: 100%;
             position: relative;
         }
-        #videoContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .video-js {
-            width: 100%;
-            height: 100%;
-        }
+
         #status {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+            margin-top: 15px;
             font-size: 18px;
             color: #ffcc00;
-            z-index: 100;
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 10px;
+            text-align: center;
+            min-height: 24px;
         }
+
         .error {
             color: #ff4444;
             font-weight: bold;
         }
-        
-        /* Скрываем оригинальный плеер */
-        #plok {
-            display: none;
+
+        /* Кастомный лоадер спиннер поверх плеера */
+        .vjs-loading-spinner {
+            display: block !important;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -30px;
+            margin-top: -30px;
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 204, 0, 0.3);
+            border-top-color: #ffcc00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
-    
-    <!-- Перехватчик сетевых запросов -->
-    <script>
-        window.m3u8Url = null;
-        let detected = false;
-        
-        // Переопределяем fetch
-        const originalFetch = window.fetch;
-        window.fetch = async function(...args) {
-            const url = args[0]?.url || args[0];
-            if (typeof url === 'string' && url.includes('.m3u8') && !detected) {
-                detected = true;
-                window.m3u8Url = url;
-                console.log('[M3U8 Detector] Found via fetch:', url);
-            }
-            return originalFetch.apply(this, args);
-        };
-
-        // Переопределяем XMLHttpRequest
-        const originalXHROpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function(method, url) {
-            if (typeof url === 'string' && url.includes('.m3u8') && !detected) {
-                this.addEventListener('load', () => {
-                    if (!detected) {
-                        detected = true;
-                        window.m3u8Url = url;
-                        console.log('[M3U8 Detector] Found via XHR:', url);
-                    }
-                });
-            }
-            originalXHROpen.apply(this, [method, url]);
-        };
-    </script>
 </head>
 <body>
     <div id="player">
-        <!-- Контейнер для Video.js -->
-        <div id="videoContainer">
-            <video id="customVideoPlayer" class="video-js vjs-default-skin" muted playsinline></video>
-        </div>
-        
-        <!-- Оригинальный контейнер плеера (изначально скрыт) -->
-        <div id="plok"></div>
-        
-        <div id="status">Инициализация видеоплеера...</div>
+        <video
+            id="customVideoPlayer"
+            class="video-js vjs-default-skin"
+            controls
+            playsinline
+            preload="auto"
+            width="100%"
+            height="auto"
+        ></video>
     </div>
 
-    <!-- Библиотеки -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="p13.js"></script>
+    <div id="status">Нажмите play для запуска потока...</div>
+
+    <!-- Video.js скрипты -->
     <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
     <script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
 
     <script>
-        // Параметры потока
-        const kodk = "593/index.m3u8?k=1751311748p422i02i581i901S";
-        const kos = "c1cba7dc7";
-        
-        // Основная функция инициализации Video.js
-        function initVideoJS(m3u8Url) {
-            console.log('Инициализация Video.js с URL:', m3u8Url);
-            
-            // Обновляем статус
-            document.getElementById('status').textContent = 'Загрузка видео...';
-
-            // Инициализация Video.js
-            const videoPlayer = videojs('customVideoPlayer', {
-                sources: [{
-                    src: m3u8Url,
-                    type: 'application/x-mpegURL'
-                }],
-                autoplay: true,
+        // Инициируем Video.js сразу с пустым источником
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusEl = document.getElementById('status');
+            const player = videojs('customVideoPlayer', {
                 controls: true,
+                autoplay: false,
                 fluid: true,
-                muted: true, // Важно для автовоспроизведения
                 playbackRates: [0.5, 1, 1.5, 2],
                 html5: {
                     hls: {
                         overrideNative: true,
-                        enableLowInitialPlaylist: true
+                        enableLowInitialPlaylist: true,
+                    },
+                },
+                sources: [], // пустой пока источник
+            });
+
+            // Спиннер загрузки (создадим, но скроем)
+            const spinner = document.createElement('div');
+            spinner.className = 'vjs-loading-spinner';
+            spinner.style.display = 'none';
+            const playerEl = document.getElementById('customVideoPlayer');
+            playerEl.parentNode.style.position = 'relative';
+            playerEl.parentNode.appendChild(spinner);
+
+            let detectionAttempts = 0;
+            const maxAttempts = 10;
+            const detectionInterval = 1000;
+            let detectionTimer = null;
+
+            // Перехватываем первый клик play
+            player.one('play', () => {
+                statusEl.textContent = 'Поиск видео-потока, ждите...';
+                player.pause();
+                spinner.style.display = 'block';
+
+                detectionTimer = setInterval(() => {
+                    detectionAttempts++;
+
+                    if (window.m3u8Url) {
+                        clearInterval(detectionTimer);
+                        statusEl.textContent = 'Поток найден, запускаем...';
+                        spinner.style.display = 'none';
+
+                        player.src({
+                            src: window.m3u8Url,
+                            type: 'application/x-mpegURL',
+                        });
+
+                        player.play();
+                    } else if (detectionAttempts >= maxAttempts) {
+                        clearInterval(detectionTimer);
+                        spinner.style.display = 'none';
+
+                        statusEl.innerHTML =
+                            '<span class="error">Ошибка: M3U8 не обнаружен</span><br>Попробуйте перезагрузить страницу';
+                    } else {
+                        statusEl.textContent = `Поиск видео-потока... (${detectionAttempts}/${maxAttempts})`;
                     }
-                }
+                }, detectionInterval);
             });
+        });
 
-            // Обеспечиваем автовоспроизведение после загрузки
-            videoPlayer.ready(function() {
-                console.log('Video.js готов к работе');
-                
-                // Пробуем включить звук после взаимодействия пользователя
-                const tryUnmute = () => {
-                    if (videoPlayer.muted()) {
-                        videoPlayer.muted(false);
-                        document.removeEventListener('click', tryUnmute);
-                    }
-                };
-                document.addEventListener('click', tryUnmute);
-                
-                // Запускаем воспроизведение
-                const playPromise = videoPlayer.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log('Автовоспроизведение не сработало:', error);
-                        document.getElementById('status').textContent = 'Нажмите для воспроизведения';
-                    });
-                }
-            });
-
-            // Обработчики событий
-            videoPlayer.on('loadedmetadata', function() {
-                document.getElementById('status').textContent = 'Воспроизведение видео...';
-                setTimeout(() => {
-                    document.getElementById('status').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('status').style.display = 'none';
-                    }, 1000);
-                }, 2000);
-            });
-            
-            videoPlayer.on('playing', function() {
-                document.getElementById('status').textContent = 'Воспроизведение видео...';
-                document.getElementById('status').style.display = 'none';
-            });
-            
-            videoPlayer.on('error', function() {
-                document.getElementById('status').innerHTML = 
-                    '<span class="error">Ошибка воспроизведения</span><br>Попробуйте перезагрузить страницу';
-                document.getElementById('status').style.display = 'block';
-            });
-        }
-
-        // Функция для показа оригинального плеера
-        function showOriginalPlayer() {
-            console.log('Активация оригинального плеера');
-            document.getElementById('status').innerHTML = 
-                '<span class="error">Ошибка: M3U8 не обнаружен</span><br>Активация основного плеера';
-            
-            // Показываем оригинальный плеер
-            document.getElementById('plok').style.display = 'block';
-            
-            // Инициализация оригинального плеера
-            try {
-                const player = new Playerjs({
-                    id: "plok",
-                    file: "#FI0ZhSFIwY0hNNkx5OXpMbTl1ZEdsMmFTNXVaFNTU2RzNEWFF2ZTNZeGZUSTBNbVo3ZGpKOU9HUXpNRFl6TmpSalpEVTFNRGswTnpjM01TQnZjaUJvZEhSd2N6b3ZMM0l1Y0c5Rk5UVTJSek5FVVRFPXJZWG91YkZOVFUyUFNTU2RzM=npNPVdVdmUzWXhmVEkwTW1aN2RqSjlPR1F6TURZek5qUmpaRFUxTURrME56YzNNUT09"
-                });
-                
-                // Скрываем статус через 3 секунды
-                setTimeout(() => {
-                    document.getElementById('status').style.display = 'none';
-                }, 3000);
-            } catch (e) {
-                console.error('Ошибка инициализации оригинального плеера:', e);
-                document.getElementById('status').innerHTML = 
-                    '<span class="error">Критическая ошибка плеера</span><br>Пожалуйста, сообщите администратору';
-            }
-        }
-
-        // Проверка обнаружения M3U8
-        let detectionAttempts = 0;
-        const maxAttempts = 15; // Увеличено для надежности
-        const detectionInterval = 300; // Более частые проверки
-        
-        // Запускаем проверку сразу
-        const detectionTimer = setInterval(() => {
-            detectionAttempts++;
-            
-            if (window.m3u8Url) {
-                clearInterval(detectionTimer);
-                initVideoJS(window.m3u8Url);
-            } 
-            else if (detectionAttempts >= maxAttempts) {
-                clearInterval(detectionTimer);
-                showOriginalPlayer();
-            }
-            else {
-                document.getElementById('status').textContent = 
-                    `Поиск видео-потока... (${detectionAttempts}/${maxAttempts})`;
-            }
-        }, detectionInterval);
+        // Твой существующий код перехвата fetch/XHR и MediaSource оставь как есть или подключи отдельно,
+        // чтобы window.m3u8Url обновлялся корректно
     </script>
 </body>
 </html>
