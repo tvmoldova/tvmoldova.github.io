@@ -1,153 +1,198 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8" />
-    <title>Тест плеера: Мужское кино</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Video.js стили -->
-    <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <title>Тест плеера: Мужское кино</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet" />
 
-    <style>
-        body {
-            margin: 0;
-            background-color: #000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        #player {
-            max-width: 800px;
-            width: 100%;
-            position: relative;
-        }
-
-        #status {
-            margin-top: 15px;
-            font-size: 18px;
-            color: #ffcc00;
-            text-align: center;
-            min-height: 24px;
-        }
-
-        .error {
-            color: #ff4444;
-            font-weight: bold;
-        }
-
-        /* Кастомный лоадер спиннер поверх плеера */
-        .vjs-loading-spinner {
-            display: block !important;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-left: -30px;
-            margin-top: -30px;
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(255, 204, 0, 0.3);
-            border-top-color: #ffcc00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    #player {
+      max-width: 800px;
+      width: 100%;
+      position: relative;
+    }
+    #status {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #ffcc00;
+      text-align: center;
+      min-height: 24px;
+    }
+    .error {
+      color: #ff4444;
+      font-weight: bold;
+    }
+    .vjs-loading-spinner {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -30px;
+      margin-top: -30px;
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255, 204, 0, 0.3);
+      border-top-color: #ffcc00;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 10;
+      pointer-events: none;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-    <div id="player">
-        <video
-            id="customVideoPlayer"
-            class="video-js vjs-default-skin"
-            controls
-            playsinline
-            preload="auto"
-            width="100%"
-            height="auto"
-        ></video>
-    </div>
+  <div id="player">
+    <video
+      id="customVideoPlayer"
+      class="video-js vjs-default-skin"
+      controls
+      playsinline
+      preload="auto"
+      width="100%"
+      height="auto"
+    ></video>
+    <div class="vjs-loading-spinner" id="spinner"></div>
+  </div>
 
-    <div id="status">Нажмите play для запуска потока...</div>
+  <div id="status"></div>
 
-    <!-- Video.js скрипты -->
-    <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
-    <script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
+  <script>
+    // Перехват m3u8 через fetch и XHR (твой код)
+    window.m3u8Url = null;
 
-    <script>
-        // Инициируем Video.js сразу с пустым источником
-        document.addEventListener('DOMContentLoaded', () => {
-            const statusEl = document.getElementById('status');
-            const player = videojs('customVideoPlayer', {
-                controls: true,
-                autoplay: false,
-                fluid: true,
-                playbackRates: [0.5, 1, 1.5, 2],
-                html5: {
-                    hls: {
-                        overrideNative: true,
-                        enableLowInitialPlaylist: true,
-                    },
-                },
-                sources: [], // пустой пока источник
-            });
+    const originalFetch = window.fetch;
+    const originalXHRSend = XMLHttpRequest.prototype.send;
+    const originalXHROpen = XMLHttpRequest.prototype.open;
 
-            // Спиннер загрузки (создадим, но скроем)
-            const spinner = document.createElement('div');
-            spinner.className = 'vjs-loading-spinner';
-            spinner.style.display = 'none';
-            const playerEl = document.getElementById('customVideoPlayer');
-            playerEl.parentNode.style.position = 'relative';
-            playerEl.parentNode.appendChild(spinner);
+    XMLHttpRequest.prototype.open = function(method, url) {
+      this._url = url;
+      return originalXHROpen.apply(this, arguments);
+    };
 
-            let detectionAttempts = 0;
-            const maxAttempts = 10;
-            const detectionInterval = 1000;
-            let detectionTimer = null;
+    XMLHttpRequest.prototype.send = function(body) {
+      if (this._url && this._url.includes('.m3u8')) {
+        const originalOnReadyStateChange = this.onreadystatechange;
+        this.onreadystatechange = function() {
+          if (this.readyState === 4) {
+            window.m3u8Url = this._url;
+            console.log('[M3U8 Detector] XHR detected:', this._url);
+          }
+          if (originalOnReadyStateChange) {
+            originalOnReadyStateChange.apply(this, arguments);
+          }
+        };
+      }
+      return originalXHRSend.apply(this, arguments);
+    };
 
-            // Перехватываем первый клик play
-            player.one('play', () => {
-                statusEl.textContent = 'Поиск видео-потока, ждите...';
-                player.pause();
-                spinner.style.display = 'block';
+    window.fetch = async function(input, init) {
+      const url = typeof input === 'string' ? input : input.url;
+      if (url && url.includes('.m3u8')) {
+        try {
+          const response = await originalFetch(input, init);
+          window.m3u8Url = url;
+          console.log('[M3U8 Detector] Fetch detected:', url);
+          return response;
+        } catch (e) {
+          return originalFetch(input, init);
+        }
+      }
+      return originalFetch(input, init);
+    };
 
-                detectionTimer = setInterval(() => {
-                    detectionAttempts++;
-
-                    if (window.m3u8Url) {
-                        clearInterval(detectionTimer);
-                        statusEl.textContent = 'Поток найден, запускаем...';
-                        spinner.style.display = 'none';
-
-                        player.src({
-                            src: window.m3u8Url,
-                            type: 'application/x-mpegURL',
-                        });
-
-                        player.play();
-                    } else if (detectionAttempts >= maxAttempts) {
-                        clearInterval(detectionTimer);
-                        spinner.style.display = 'none';
-
-                        statusEl.innerHTML =
-                            '<span class="error">Ошибка: M3U8 не обнаружен</span><br>Попробуйте перезагрузить страницу';
-                    } else {
-                        statusEl.textContent = `Поиск видео-потока... (${detectionAttempts}/${maxAttempts})`;
-                    }
-                }, detectionInterval);
-            });
+    // Перехват через MediaSource и src
+    const originalCreateElement = document.createElement.bind(document);
+    document.createElement = function(tagName, options) {
+      const element = originalCreateElement(tagName, options);
+      if (tagName.toLowerCase() === 'video' || tagName.toLowerCase() === 'audio') {
+        const originalSetSrc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src').set;
+        Object.defineProperty(element, 'src', {
+          set: function(value) {
+            if (value.includes('.m3u8')) {
+              window.m3u8Url = value;
+              console.log('[M3U8 Detector] Media element detected:', value);
+            }
+            return originalSetSrc.call(this, value);
+          }
         });
+      }
+      return element;
+    };
+  </script>
 
-        // Твой существующий код перехвата fetch/XHR и MediaSource оставь как есть или подключи отдельно,
-        // чтобы window.m3u8Url обновлялся корректно
-    </script>
+  <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
+  <script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const statusEl = document.getElementById('status');
+      const spinner = document.getElementById('spinner');
+      const player = videojs('customVideoPlayer', {
+        controls: true,
+        autoplay: false,
+        fluid: true,
+        playbackRates: [0.5, 1, 1.5, 2],
+        html5: {
+          hls: {
+            overrideNative: true,
+            enableLowInitialPlaylist: true,
+          },
+        },
+        sources: [],
+      });
+
+      statusEl.textContent = '';
+
+      let detectionAttempts = 0;
+      const maxAttempts = 15;
+      const detectionInterval = 1000;
+      let detectionTimer = null;
+
+      player.one('play', () => {
+        statusEl.textContent = 'Ищем поток...';
+        player.pause();
+        spinner.style.display = 'block';
+
+        detectionTimer = setInterval(() => {
+          detectionAttempts++;
+
+          if (window.m3u8Url) {
+            clearInterval(detectionTimer);
+            statusEl.textContent = 'Поток найден, запускаем...';
+            spinner.style.display = 'none';
+
+            player.src({
+              src: window.m3u8Url,
+              type: 'application/x-mpegURL',
+            });
+            player.play();
+          } else if (detectionAttempts >= maxAttempts) {
+            clearInterval(detectionTimer);
+            spinner.style.display = 'none';
+            statusEl.innerHTML =
+              '<span class="error">Ошибка: поток не найден</span><br>Перезагрузите страницу.';
+          } else {
+            statusEl.textContent = `Ищем поток... (${detectionAttempts}/${maxAttempts})`;
+          }
+        }, detectionInterval);
+      });
+    });
+  </script>
 </body>
 </html>
