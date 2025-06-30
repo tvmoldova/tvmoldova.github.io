@@ -1,194 +1,240 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ультра Ловец M3U8 с Video.js</title>
-
-<link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet" />
-
-<style>
-  body {
-    background: #000;
-    color: #fff;
-    font-family: Arial,sans-serif;
-    margin: 0; padding: 0;
-  }
-  #player-container {
-    max-width: 800px;
-    margin: 20px auto;
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-  }
-  #videojs-player {
-    position: absolute;
-    top:0; left:0;
-    width: 100%; height: 100%;
-    display: none;
-  }
-  #status {
-    text-align:center;
-    margin-top: 20px;
-    font-size: 18px;
-  }
-</style>
-
-<script>
-  (() => {
-    const log = (...args) => console.log('[M3U8 Detector]', ...args);
-
-    window.m3u8Url = null;
-    window.m3u8Detected = false;
-
-    function tryDetect(url) {
-      if (!window.m3u8Detected && url && url.includes('.m3u8')) {
-        window.m3u8Detected = true;
-        window.m3u8Url = url;
-        log('Пойман URL:', url);
-        window.initVideoJS && window.initVideoJS();
-      }
-    }
-
-    // Перехват fetch
-    const origFetch = window.fetch;
-    window.fetch = function (...args) {
-      let url = args[0];
-      if (typeof url === 'string') tryDetect(url);
-      return origFetch.apply(this, args);
-    };
-
-    // Перехват XHR.open и XHR.send
-    const origXHROpen = XMLHttpRequest.prototype.open;
-    const origXHRSend = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.open = function (method, url) {
-      this._url = url; // запомним
-      return origXHROpen.apply(this, arguments);
-    };
-    XMLHttpRequest.prototype.send = function () {
-      if (typeof this._url === 'string') tryDetect(this._url);
-      return origXHRSend.apply(this, arguments);
-    };
-
-    // Перехват video.src
-    const videoProto = HTMLVideoElement.prototype;
-    const videoSrcDesc = Object.getOwnPropertyDescriptor(videoProto, 'src');
-    if (videoSrcDesc && videoSrcDesc.set) {
-      Object.defineProperty(videoProto, 'src', {
-        set: function (val) {
-          tryDetect(val);
-          return videoSrcDesc.set.call(this, val);
-        },
-        get: videoSrcDesc.get,
-        configurable: true
-      });
-    }
-
-    // Перехват source.src
-    const sourceProto = HTMLSourceElement.prototype;
-    const sourceSrcDesc = Object.getOwnPropertyDescriptor(sourceProto, 'src');
-    if (sourceSrcDesc && sourceSrcDesc.set) {
-      Object.defineProperty(sourceProto, 'src', {
-        set: function (val) {
-          tryDetect(val);
-          return sourceSrcDesc.set.call(this, val);
-        },
-        get: sourceSrcDesc.get,
-        configurable: true
-      });
-    }
-
-    // Перехват добавления атрибутов src через setAttribute (на всякий случай)
-    const origSetAttribute = Element.prototype.setAttribute;
-    Element.prototype.setAttribute = function (name, value) {
-      if ((name === 'src' || name === 'SRC') && typeof value === 'string') {
-        tryDetect(value);
-      }
-      return origSetAttribute.apply(this, arguments);
-    };
-
-    // Мониторинг добавления новых элементов <source> и <video>
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
-          if (node.tagName === 'SOURCE' && node.src) tryDetect(node.src);
-          if (node.tagName === 'VIDEO' && node.src) tryDetect(node.src);
-          // Можно расширить для вложенных элементов
-        });
-      });
-    });
-    observer.observe(document, { childList: true, subtree: true });
-
-    // Performance API — на всякий пожарный, ловим все запросы после полной загрузки
-    window.addEventListener('load', () => {
-      const entries = performance.getEntriesByType('resource');
-      entries.forEach(entry => {
-        tryDetect(entry.name);
-      });
-    });
-  })();
-</script>
+    <title>Тест плеера: Мужское кино</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Стили Video.js -->
+    <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #player {
+            max-width: 800px;
+            margin: 20px auto;
+            position: relative;
+        }
+        .vjs-default-skin {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 соотношение */
+        }
+        .video-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #status {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #ffcc00;
+        }
+        .error {
+            color: #ff4444;
+            font-weight: bold;
+        }
+    </style>
+    
+    <!-- Перехватчик сетевых запросов -->
+    <script>
+        window.m3u8Url = null;
+        
+        // Сохраняем оригинальные методы
+        const originalFetch = window.fetch;
+        const originalXHRSend = XMLHttpRequest.prototype.send;
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        
+        // Переопределяем XMLHttpRequest
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this._url = url;
+            return originalXHROpen.apply(this, arguments);
+        };
+        
+        XMLHttpRequest.prototype.send = function(body) {
+            if (this._url && this._url.includes('.m3u8')) {
+                const originalOnReadyStateChange = this.onreadystatechange;
+                this.onreadystatechange = function() {
+                    if (this.readyState === 4) {
+                        window.m3u8Url = this._url;
+                        console.log('[M3U8 Detector] XHR detected:', this._url);
+                    }
+                    if (originalOnReadyStateChange) {
+                        originalOnReadyStateChange.apply(this, arguments);
+                    }
+                };
+            }
+            return originalXHRSend.apply(this, arguments);
+        };
+        
+        // Переопределяем fetch
+        window.fetch = async function(input, init) {
+            const url = typeof input === 'string' ? input : input.url;
+            if (url && url.includes('.m3u8')) {
+                try {
+                    const response = await originalFetch(input, init);
+                    window.m3u8Url = url;
+                    console.log('[M3U8 Detector] Fetch detected:', url);
+                    return response;
+                } catch (e) {
+                    return originalFetch(input, init);
+                }
+            }
+            return originalFetch(input, init);
+        };
+        
+        // Перехват через MediaSource
+        const originalCreateElement = document.createElement.bind(document);
+        document.createElement = function(tagName, options) {
+            const element = originalCreateElement(tagName, options);
+            if (tagName.toLowerCase() === 'video' || tagName.toLowerCase() === 'audio') {
+                const originalSetSrc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src').set;
+                Object.defineProperty(element, 'src', {
+                    set: function(value) {
+                        if (value.includes('.m3u8')) {
+                            window.m3u8Url = value;
+                            console.log('[M3U8 Detector] Media element detected:', value);
+                        }
+                        return originalSetSrc.call(this, value);
+                    }
+                });
+            }
+            return element;
+        };
+    </script>
+    
+    <script src="jquery.js"></script>
+    <script src="p13.js"></script>
 </head>
 <body>
+    <div id="player">
+        <!-- Контейнер для Video.js -->
+        <div id="videoContainer" style="display:none">
+            <video id="customVideoPlayer" class="video-js vjs-default-skin" controls playsinline></video>
+        </div>
+        
+        <!-- Оригинальный контейнер плеера -->
+        <div id="plok"></div>
+    </div>
 
-<div id="player-container">
-  <div id="original-player">
-    <!-- Здесь будет твой оригинальный плеер -->
-    <p style="text-align:center; color:#666;">Оригинальный плеер работает...</p>
-  </div>
-  <video id="videojs-player" class="video-js vjs-default-skin" controls playsinline></video>
-</div>
+    <div id="status">Запуск видео-плеера...</div>
 
-<div id="status">Ждём поток...</div>
+    <!-- Библиотеки Video.js -->
+    <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
 
-<script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
-<script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
+    <script>
+        // Параметры потока
+        var kodk = "593/index.m3u8?k=1751311748p422i02i581i901S";
+        var kos = "c1cba7dc7";
+        
+        // Инициализация оригинального плеера
+        var player = new Playerjs({
+            id: "plok",
+            file: "#FI0ZhSFIwY0hNNkx5OXpMbTl1ZEdsMmFTNXVaFNTU2RzNEWFF2ZTNZeGZUSTBNbVo3ZGpKOU9HUXpNRFl6TmpSalpEVTFNRGswTnpjM01TQnZjaUJvZEhSd2N6b3ZMM0l1Y0c5Rk5UVTJSek5FVVRFPXJZWG91YkZOVFUyUFNTU2RzM=npNPVdVdmUzWXhmVEkwTW1aN2RqSjlPR1F6TURZek5qUmpaRFUxTURrME56YzNNUT09"
+        });
 
-<script>
-  // Симуляция запуска оригинального плеера — замени на реальный
-  function startOriginalPlayer() {
-    // Тут реальный плеер будет загружать поток и делать запросы
-    // Для примера имитируем fetch m3u8 через 2 секунды:
-    setTimeout(() => {
-      fetch('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8');
-      console.log('Имитация загрузки потока через fetch');
-    }, 2000);
-  }
+        // Основная функция инициализации Video.js
+        function initVideoJS(m3u8Url) {
+            console.log('Инициализация Video.js с URL:', m3u8Url);
+            
+            // Удаляем оригинальный плеер
+            const plok = document.getElementById('plok');
+            if (plok) {
+                plok.innerHTML = '';
+                plok.style.display = 'none';
+            }
+            
+            // Показываем контейнер Video.js
+            document.getElementById('videoContainer').style.display = 'block';
+            document.getElementById('status').textContent = 'Загрузка видео...';
 
-  startOriginalPlayer();
+            // Инициализация Video.js
+            const videoPlayer = videojs('customVideoPlayer', {
+                sources: [{
+                    src: m3u8Url,
+                    type: 'application/x-mpegURL'
+                }],
+                autoplay: true,
+                controls: true,
+                fluid: true,
+                playbackRates: [0.5, 1, 1.5, 2],
+                html5: {
+                    hls: {
+                        overrideNative: true,
+                        enableLowInitialPlaylist: true
+                    }
+                }
+            });
 
-  // Инициализация Video.js после ловли M3U8
-  window.initVideoJS = function () {
-    if (!window.m3u8Url) {
-      console.error('M3U8 URL не найден!');
-      return;
-    }
-    document.getElementById('status').textContent = 'M3U8 найден, запускаем Video.js...';
+            // Обработчики событий
+            videoPlayer.on('loadedmetadata', function() {
+                document.getElementById('status').textContent = 'Воспроизведение видео...';
+            });
+            
+            videoPlayer.on('error', function() {
+                document.getElementById('status').innerHTML = 
+                    '<span class="error">Ошибка воспроизведения</span><br>Попробуйте перезагрузить страницу';
+            });
+        }
 
-    // Удаляем оригинальный плеер
-    const original = document.getElementById('original-player');
-    original.innerHTML = '';
-
-    const video = document.getElementById('videojs-player');
-    video.style.display = 'block';
-
-    const player = videojs('videojs-player', {
-      fluid: true,
-      autoplay: true,
-      controls: true,
-      playbackRates: [0.5, 1, 1.5, 2],
-      sources: [{
-        src: window.m3u8Url,
-        type: 'application/x-mpegURL'
-      }]
-    });
-
-    player.ready(() => {
-      console.log('Video.js готов к воспроизведению');
-      document.getElementById('status').textContent = 'Воспроизведение...';
-    });
-  };
-</script>
-
+        // Проверка обнаружения M3U8
+        let detectionAttempts = 0;
+        const maxAttempts = 10;
+        const detectionInterval = 1000; // 1 секунда
+        
+        const detectionTimer = setInterval(() => {
+            detectionAttempts++;
+            
+            if (window.m3u8Url) {
+                clearInterval(detectionTimer);
+                initVideoJS(window.m3u8Url);
+            } 
+            else if (detectionAttempts >= maxAttempts) {
+                clearInterval(detectionTimer);
+                document.getElementById('status').innerHTML = 
+                    '<span class="error">Ошибка: M3U8 не обнаружен</span><br>Попробуйте перезагрузить страницу';
+                console.error('M3U8 не обнаружен после', maxAttempts, 'попыток');
+                
+                // Попробуем найти URL в консоли (fallback)
+                try {
+                    const consoleOutput = [];
+                    const originalConsole = console.log;
+                    console.log = function(message) {
+                        consoleOutput.push(message);
+                        originalConsole.apply(console, arguments);
+                    };
+                    
+                    setTimeout(() => {
+                        console.log = originalConsole;
+                        const m3u8Messages = consoleOutput.filter(msg => 
+                            typeof msg === 'string' && msg.includes('.m3u8')
+                        );
+                        
+                        if (m3u8Messages.length > 0) {
+                            const urlMatch = m3u8Messages[0].match(/https?:\/\/[^\s]+\.m3u8[^\s]*/);
+                            if (urlMatch) {
+                                initVideoJS(urlMatch[0]);
+                            }
+                        }
+                    }, 2000);
+                } catch (e) {
+                    console.error('Fallback detection failed:', e);
+                }
+            }
+            else {
+                console.log('Попытка обнаружения M3U8', detectionAttempts, 'из', maxAttempts);
+                document.getElementById('status').textContent = 
+                    `Обнаружение видео-потока... (${detectionAttempts}/${maxAttempts})`;
+            }
+        }, detectionInterval);
+    </script>
 </body>
 </html>
