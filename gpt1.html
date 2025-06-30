@@ -83,14 +83,6 @@
             justify-content: center;
             align-items: center;
             transition: all 0.2s ease;
-            box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 204, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
         }
         
         .play-button:hover {
@@ -117,40 +109,9 @@
             opacity: 0;
             pointer-events: none;
         }
-        
-        .player-title {
-            text-align: center;
-            color: #ffcc00;
-            margin-bottom: 15px;
-            font-size: 22px;
-            font-weight: bold;
-        }
-        
-        .controls-info {
-            text-align: center;
-            color: #aaa;
-            font-size: 13px;
-            margin-top: 15px;
-        }
-        
-        .loading-spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 204, 0, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #ffcc00;
-            animation: spin 1s linear infinite;
-            margin: 10px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
     
-    <!-- Перехватчик сетевых запросов -->
+    <!-- Перехватчик сетевых запросов (сохранен как в оригинале) -->
     <script>
         window.m3u8Url = null;
         
@@ -218,8 +179,6 @@
     </script>
 </head>
 <body>
-    <div class="player-title">Мужское кино | Видеоплеер</div>
-    
     <div class="player-container">
         <div id="videoContainer">
             <video id="customVideoPlayer" class="video-js vjs-default-skin" controls playsinline></video>
@@ -228,11 +187,6 @@
             </div>
         </div>
         <div id="status">Нажмите для запуска видео</div>
-        <div class="loading-spinner" id="loadingSpinner"></div>
-    </div>
-    
-    <div class="controls-info">
-        Для управления используйте кнопки плеера. Качество видео автоматически адаптируется.
     </div>
     
     <!-- Скрытый контейнер для фонового плеера -->
@@ -252,14 +206,18 @@
         let hiddenPlayer = null;
         let detectionTimer = null;
         let detectionAttempts = 0;
-        const maxAttempts = 12;
+        const maxAttempts = 15;
         const detectionInterval = 1000;
         
         // Функция запуска фонового плеера
         function startHiddenPlayer() {
             console.log('Запуск фонового плеера...');
             document.getElementById('status').textContent = 'Подготовка видео...';
-            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            // Очищаем предыдущий экземпляр
+            if (hiddenPlayer) {
+                document.getElementById('plok').innerHTML = '';
+            }
             
             // Создаем экземпляр Playerjs в скрытом контейнере
             hiddenPlayer = new Playerjs({
@@ -287,7 +245,6 @@
                     clearInterval(detectionTimer);
                     document.getElementById('status').innerHTML = 
                         '<span class="error">Ошибка: не удалось загрузить видео</span>';
-                    document.getElementById('loadingSpinner').style.display = 'none';
                     console.error('M3U8 не обнаружен после', maxAttempts, 'попыток');
                     
                     // Удаляем скрытый плеер
@@ -325,7 +282,7 @@
             // Удаляем постер
             document.querySelector('.poster-overlay').style.display = 'none';
             
-            // Инициализируем Video.js
+            // Инициализируем Video.js только после получения M3U8
             videoPlayer = videojs('customVideoPlayer', {
                 controls: true,
                 autoplay: true,
@@ -337,7 +294,8 @@
                 }],
                 html5: {
                     hls: {
-                        overrideNative: true
+                        overrideNative: true,
+                        enableLowInitialPlaylist: true
                     }
                 }
             });
@@ -345,13 +303,11 @@
             // Обработчики событий
             videoPlayer.on('playing', function() {
                 document.getElementById('status').textContent = '';
-                document.getElementById('loadingSpinner').style.display = 'none';
             });
             
             videoPlayer.on('error', function() {
                 document.getElementById('status').innerHTML = 
                     '<span class="error">Ошибка воспроизведения</span>';
-                document.getElementById('loadingSpinner').style.display = 'none';
                     
                 // Показываем кнопку повторной попытки
                 document.querySelector('.poster-overlay').innerHTML = `
@@ -376,16 +332,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Добавляем обработчик на кнопку воспроизведения
             document.querySelector('.play-button').addEventListener('click', initPlayer);
-            
-            // Также обрабатываем клик по статусной строке
-            document.getElementById('status').addEventListener('click', initPlayer);
-            
-            // Инициализируем Video.js без источника
-            videoPlayer = videojs('customVideoPlayer', {
-                controls: false,
-                autoplay: false,
-                fluid: true
-            });
         });
     </script>
 </body>
