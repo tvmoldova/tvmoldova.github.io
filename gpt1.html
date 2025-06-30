@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Видеоплеер | Мужское кино</title>
+    <title>Мужское кино - Видеоплеер</title>
     <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet">
     <style>
         * {
@@ -13,29 +13,29 @@
         }
         
         body {
-            background: #000;
+            background: #0a0a0a;
             color: #fff;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background-image: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #0a0a0a 70%);
         }
         
         .player-container {
             max-width: 900px;
             width: 100%;
             position: relative;
-            border-radius: 4px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
             background: #111;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
         
         #videoContainer {
-            display: block;
             position: relative;
             background: #000;
         }
@@ -43,7 +43,7 @@
         .video-js {
             width: 100%;
             height: 0;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* 16:9 */
         }
         
         #status {
@@ -69,7 +69,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9));
+            background: linear-gradient(rgba(10,10,10,0.9), rgba(5,5,5,0.95));
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -79,8 +79,8 @@
         }
         
         .play-button {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             background: rgba(255, 204, 0, 0.85);
             border-radius: 50%;
             display: flex;
@@ -93,7 +93,7 @@
         
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 204, 0, 0); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 204, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
         }
         
@@ -107,20 +107,30 @@
             display: block;
             width: 0;
             height: 0;
-            border-top: 20px solid transparent;
-            border-left: 30px solid #000;
-            border-bottom: 20px solid transparent;
-            margin-left: 10px;
+            border-top: 25px solid transparent;
+            border-left: 40px solid #000;
+            border-bottom: 25px solid transparent;
+            margin-left: 12px;
+        }
+        
+        .player-title {
+            color: #ffcc00;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+            letter-spacing: 1px;
         }
         
         .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 204, 0, 0.3);
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 204, 0, 0.3);
             border-radius: 50%;
-            border-top: 4px solid #ffcc00;
-            animation: spin 1s linear infinite;
-            margin: 10px auto;
+            border-top: 5px solid #ffcc00;
+            animation: spin 1.5s linear infinite;
+            margin: 20px auto;
             display: none;
         }
         
@@ -133,29 +143,70 @@
             background: rgba(255, 70, 70, 0.8);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            margin-top: 15px;
+            padding: 12px 30px;
+            border-radius: 30px;
+            margin-top: 25px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 16px;
             transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 70, 70, 0.3);
         }
         
         .retry-button:hover {
             background: rgba(255, 70, 70, 1);
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 70, 70, 0.4);
+        }
+        
+        .controls-info {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 0 20px;
         }
         
         #hiddenPlayerContainer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100px;
-            height: 100px;
-            overflow: hidden;
+            top: 10px;
+            left: 10px;
+            width: 320px;
+            height: 180px;
             z-index: 10000;
-            opacity: 0.01;
+            opacity: 0.001;
             pointer-events: none;
+            background: #000;
+            border: 1px solid #333;
+        }
+        
+        .debug-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: #666;
+            font-size: 12px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .player-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .player-header h1 {
+            font-size: 32px;
+            color: #ffcc00;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .player-header p {
+            color: #aaa;
+            font-size: 16px;
         }
     </style>
     
@@ -181,6 +232,7 @@
                     if (this.readyState === 4) {
                         window.m3u8Url = this._url;
                         console.log('[M3U8 Detector] XHR detected:', this._url);
+                        updateDebugInfo('M3U8 URL обнаружен');
                     }
                     if (originalOnReadyStateChange) {
                         originalOnReadyStateChange.apply(this, arguments);
@@ -198,6 +250,7 @@
                     const response = await originalFetch(input, init);
                     window.m3u8Url = url;
                     console.log('[M3U8 Detector] Fetch detected:', url);
+                    updateDebugInfo('M3U8 URL обнаружен');
                     return response;
                 } catch (e) {
                     return originalFetch(input, init);
@@ -217,6 +270,7 @@
                         if (value.includes('.m3u8')) {
                             window.m3u8Url = value;
                             console.log('[M3U8 Detector] Media element detected:', value);
+                            updateDebugInfo('M3U8 URL установлен');
                         }
                         return originalSetSrc.call(this, value);
                     }
@@ -224,25 +278,48 @@
             }
             return element;
         };
+        
+        function updateDebugInfo(message) {
+            const debugEl = document.getElementById('debugInfo');
+            debugEl.textContent = message;
+            debugEl.style.display = 'block';
+            setTimeout(() => {
+                debugEl.style.display = 'none';
+            }, 3000);
+        }
     </script>
 </head>
 <body>
+    <div class="player-header">
+        <h1>Мужское кино</h1>
+        <p>Премиум видеоплеер с мгновенным запуском</p>
+    </div>
+    
     <div class="player-container">
         <div id="videoContainer">
             <video id="customVideoPlayer" class="video-js vjs-default-skin" controls playsinline></video>
             <div class="poster-overlay">
                 <div class="play-button"></div>
-                <div style="margin-top: 20px; font-size: 18px; color: #fff;">Нажмите для запуска</div>
+                <div style="margin-top: 25px; font-size: 20px; color: #fff; text-align: center;">
+                    Нажмите для запуска<br>
+                    <span style="font-size: 16px; color: #aaa;">Качество видео автоматически адаптируется</span>
+                </div>
             </div>
         </div>
         <div id="status">Готов к воспроизведению</div>
         <div class="loading-spinner" id="loadingSpinner"></div>
     </div>
     
+    <div class="controls-info">
+        Для управления используйте кнопки плеера. Поддерживается регулировка громкости, качества и скорости воспроизведения.
+    </div>
+    
     <!-- Скрытый контейнер для фонового плеера -->
     <div id="hiddenPlayerContainer">
         <div id="plok"></div>
     </div>
+    
+    <div id="debugInfo" class="debug-info"></div>
 
     <!-- Библиотеки -->
     <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
@@ -256,17 +333,23 @@
         let hiddenPlayer = null;
         let detectionTimer = null;
         let detectionAttempts = 0;
-        const maxAttempts = 12;
+        const maxAttempts = 15;
         const detectionInterval = 800;
         
         // Функция запуска фонового плеера
         function startHiddenPlayer() {
             console.log('Запуск фонового плеера...');
+            updateDebugInfo('Запуск фонового плеера');
             document.getElementById('status').textContent = 'Подготовка видео...';
             document.getElementById('loadingSpinner').style.display = 'block';
             
             // Очищаем предыдущий экземпляр
             if (hiddenPlayer) {
+                try {
+                    hiddenPlayer.api("destroy");
+                } catch (e) {
+                    console.error('Ошибка при уничтожении плеера:', e);
+                }
                 document.getElementById('plok').innerHTML = '';
                 hiddenPlayer = null;
             }
@@ -278,11 +361,33 @@
             const plokContainer = document.getElementById('plok');
             plokContainer.innerHTML = '';
             
+            // Показываем контейнер для гарантии загрузки
+            document.getElementById('hiddenPlayerContainer').style.display = 'block';
+            
             // Создаем экземпляр Playerjs в скрытом контейнере
-            hiddenPlayer = new Playerjs({
-                id: "plok",
-                file: "#FI0ZhSFIwY0hNNkx5OXpMbTl1ZEdsMmFTNXVaFNTU2RzNEWFF2ZTNZeGZUSTBNbVo3ZGpKOU9HUXpNRFl6TmpSalpEVTFNRGswTnpjM01TQnZjaUJvZEhSd2N6b3ZMM0l1Y0c5Rk5UVTJSek5FVVRFPXJZWG91YkZOVFUyUFNTU2RzM=npNPVdVdmUzWXhmVEkwTW1aN2RqSjlPR1F6TURZek5qUmpaRFUxTURrME56YzNNUT09"
-            });
+            try {
+                hiddenPlayer = new Playerjs({
+                    id: "plok",
+                    file: "#FI0ZhSFIwY0hNNkx5OXpMbTl1ZEdsMmFTNXVaFNTU2RzNEWFF2ZTNZeGZUSTBNbVo3ZGpKOU9HUXpNRFl6TmpSalpEVTFNRGswTnpjM01TQnZjaUJvZEhSd2N6b3ZMM0l1Y0c5Rk5UVTJSek5FVVRFPXJZWG91YkZOVFUyUFNTU2RzM=npNPVdVdmUzWXhmVEkwTW1aN2RqSjlPR1F6TURZek5qUmpaRFUxTURrME56YzNNUT09"
+                });
+                
+                // Принудительно запускаем воспроизведение
+                setTimeout(() => {
+                    try {
+                        hiddenPlayer.api("play");
+                        updateDebugInfo('Фоновый плеер запущен');
+                    } catch (e) {
+                        console.error('Ошибка при запуске фонового плеера:', e);
+                        updateDebugInfo('Ошибка запуска фонового плеера');
+                    }
+                }, 500);
+            } catch (e) {
+                console.error('Ошибка создания Playerjs:', e);
+                updateDebugInfo('Ошибка создания плеера');
+                document.getElementById('status').innerHTML = '<span class="error">Ошибка инициализации</span>';
+                document.getElementById('loadingSpinner').style.display = 'none';
+                return;
+            }
             
             // Запускаем интервал для обнаружения M3U8
             startDetection();
@@ -295,9 +400,11 @@
             
             detectionTimer = setInterval(() => {
                 detectionAttempts++;
+                updateDebugInfo(`Попытка обнаружения: ${detectionAttempts}/${maxAttempts}`);
                 
                 if (window.m3u8Url) {
                     clearInterval(detectionTimer);
+                    updateDebugInfo('M3U8 найден!');
                     initVideoJS(window.m3u8Url);
                 } 
                 else if (detectionAttempts >= maxAttempts) {
@@ -306,17 +413,29 @@
                         '<span class="error">Ошибка: не удалось загрузить видео</span>';
                     document.getElementById('loadingSpinner').style.display = 'none';
                     console.error('M3U8 не обнаружен после', maxAttempts, 'попыток');
+                    updateDebugInfo('M3U8 не найден');
                     
                     // Удаляем скрытый плеер
                     if (hiddenPlayer) {
+                        try {
+                            hiddenPlayer.api("destroy");
+                        } catch (e) {
+                            console.error('Ошибка при уничтожении плеера:', e);
+                        }
                         document.getElementById('plok').innerHTML = '';
                         hiddenPlayer = null;
                     }
                     
+                    // Скрываем контейнер
+                    document.getElementById('hiddenPlayerContainer').style.display = 'none';
+                    
                     // Показываем кнопку повторной попытки
                     document.querySelector('.poster-overlay').innerHTML = `
                         <div class="play-button" style="background: rgba(255, 70, 70, 0.8);"></div>
-                        <div style="margin-top: 15px; color: #ff4444; font-size: 16px;">Ошибка загрузки</div>
+                        <div style="margin-top: 20px; color: #ff4444; font-size: 18px; text-align: center;">
+                            Ошибка загрузки<br>
+                            <span style="font-size: 16px; color: #aaa;">Попробуйте снова</span>
+                        </div>
                         <button class="retry-button">Попробовать снова</button>
                     `;
                     document.querySelector('.retry-button').addEventListener('click', initPlayer);
@@ -332,74 +451,72 @@
         // Функция инициализации Video.js с полученным M3U8
         function initVideoJS(m3u8Url) {
             console.log('Инициализация Video.js с URL:', m3u8Url);
+            updateDebugInfo('Запуск Video.js');
             document.getElementById('status').textContent = 'Запуск видео...';
             
             // Удаляем скрытый плеер
             if (hiddenPlayer) {
+                try {
+                    hiddenPlayer.api("destroy");
+                } catch (e) {
+                    console.error('Ошибка при уничтожении плеера:', e);
+                }
                 document.getElementById('plok').innerHTML = '';
                 hiddenPlayer = null;
             }
+            
+            // Скрываем контейнер
+            document.getElementById('hiddenPlayerContainer').style.display = 'none';
             
             // Удаляем постер
             document.querySelector('.poster-overlay').style.display = 'none';
             
             // Инициализируем Video.js только после получения M3U8
-            videoPlayer = videojs('customVideoPlayer', {
-                controls: true,
-                autoplay: true,
-                fluid: true,
-                playbackRates: [0.5, 1, 1.5, 2],
-                sources: [{
-                    src: m3u8Url,
-                    type: 'application/x-mpegURL'
-                }],
-                html5: {
-                    hls: {
-                        overrideNative: true,
-                        enableLowInitialPlaylist: true
+            try {
+                videoPlayer = videojs('customVideoPlayer', {
+                    controls: true,
+                    autoplay: true,
+                    fluid: true,
+                    playbackRates: [0.5, 1, 1.5, 2],
+                    sources: [{
+                        src: m3u8Url,
+                        type: 'application/x-mpegURL'
+                    }],
+                    html5: {
+                        hls: {
+                            overrideNative: true,
+                            enableLowInitialPlaylist: true
+                        }
                     }
-                }
-            });
-            
-            // Обработчики событий
-            videoPlayer.on('playing', function() {
-                document.getElementById('status').textContent = '';
-                document.getElementById('loadingSpinner').style.display = 'none';
-            });
-            
-            videoPlayer.on('error', function() {
-                document.getElementById('status').innerHTML = 
-                    '<span class="error">Ошибка воспроизведения</span>';
-                document.getElementById('loadingSpinner').style.display = 'none';
+                });
+                
+                // Обработчики событий
+                videoPlayer.on('playing', function() {
+                    document.getElementById('status').textContent = '';
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    updateDebugInfo('Воспроизведение начато');
+                });
+                
+                videoPlayer.on('error', function() {
+                    document.getElementById('status').innerHTML = 
+                        '<span class="error">Ошибка воспроизведения</span>';
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    updateDebugInfo('Ошибка воспроизведения');
                     
-                // Показываем кнопку повторной попытки
-                document.querySelector('.poster-overlay').innerHTML = `
-                    <div class="play-button" style="background: rgba(255, 70, 70, 0.8);"></div>
-                    <div style="margin-top: 15px; color: #ff4444; font-size: 16px;">Ошибка воспроизведения</div>
-                    <button class="retry-button">Попробовать снова</button>
-                `;
-                document.querySelector('.poster-overlay').style.display = 'flex';
-                document.querySelector('.retry-button').addEventListener('click', initPlayer);
-            });
-        }
-        
-        // Основная функция инициализации плеера
-        function initPlayer() {
-            // Скрываем постер
-            document.querySelector('.poster-overlay').style.display = 'none';
-            
-            // Запускаем фоновый плеер
-            startHiddenPlayer();
-        }
-        
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            // Добавляем обработчик на кнопку воспроизведения
-            document.querySelector('.play-button').addEventListener('click', initPlayer);
-            
-            // Убедимся, что скрытый контейнер виден для браузера
-            document.getElementById('hiddenPlayerContainer').style.visibility = 'visible';
-        });
-    </script>
-</body>
-</html>
+                    // Показываем кнопку повторной попытки
+                    document.querySelector('.poster-overlay').innerHTML = `
+                        <div class="play-button" style="background: rgba(255, 70, 70, 0.8);"></div>
+                        <div style="margin-top: 20px; color: #ff4444; font-size: 18px; text-align: center;">
+                            Ошибка воспроизведения<br>
+                            <span style="font-size: 16px; color: #aaa;">Попробуйте снова</span>
+                        </div>
+                        <button class="retry-button">Попробовать снова</button>
+                    `;
+                    document.querySelector('.poster-overlay').style.display = 'flex';
+                    document.querySelector('.retry-button').addEventListener('click', initPlayer);
+                });
+            } catch (e) {
+                console.error('Ошибка инициализации Video.js:', e);
+                updateDebugInfo('Ошибка инициализации Video.js');
+                document.getElementById('status').innerHTML = 
+                    '<span class="error">Ошибка 
