@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ловец M3U8 и Video.js</title>
+
+<!-- Video.js CSS -->
+<link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet" />
+
+<style>
+  body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 0;
+  }
+  #player-container {
+    max-width: 800px;
+    margin: 20px auto;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+  }
+  #videojs-player {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  #status {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+  }
+</style>
+
+<script>
+  // === ЛОВЕЦ M3U8 - максимально универсальный ===
+
+  window.m3u8Url = null;
+  window.m3u8Detected = false;
+
+  // Вызов функции инициализации Video.js, объявим заглушкой
+  window.initVideoJS = function() {
+    console.log("[M3U8 Detector] initVideoJS вызвана, но еще не определена.");
+  };
+
+  // Помощник: ловим fetch
+  (function(){
+    const origFetch = window.fetch;
+    window.fetch = function(...args) {
+      let url = args[0];
+      if (url && typeof url === "string" && url.includes(".m3u8") && !window.m3u8Detected) {
+        window.m3u8Detected = true;
+        window.m3u8Url = url;
+        console.log("[M3U8 Detector] Найден URL через fetch:", url);
+        window.initVideoJS();
+      }
+      return origFetch.apply(this, args);
+    };
+  })();
+
+  // Помощник: ловим XMLHttpRequest
+  (function(){
+    const origOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      if (url && typeof url === "string" && url.includes(".m3u8") && !window.m3u8Detected) {
+        this.addEventListener("load", () => {
+          if (!window.m3u8Detected) {
+            window.m3u8Detected = true;
+            window.m3u8Url = url;
+            console.log("[M3U8 Detector] Найден URL через XHR:", url);
+            window.initVideoJS();
+          }
+        });
+      }
+      return origOpen.apply(this, arguments);
+    };
+  })();
+
+  // Ловим присвоение video.src
+  (function(){
+    const proto = HTMLVideoElement.prototype;
+    const desc = Object.getOwnPropertyDescriptor(proto, 'src');
+
+    if(desc && desc.set){
+      Object.defineProperty(proto, 'src', {
+        set: function(value){
+          if(value && value.includes(".m3u8") && !window.m3u8Detected){
+            window.m3u8Detected = true;
+            window.m3u8Url = value;
+            console.log("[M3U8 Detector] Найден URL через video.src:", value);
+            window.initVideoJS();
+          }
+          desc.set.call(this, value);
+        },
+        get: desc.get
+      });
+    }
+  })();
+
+  // Ловим присвоение src у <source> внутри video
+  (function(){
+    const proto = HTMLSourceElement.prototype;
+    const desc = Object.getOwnPropertyDescriptor(proto, 'src');
+    if(desc && desc.set){
+      Object.defineProperty(proto, 'src', {
+        set: function(value){
+          if(value && value.includes(".m3u8") && !window.m3u8Detected){
+            window.m3u8Detected = true;
+            window.m3u8Url = value;
+            console.log("[M3U8 Detector] Найден URL через source.src:", value);
+            window.initVideoJS();
+          }
+          desc.set.call(this, value);
+        },
+        get: desc.get
+      });
+    }
+  })();
+
+  // Дополнительно: мониторим Performance API для диагностики после полной загрузки
+  window.addEventListener('load', () => {
+    const entries = performance.getEntriesByType("resource");
+    entries.forEach(e => {
+      if(e.name && e.name.includes(".m3u8") && !window.m3u8Detected){
+        window.m3u8Detected = true;
+        window.m3u8Url = e.name;
+        console.log("[M3U8 Detector] Найден URL через performance:", e.name);
+        window.initVideoJS();
+      }
+    });
+  });
+</script>
+
+</head>
+<body>
+
+<div id="player-container">
+  <!-- Оригинальный плеер (примерно Playerjs или любой другой) -->
+  <div id="original-player"></div>
+
+  <!-- Video.js контейнер -->
+  <video id="videojs-player" class="video-js vjs-default-skin" controls playsinline style="display:none;"></video>
+</div>
+
+<div id="status">Ожидание видео-потока...</div>
+
+<!-- Библиотеки -->
+<script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
+<script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
+
+<script>
+  // Имитация запуска оригинального плеера (замени на свой вызов)
+  var originalPlayer = {
+    init: function(){
+      const container = document.getElementById("original-player");
+      container.innerHTML = "<p style='color:#aaa; text-align:center;'>Оригинальный плеер работает...</p>";
+
+      // Пример: через 2 секунды запускается поток с .m3u8
+      // В реальности это событие вызовет перехватчики
+      setTimeout(() => {
+        // Допустим, здесь оригинальный плеер установил video.src на m3u8
+        let video = document.createElement("video");
+        video.src = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+        video.load();
+        // Или выполнится fetch/XHR с этой ссылкой
+        console.log("Имитация загрузки потока .m3u8");
+      }, 2000);
+    },
+    destroy: function(){
+      const container = document.getElementById("original-player");
+      container.innerHTML = "";
+    }
+  };
+
+  originalPlayer.init();
+
+  // Функция инициализации Video.js после нахождения M3U8
+  window.initVideoJS = function(){
+    if(!window.m3u8Url){
+      console.error("M3U8 URL не найден!");
+      return;
+    }
+    document.getElementById('status').textContent = "M3U8 найден, запускаем Video.js...";
+
+    // Уничтожаем оригинальный плеер
+    originalPlayer.destroy();
+
+    const video = document.getElementById('videojs-player');
+    video.style.display = "block";
+
+    // Инициализируем Video.js
+    const player = videojs('videojs-player', {
+      fluid: true,
+      autoplay: true,
+      controls: true,
+      playbackRates: [0.5, 1, 1.5, 2],
+      sources: [{
+        src: window.m3u8Url,
+        type: 'application/x-mpegURL'
+      }]
+    });
+
+    player.ready(() => {
+      console.log("Video.js готов к воспроизведению");
+      document.getElementById('status').textContent = "Воспроизведение...";
+    });
+  };
+</script>
+
+</body>
+</html>
