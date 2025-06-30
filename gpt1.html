@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест плеера: Мужское кино</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Стили Video.js -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #player-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        #videoContainer {
+            display: none;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #status {
+            text-align: center;
+            padding: 20px;
+            background: #111;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .status-loading { color: #4CAF50; }
+        .status-error { color: #F44336; }
+        .status-success { color: #2196F3; }
+        #original-player {
+            width: 100%;
+            min-height: 450px;
+            background: #222;
+        }
+    </style>
+    
+    <!-- Усиленный перехватчик сетевых запросов -->
+    <script>
+        // Глобальная переменная для хранения M3U8 URL
+        window.detectedM3U8 = null;
+        
+        // Перехватчик для fetch API
+        const originalFetch = window.fetch;
+        window.fetch = async function(input, init) {
+            // Проверяем URL на соответствие M3U8
+            const url = input.url || input;
+            if (url && /\.m3u8($|\?)/i.test(url)) {
+                console.log('[Перехватчик] Обнаружен fetch запрос к M3U8:', url);
+                window.detectedM3U8 = url;
+                return originalFetch.apply(this, arguments);
+            }
+            
+            // Для других запросов - обычная обработка
+            const response = await originalFetch.apply(this, arguments);
+            
+            // Дополнительная проверка Content-Type для HLS
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/vnd.apple.mpegurl')) {
+                console.log('[Перехватчик] Обнаружен HLS-ответ:', response.url);
+                window.detectedM3U8 = response.url;
+            }
+            
+            return response;
+        };
+        
+        // Перехватчик для XMLHttpRequest
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        const originalXHRSend = XMLHttpRequest.prototype.send;
+        
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this._requestUrl = url;
+            return originalXHROpen.apply(this, arguments);
+        };
+        
+        XMLHttpRequest.prototype.send = function(body) {
+            // Проверка URL перед отправкой
+            if (this._requestUrl && /\.m3u8($|\?)/i.test(this._requestUrl)) {
+                console.log('[Перехватчик] Обнаружен XHR запрос к M3U8:', this._requestUrl);
+                window.detectedM3U8 = this._requestUrl;
+            }
+            
+            // Перехват ответа
+            const originalOnReady = this.onreadystatechange;
+            this.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    const contentType = this.getResponseHeader('content-type');
+                    if (contentType && contentType.includes('application/vnd.apple.mpegurl')) {
+                        console.log('[Перехватчик] Обнаружен HLS-ответ XHR:', this.responseURL);
+                        window.detectedM3U8 = this.responseURL || this._requestUrl;
+                    }
+                }
+                if (originalOnReady) originalOnReady.apply(this, arguments);
+            };
+            
+            return originalXHRSend.apply(this, arguments);
+        };
+    </script>
+</head>
+<body>
+    <div id="player-container">
+        <!-- Оригинальный плеер (для инициализации запросов) -->
+        <div id="original-player">
+            <div id="plok"></div>
+        </div>
+        
+        <!-- Контейнер для Video.js -->
+        <div id="videoContainer">
+            <video id="customVideoPlayer" class="video-js vjs-default-skin" controls></video>
+        </div>
+        
+        <div id="status" class="status-loading">Инициализация плеера...</div>
+    </div>
+
+    <!-- Библиотеки -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="p13.js"></script>
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+
+    <script>
+        // Параметры потока
+        const kodk = "593/index.m3u8?k=1751311748p422i02i581i901S";
+        const kos = "c1cba7dc7";
+        
+        // Инициализация оригинального плеера
+        $(document).ready(function() {
+            try {
+                const player = new Playerjs({
+                    id: "plok",
+                    file: "#FI0ZhSFIwY0hNNkx5OXpMbTl1ZEdsMmFTNXVaFNTU2RzNEWFF2ZTNZeGZUSTBNbVo3ZGpKOU9HUXpNRFl6TmpSalpEVTFNRGswTnpjM01TQnZjaUJvZEhSd2N6b3ZMM0l1Y0c5Rk5UVTJSek5FVVRFPXJZWG91YkZOVFUyUFNTU2RzM=npNPVdVdmUzWXhmVEkwTW1aN2RqSjlPR1F6TURZek5qUmpaRFUxTURrME56YzNNUT09"
+                });
+                
+                $('#status').text('Поиск видео-потока...');
+                
+                // Проверка обнаружения M3U8
+                let checkCount = 0;
+                const maxChecks = 10;
+                const checkInterval = 1000; // 1 секунда
+                
+                const checkForM3U8 = setInterval(() => {
+                    checkCount++;
+                    
+                    if (window.detectedM3U8) {
+                        clearInterval(checkForM3U8);
+                        initVideoPlayer(window.detectedM3U8);
+                    } 
+                    else if (checkCount >= maxChecks) {
+                        clearInterval(checkForM3U8);
+                        showError('M3U8 не обнаружен. Проверьте консоль для диагностики.');
+                    }
+                    else {
+                        $('#status').html(`Поиск видео-потока...<br>Попытка ${checkCount}/${maxChecks}`);
+                        console.log(`Проверка #${checkCount}: M3U8 еще не обнаружен`);
+                    }
+                }, checkInterval);
+            } 
+            catch (e) {
+                showError('Ошибка инициализации плеера: ' + e.message);
+            }
+        });
+        
+        // Инициализация видеоплеера
+        function initVideoPlayer(m3u8Url) {
+            console.log('Инициализация Video.js с URL:', m3u8Url);
+            
+            // Скрываем оригинальный плеер
+            $('#original-player').hide();
+            $('#videoContainer').show();
+            $('#status').html('<span class="status-success">Видеопоток обнаружен! Запуск плеера...</span>');
+            
+            // Инициализация Video.js
+            const player = videojs('customVideoPlayer', {
+                sources: [{
+                    src: m3u8Url,
+                    type: 'application/x-mpegURL'
+                }],
+                autoplay: true,
+                controls: true,
+                fluid: true,
+                liveui: true,
+                playbackRates: [0.5, 1, 1.25, 1.5, 2]
+            });
+            
+            // Обработчики событий
+            player.on('loadedmetadata', () => {
+                $('#status').html(`<span class="status-success">Воспроизведение: ${player.duration().toFixed(0)} сек видео</span>`);
+            });
+            
+            player.on('error', () => {
+                const error = player.error();
+                showError(`Ошибка воспроизведения: ${error.code} - ${error.message}`);
+            });
+            
+            player.on('loadeddata', () => {
+                console.log('Видео успешно загружено');
+            });
+        }
+        
+        // Показать сообщение об ошибке
+        function showError(message) {
+            console.error(message);
+            $('#status').html(`<span class="status-error">${message}</span>`);
+        }
+        
+        // Автоматическая диагностика
+        window.addEventListener('error', (event) => {
+            console.error('Глобальная ошибка:', event.error);
+            $('#status').append(`<br><span class="status-error">Ошибка: ${event.message}</span>`);
+        });
+    </script>
+</body>
+</html>
