@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мужское кино - Видеоплеер</title>
+    <title>Видеоплеер | Мужское кино</title>
     <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet">
     <style>
         * {
@@ -13,44 +13,30 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            background-color: #0a0a0a;
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 20px;
-            background-attachment: fixed;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             width: 100%;
-            margin-top: 30px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #333;
-        }
-        
-        h1 {
-            font-size: 2.2rem;
-            color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
-            margin-bottom: 10px;
+            margin: 0 auto;
         }
         
         .player-container {
             position: relative;
-            border-radius: 8px;
+            border-radius: 4px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             background: #000;
+            margin-bottom: 20px;
         }
         
         .video-js {
@@ -59,68 +45,14 @@
             padding-bottom: 56.25%;
         }
         
-        .player-info {
-            background: rgba(20, 20, 20, 0.8);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 3px solid #ffcc00;
-        }
-        
-        .player-info h3 {
-            color: #ffcc00;
-            margin-bottom: 10px;
-        }
-        
-        .player-info p {
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-        
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .feature-card {
-            background: rgba(30, 30, 30, 0.8);
-            border-radius: 8px;
-            padding: 20px;
-            flex: 1;
-            min-width: 250px;
-            border-top: 2px solid #ffcc00;
-        }
-        
-        .feature-card h3 {
-            color: #ffcc00;
-            margin-bottom: 10px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: auto;
-            padding: 20px;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-        
-        #hiddenPlayerContainer {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            opacity: 0;
-            pointer-events: none;
-        }
-        
         #status {
             text-align: center;
-            padding: 10px;
-            font-size: 1rem;
+            padding: 12px;
+            font-size: 14px;
             color: #ffcc00;
-            min-height: 24px;
+            min-height: 40px;
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 4px;
         }
         
         .error {
@@ -134,21 +66,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
-                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23111111"/><path d="M40 30 L70 50 L40 70 Z" fill="%23ffcc00"/></svg>') center/cover;
+            background: rgba(10, 10, 10, 0.8);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             z-index: 1;
-        }
-        
-        .poster-overlay h2 {
-            color: #ffcc00;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         
         .play-button {
@@ -159,12 +83,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            transition: all 0.2s ease;
         }
         
         .play-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
             background: rgba(255, 204, 0, 1);
         }
         
@@ -177,6 +100,30 @@
             border-left: 25px solid #000;
             border-bottom: 15px solid transparent;
             margin-left: 5px;
+        }
+        
+        #hiddenPlayerContainer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .player-title {
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .controls-info {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 10px;
         }
     </style>
     
@@ -249,40 +196,20 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Мужское кино</h1>
-            <p>Премиум видеоплеер с мгновенным запуском</p>
-        </header>
+        <div class="player-title">Видеоплеер | Мужское кино</div>
         
         <div class="player-container">
             <div id="videoContainer">
                 <video id="customVideoPlayer" class="video-js vjs-default-skin" controls playsinline></video>
                 <div class="poster-overlay">
-                    <h2>Нажмите для запуска</h2>
                     <div class="play-button"></div>
                 </div>
             </div>
-            <div id="status"></div>
+            <div id="status">Нажмите для запуска видео</div>
         </div>
         
-        <div class="player-info">
-            <h3>Премиум возможности плеера</h3>
-            <p>Наш плеер использует передовые технологии для мгновенного запуска видео без задержек. Просто нажмите кнопку воспроизведения и наслаждайтесь просмотром.</p>
-        </div>
-        
-        <div class="features">
-            <div class="feature-card">
-                <h3>Мгновенный запуск</h3>
-                <p>Видео начинает воспроизводиться сразу после нажатия кнопки без загрузки страницы</p>
-            </div>
-            <div class="feature-card">
-                <h3>Высокое качество</h3>
-                <p>Автоматическая адаптация под ваше интернет-соединение для лучшего качества просмотра</p>
-            </div>
-            <div class="feature-card">
-                <h3>Полный контроль</h3>
-                <p>Управление громкостью, качеством видео и скоростью воспроизведения</p>
-            </div>
+        <div class="controls-info">
+            Для управления используйте кнопки плеера. Качество видео автоматически адаптируется.
         </div>
         
         <!-- Скрытый контейнер для фонового плеера -->
@@ -290,10 +217,6 @@
             <div id="plok"></div>
         </div>
     </div>
-    
-    <footer>
-        <p>© 2023 Мужское кино. Премиум видеоплеер. Все права защищены.</p>
-    </footer>
 
     <!-- Библиотеки -->
     <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
@@ -308,20 +231,14 @@
             autoplay: false,
             fluid: true,
             playbackRates: [0.5, 1, 1.5, 2],
-            inactivityTimeout: 0,
-            userActions: {
-                hotkeys: true
-            }
+            inactivityTimeout: 0
         });
-        
-        // Скрываем элементы управления до начала воспроизведения
-        videoPlayer.controlBar.hide();
         
         // Переменные для управления процессом
         let hiddenPlayer = null;
         let detectionTimer = null;
         let detectionAttempts = 0;
-        const maxAttempts = 15;
+        const maxAttempts = 10;
         const detectionInterval = 1000;
         
         // Функция запуска фонового плеера
@@ -354,7 +271,7 @@
                 else if (detectionAttempts >= maxAttempts) {
                     clearInterval(detectionTimer);
                     document.getElementById('status').innerHTML = 
-                        '<span class="error">Ошибка загрузки видео</span>';
+                        '<span class="error">Ошибка: не удалось загрузить видео</span>';
                     console.error('M3U8 не обнаружен после', maxAttempts, 'попыток');
                     
                     // Удаляем скрытый плеер
@@ -365,16 +282,15 @@
                     
                     // Показываем кнопку повторной попытки
                     document.querySelector('.poster-overlay').innerHTML = `
-                        <h2>Ошибка загрузки</h2>
                         <div class="play-button" style="background: rgba(255, 70, 70, 0.8);"></div>
-                        <p style="margin-top: 15px;">Нажмите для повторной попытки</p>
+                        <div style="margin-top: 15px; color: #ff4444;">Нажмите для повторной попытки</div>
                     `;
                     document.querySelector('.poster-overlay').addEventListener('click', initPlayer);
                 }
                 else {
                     console.log('Попытка обнаружения M3U8', detectionAttempts, 'из', maxAttempts);
                     document.getElementById('status').textContent = 
-                        `Подготовка видео... (${detectionAttempts}/${maxAttempts})`;
+                        `Поиск видео... (${detectionAttempts}/${maxAttempts})`;
                 }
             }, detectionInterval);
         }
@@ -401,14 +317,9 @@
             
             videoPlayer.ready(() => {
                 videoPlayer.play();
-                videoPlayer.controlBar.show();
             });
             
             // Обработчики событий
-            videoPlayer.on('loadedmetadata', function() {
-                document.getElementById('status').textContent = '';
-            });
-            
             videoPlayer.on('playing', function() {
                 document.getElementById('status').textContent = '';
             });
@@ -419,9 +330,8 @@
                     
                 // Показываем кнопку повторной попытки
                 document.querySelector('.poster-overlay').innerHTML = `
-                    <h2>Ошибка воспроизведения</h2>
                     <div class="play-button" style="background: rgba(255, 70, 70, 0.8);"></div>
-                    <p style="margin-top: 15px;">Нажмите для повторной попытки</p>
+                    <div style="margin-top: 15px; color: #ff4444;">Нажмите для повторной попытки</div>
                 `;
                 document.querySelector('.poster-overlay').style.display = 'flex';
                 document.querySelector('.poster-overlay').addEventListener('click', initPlayer);
@@ -441,6 +351,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Добавляем обработчик на кнопку воспроизведения
             document.querySelector('.play-button').addEventListener('click', initPlayer);
+            
+            // Также обрабатываем клик по статусной строке
+            document.getElementById('status').addEventListener('click', initPlayer);
         });
     </script>
 </body>
