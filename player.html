@@ -5,77 +5,86 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Стили для плеера и страницы */
-        body, html { margin: 0; padding: 0; height: 100%; background-color: #000; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            background-color: #000; 
+            font-family: Arial, sans-serif;
+        }
         #player { width: 100%; height: 100%; }
         #loading {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute; 
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: white; font-family: sans-serif; font-size: 20px;
+            color: white; text-align: center;
         }
+        .error { color: #ff5555; }
     </style>
     <script src="https://cdn.jsdelivr.net/gh/Playerjs/playerjs-stable@latest/dist/playerjs.js"></script>
 </head>
 <body>
-
     <div id="player">
         <div id="loading">Загрузка данных канала...</div>
     </div>
 
     <script>
-        // Название канала можно менять здесь
-        const channelName = 'muzhskoe-kinotv.html';
-        const channelUrl = `https://ip.ontivi.net/${channelName}`;
+        // 1. Конфигурация
+        const config = {
+            channelName: 'muzhskoe-kinotv.html', // Измените здесь канал
+            proxyUrl: 'proxy.php?channel=' // Путь к прокси
+        };
 
-        // Основная асинхронная функция для получения данных и запуска плеера
-        async function setupPlayer() {
+        // 2. Основная функция
+        async function initPlayer() {
             try {
-                // 1. Получаем HTML-код страницы канала
-                // ВАЖНО: Этот запрос может быть заблокирован политикой CORS.
-                // Если не работает, смотрите "План Б" ниже.
-                const response = await fetch(channelUrl);
-                if (!response.ok) {
-                    throw new Error(`Ошибка сети: ${response.statusText}`);
-                }
-                const htmlText = await response.text();
-
-                // 2. Извлекаем нужные переменные с помощью регулярных выражений
-                const kodk = htmlText.match(/var kodk="([^"]+)"/)[1];
-                const kos = htmlText.match(/var kos="([^"]+)"/)[1];
-                const file = htmlText.match(/file:"([^"]+)"/)[1];
-
+                const loadingEl = document.getElementById('loading');
+                loadingEl.textContent = 'Запрос данных через прокси...';
+                
+                // Запрос через PHP-прокси
+                const response = await fetch(`${config.proxyUrl}${encodeURIComponent(config.channelName)}`);
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const html = await response.text();
+                
+                // 3. Парсинг данных (улучшенные регулярки)
+                const extractVar = (name) => {
+                    const regex = new RegExp(`var ${name}="([^"]+)"`);
+                    const match = html.match(regex);
+                    return match ? match[1] : null;
+                };
+                
+                const kodk = extractVar('kodk');
+                const kos = extractVar('kos');
+                const file = html.match(/file:\s*"([^"]+)"/)?.[1];
+                
                 if (!kodk || !kos || !file) {
-                    throw new Error('Не удалось найти все параметры для плеера.');
+                    throw new Error('Не найдены параметры потока');
                 }
-
-                // Убираем сообщение о загрузке
-                document.getElementById('loading').style.display = 'none';
-
-                // 3. Инициализируем плеер с полученными данными
+                
+                // 4. Запуск плеера
+                loadingEl.style.display = 'none';
                 new Playerjs({
                     id: "player",
-                    file: file, // Передаем все три параметра, как требует ваш оригинальный код
-                    vars: {
-                        kodk: kodk,
-                        kos: kos
-                    }
-                    // Примечание: PlayerJS может не иметь прямых опций `kodk` и `kos`.
-                    // Логика их использования скрыта в файле p13.js, который вы упоминали.
-                    // Если PlayerJS не использует их напрямую, их нужно обработать
-                    // так, как это делает p13.js, но для начала попробуем так.
+                    file: file,
+                    vars: { kodk, kos }
                 });
-
+                
             } catch (error) {
-                // Выводим ошибку на экран, если что-то пошло не так
                 const playerDiv = document.getElementById('player');
-                playerDiv.innerHTML = `<div id="loading">Ошибка: ${error.message}. <br><br>Вероятнее всего, проблема связана с CORS. Попробуйте "План Б".</div>`;
-                console.error("Ошибка при настройке плеера:", error);
+                playerDiv.innerHTML = `
+                    <div id="loading" class="error">
+                        Ошибка: ${error.message}<br><br>
+                        Проверьте:<br>
+                        - Работоспособность proxy.php<br>
+                        - Название канала<br>
+                        - Консоль разработчика (F12)
+                    </div>
+                `;
+                console.error("Player Error:", error);
             }
         }
-
-        // Запускаем весь процесс при загрузке страницы
-        document.addEventListener('DOMContentLoaded', setupPlayer);
+        
+        // Старт при загрузке страницы
+        window.addEventListener('DOMContentLoaded', initPlayer);
     </script>
-
 </body>
 </html>
