@@ -1,45 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Автогенерация Playerjs</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="p13.js"></script> <!-- Подключи оригинальный Playerjs -->
-    <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Мужское кино — автопоток</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    #plok {
+      width: 100%;
+      max-width: 800px;
+      height: 450px;
+      margin: 0 auto;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://ip.ontivi.net/p13.js"></script> <!-- подключаем их же Playerjs -->
 </head>
 <body>
-    <h2>Мужское кино</h2>
-    <div id="plok"></div>
-    <div id="status">Загрузка...</div>
+  <h2>Мужское кино (Автообновляемый поток)</h2>
+  <div id="plok"></div>
+  <div id="status">Загрузка...</div>
 
-    <script>
-    // Подгружаем HTML страницы через CORS-прокси
-    fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://ip.ontivi.net/muzhskoe-kinotv.html"))
-      .then(response => response.json())
-      .then(data => {
-        const html = data.contents;
+  <script>
+    // Используем CORS-прокси (если заблочен — замени на свой сервер)
+    const proxyUrl = "https://corsproxy.io/?";
+    const targetUrl = "https://ip.ontivi.net/muzhskoe-kinotv.html";
 
-        const fileMatch = html.match(/file\s*:\s*"(#FI[^"]+)"/);
-        if (!fileMatch) return document.getElementById("status").textContent = "Ошибка: не удалось найти file";
+    fetch(proxyUrl + encodeURIComponent(targetUrl))
+      .then(res => res.text())
+      .then(html => {
+        // Парсим file: "#FI..."
+        const match = html.match(/file\s*:\s*"(#FI[^"]+)"/);
+        if (!match) {
+          document.getElementById("status").textContent = "❌ Поток не найден";
+          return;
+        }
 
-        const file = fileMatch[1];
+        const file = match[1];
         console.log("Найден file:", file);
 
-        // Инициализируем Playerjs с живым file
         new Playerjs({
-            id: "plok",
-            file: file
+          id: "plok",
+          file: file
         });
 
-        document.getElementById("status").textContent = "Воспроизведение потока...";
+        document.getElementById("status").textContent = "▶ Поток запущен";
       })
       .catch(err => {
         console.error(err);
-        document.getElementById("status").textContent = "Ошибка загрузки потока.";
+        document.getElementById("status").textContent = "⚠ Ошибка загрузки: " + err;
       });
-    </script>
+  </script>
 </body>
 </html>
