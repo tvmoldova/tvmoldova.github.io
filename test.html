@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ontivi Parser Test</title>
+    <meta charset="utf-8">
+    <script>
+    async function testParser() {
+        // 1. Получаем данные через прокси
+        const channel = 'muzhskoe-kinotv.html';
+        const response = await fetch(`proxy.php?channel=${channel}`);
+        const html = await response.text();
+        
+        // 2. Выводим первые 2000 символов HTML для проверки
+        document.getElementById('html-output').textContent = html.substring(0, 2000) + '...';
+        
+        // 3. Пытаемся извлечь параметры
+        try {
+            // Ищем скрипт с нужными переменными
+            const scriptMatch = html.match(/<script>[\s\S]*?var kodk[\s\S]*?<\/script>/i);
+            
+            if (!scriptMatch) {
+                throw new Error('Скрипт с параметрами не найден');
+            }
+            
+            const scriptContent = scriptMatch[0];
+            
+            // Извлекаем значения
+            const kodk = scriptContent.match(/var kodk="([^"]+)"/)[1];
+            const kos = scriptContent.match(/var kos="([^"]+)"/)[1];
+            const file = scriptContent.match(/file:"([^"]+)"/)[1];
+            
+            // Выводим результаты
+            document.getElementById('results').innerHTML = `
+                <h3>Извлеченные параметры:</h3>
+                <p><strong>kodk:</strong> ${kodk}</p>
+                <p><strong>kos:</strong> ${kos}</p>
+                <p><strong>file:</strong> ${file}</p>
+            `;
+            
+        } catch (error) {
+            document.getElementById('results').innerHTML = `
+                <div style="color:red; background:#fee; padding:10px; border-radius:5px;">
+                    <h3>Ошибка парсинга</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        }
+    }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        #html-output {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow: auto;
+        }
+        #results {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест парсера Ontivi</h1>
+    <p>Канал: <strong>muzhskoe-kinotv.html</strong></p>
+    
+    <button onclick="testParser()">Запустить тест</button>
+    
+    <h2>Полученный HTML:</h2>
+    <div id="html-output">Нажмите кнопку для загрузки данных...</div>
+    
+    <div id="results">Результаты парсинга появятся здесь</div>
+    
+    <h2>Инструкция:</h2>
+    <ol>
+        <li>Нажмите кнопку "Запустить тест"</li>
+        <li>Проверьте полученный HTML (должны быть видны теги script)</li>
+        <li>Если есть ошибка - проверьте код в полученном HTML</li>
+        <li>Если нет ошибки - проверьте извлеченные параметры</li>
+    </ol>
+</body>
+</html>
