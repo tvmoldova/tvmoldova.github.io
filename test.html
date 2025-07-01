@@ -1,93 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ontivi Parser Test</title>
+    <title>Ontivi Player</title>
     <meta charset="utf-8">
-    <script>
-    async function testParser() {
-        // 1. Получаем данные через прокси
-        const channel = 'muzhskoe-kinotv.html';
-        const response = await fetch(`proxy.php?channel=${channel}`);
-        const html = await response.text();
-        
-        // 2. Выводим первые 2000 символов HTML для проверки
-        document.getElementById('html-output').textContent = html.substring(0, 2000) + '...';
-        
-        // 3. Пытаемся извлечь параметры
-        try {
-            // Ищем скрипт с нужными переменными
-            const scriptMatch = html.match(/<script>[\s\S]*?var kodk[\s\S]*?<\/script>/i);
-            
-            if (!scriptMatch) {
-                throw new Error('Скрипт с параметрами не найден');
-            }
-            
-            const scriptContent = scriptMatch[0];
-            
-            // Извлекаем значения
-            const kodk = scriptContent.match(/var kodk="([^"]+)"/)[1];
-            const kos = scriptContent.match(/var kos="([^"]+)"/)[1];
-            const file = scriptContent.match(/file:"([^"]+)"/)[1];
-            
-            // Выводим результаты
-            document.getElementById('results').innerHTML = `
-                <h3>Извлеченные параметры:</h3>
-                <p><strong>kodk:</strong> ${kodk}</p>
-                <p><strong>kos:</strong> ${kos}</p>
-                <p><strong>file:</strong> ${file}</p>
-            `;
-            
-        } catch (error) {
-            document.getElementById('results').innerHTML = `
-                <div style="color:red; background:#fee; padding:10px; border-radius:5px;">
-                    <h3>Ошибка парсинга</h3>
-                    <p>${error.message}</p>
-                </div>
-            `;
-        }
-    }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #000;
             font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 20px auto;
+        }
+        #player {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        #status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
             padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
         }
-        #html-output {
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 15px 0;
-            white-space: pre-wrap;
-            max-height: 300px;
-            overflow: auto;
+        .error {
+            color: #ff5555;
         }
-        #results {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-top: 20px;
+        .hidden {
+            display: none;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/gh/Playerjs/playerjs-stable@latest/dist/playerjs.js"></script>
 </head>
 <body>
-    <h1>Тест парсера Ontivi</h1>
-    <p>Канал: <strong>muzhskoe-kinotv.html</strong></p>
-    
-    <button onclick="testParser()">Запустить тест</button>
-    
-    <h2>Полученный HTML:</h2>
-    <div id="html-output">Нажмите кнопку для загрузки данных...</div>
-    
-    <div id="results">Результаты парсинга появятся здесь</div>
-    
-    <h2>Инструкция:</h2>
-    <ol>
-        <li>Нажмите кнопку "Запустить тест"</li>
-        <li>Проверьте полученный HTML (должны быть видны теги script)</li>
-        <li>Если есть ошибка - проверьте код в полученном HTML</li>
-        <li>Если нет ошибки - проверьте извлеченные параметры</li>
-    </ol>
+    <div id="player">
+        <div id="status">Загрузка канала...</div>
+    </div>
+
+    <script>
+        // Настройки
+        const CHANNEL = 'muzhskoe-kinotv.html';
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        const TARGET_URL = `https://ip.ontivi.net/${CHANNEL}`;
+
+        async function initPlayer() {
+            try {
+                // 1. Получаем HTML через CORS-прокси
+                const response = await fetch(CORS_PROXY + encodeURIComponent(TARGET_URL));
+                if (!response.ok) {
+                    throw new Error(`Ошибка сети: ${response.status}`);
+                }
+                
+                const html = await response.text();
+                
+                // 2. Ищем нужный скрипт
+                const scriptMatch = html.match(/<script\b[^>]*>[\s\S]*?var kodk[\s\S]*?<\/script>/i);
+                if (!scriptMatch) {
+                    throw new Error('Скрипт с параметрами не найден');
+                }
+                
+                const scriptContent = scriptMatch[0];
+                
+                // 3. Извлекаем параметры
+                const kodk = scriptContent.match(/var kodk="([^"]+)"/)[1];
+                const kos = scriptContent.match(/var kos="([^"]+)"/)[1];
+                const file = scriptContent.match(/file:"([^"]+)"/)[1];
+                
+                if (!kodk || !kos || !file) {
+                    throw new Error('Не удалось извлечь все параметры');
+                }
+                
+                // 4. Создаем контейнер для плеера
+                const playerContainer = document.createElement('div');
+                playerContainer.id = 'plok';
+                document.getElementById('player').appendChild(playerContainer);
+                
+                // 5. Инициализируем плеер
+                new Playerjs({
+                    id: "plok",
+                    file: file,
+                    vars: { 
+                        kodk: kodk,
+                        kos: kos
+                    }
+                });
+                
+                // Скрываем статус
+                document.getElementById('status').classList.add('hidden');
+                
+            } catch (error) {
+                // Показываем ошибку
+                document.getElementById('status').innerHTML = `
+                    <div class="error">
+                        <h2>Ошибка</h2>
+                        <p>${error.message}</p>
+                        <p>Проверьте консоль для деталей</p>
+                    </div>
+                `;
+                console.error('Player Error:', error);
+            }
+        }
+        
+        // Запускаем при загрузке страницы
+        window.addEventListener('DOMContentLoaded', initPlayer);
+    </script>
 </body>
 </html>
