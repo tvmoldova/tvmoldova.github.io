@@ -10,7 +10,6 @@
       color: #fff;
       font-family: sans-serif;
       text-align: center;
-      margin: 0;
       padding: 20px;
     }
     #plok {
@@ -21,41 +20,42 @@
     }
   </style>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://ip.ontivi.net/p13.js"></script> <!-- подключаем их же Playerjs -->
+  <script src="https://ip.ontivi.net/p13.js"></script> <!-- Playerjs -->
 </head>
 <body>
-  <h2>Мужское кино (Автообновляемый поток)</h2>
+  <h2>Мужское кино (Автопоток)</h2>
   <div id="plok"></div>
-  <div id="status">Загрузка...</div>
+  <div id="status">Загрузка потока...</div>
 
   <script>
-    // Используем CORS-прокси (если заблочен — замени на свой сервер)
-    const proxyUrl = "https://corsproxy.io/?";
+    const proxyUrl = "https://api.allorigins.win/get?url=";
     const targetUrl = "https://ip.ontivi.net/muzhskoe-kinotv.html";
 
     fetch(proxyUrl + encodeURIComponent(targetUrl))
-      .then(res => res.text())
-      .then(html => {
-        // Парсим file: "#FI..."
+      .then(res => res.json())
+      .then(data => {
+        const html = data.contents;
+
+        // Парсим из new Playerjs({...})
         const match = html.match(/file\s*:\s*"(#FI[^"]+)"/);
-        if (!match) {
+        if (!match || !match[1]) {
           document.getElementById("status").textContent = "❌ Поток не найден";
           return;
         }
 
         const file = match[1];
-        console.log("Найден file:", file);
+        console.log("🎯 Найден file:", file);
 
         new Playerjs({
           id: "plok",
           file: file
         });
 
-        document.getElementById("status").textContent = "▶ Поток запущен";
+        document.getElementById("status").textContent = "✅ Поток запущен";
       })
       .catch(err => {
-        console.error(err);
-        document.getElementById("status").textContent = "⚠ Ошибка загрузки: " + err;
+        console.error("Ошибка загрузки:", err);
+        document.getElementById("status").textContent = "⚠ Ошибка загрузки потока";
       });
   </script>
 </body>
