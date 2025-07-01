@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ontivi Player (Debug Mode)</title>
+    <title>Ontivi Player (Enhanced)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -114,6 +114,8 @@
             white-space: pre-wrap;
             font-family: Consolas, Monaco, 'Andale Mono', monospace;
             font-size: 13px;
+            max-height: 100%;
+            overflow: auto;
         }
         
         #params-display {
@@ -202,6 +204,28 @@
         .monospace {
             font-family: monospace;
         }
+        
+        #html-controls {
+            position: sticky;
+            top: 0;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            z-index: 100;
+        }
+        
+        #html-search {
+            padding: 8px;
+            width: 300px;
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        
+        mark {
+            background-color: yellow;
+            color: black;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/gh/Playerjs/playerjs-stable@latest/dist/playerjs.js"></script>
 </head>
@@ -244,6 +268,10 @@
                 </div>
                 
                 <div class="tab-content active" id="html-tab">
+                    <div id="html-controls">
+                        <input type="text" id="html-search" placeholder="Search in HTML...">
+                        <button onclick="searchInHtml()">Search</button>
+                    </div>
                     <div id="raw-html">Loading HTML content...</div>
                 </div>
                 
@@ -329,6 +357,7 @@
             
             // Escape HTML for safe display
             elements.rawHtml.textContent = truncatedHtml;
+            state.htmlContent = truncatedHtml;
         }
 
         function displayParams(params) {
@@ -337,6 +366,30 @@
                 output += `${key}: ${value ? value : '❌ NOT FOUND'}\n`;
             }
             elements.paramsDisplay.textContent = output;
+        }
+        
+        function searchInHtml() {
+            const searchTerm = document.getElementById('html-search').value;
+            if (!searchTerm || !state.htmlContent) return;
+            
+            try {
+                // Create safe regex
+                const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedTerm})`, 'gi');
+                
+                // Highlight matches
+                let highlighted = state.htmlContent.replace(regex, '<mark>$1</mark>');
+                
+                // Limit to first 50 matches for performance
+                const matches = highlighted.split('<mark>');
+                if (matches.length > 50) {
+                    highlighted = matches.slice(0, 50).join('<mark>') + '<br>... [TRUNCATED]';
+                }
+                
+                elements.rawHtml.innerHTML = highlighted;
+            } catch (e) {
+                logMessage(`Search error: ${e.message}`, 'error');
+            }
         }
 
         // ===== Core Functions =====
@@ -372,37 +425,82 @@
             updateLoader('Extracting stream parameters...');
             
             try {
-                // Attempt 1: Direct regex extraction
-                const kodkMatch = html.match(/var kodk\s*=\s*"([^"]+)"/);
-                const kosMatch = html.match(/var kos\s*=\s*"([^"]+)"/);
-                const fileMatch = html.match(/file:\s*"([^"]+)"/);
-                
-                const params = {
-                    kodk: kodkMatch ? kodkMatch[1] : null,
-                    kos: kosMatch ? kosMatch[1] : null,
-                    file: fileMatch ? fileMatch[1] : null
+                // 1. Улучшенные регулярные выражения
+                const regexPatterns = {
+                    kodk: /var\s+kodk\s*=\s*["']([^"']+)["']/,
+                    kos: /var\s+kos\s*=\s*["']([^"']+)["']/,
+                    file: /file\s*:\s*["']([^"']+)["']/
                 };
-                
-                // Attempt 2: DOM parsing if regex fails
-                if (!params.kodk || !params.kos || !params.file) {
+
+                let kodk = null, kos = null, file = null;
+
+                // 2. Поиск в основном HTML
+                kodk = html.match(regexPatterns.kodk)?.[1];
+                kos = html.match(regexPatterns.kos)?.[1];
+                file = html.match(regexPatterns.file)?.[1];
+
+                // 3. Если не найдено - парсим через DOM
+                if (!kodk || !kos || !file) {
                     logMessage('Direct regex failed, trying DOM parsing...', 'warning');
                     
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     
-                    const scripts = Array.from(doc.querySelectorAll('script'));
+                    // Поиск в скриптах
+                    const scripts = doc.querySelectorAll('script');
                     for (const script of scripts) {
                         const content = script.textContent;
-                        if (!params.kodk) params.kodk = content.match(/var kodk\s*=\s*"([^"]+)"/)?.[1];
-                        if (!params.kos) params.kos = content.match(/var kos\s*=\s*"([^"]+)"/)?.[1];
-                        if (!params.file) params.file = content.match(/file:\s*"([^"]+)"/)?.[1];
+                        
+                        if (!kodk) kodk = content.match(regexPatterns.kodk)?.[1];
+                        if (!kos) kos = content.match(regexPatterns.kos)?.[1];
+                        if (!file) file = content.match(regexPatterns.file)?.[1];
+                    }
+                    
+                    // Поиск в data-атрибутах
+                    if (!file) {
+                        const playerElement = doc.querySelector('[data-file]');
+                        if (playerElement) file = playerElement.dataset.file;
                     }
                 }
-                
-                // Results
+
+                // 4. Попытка найти в JSON-структурах
+                if (!file) {
+                    const jsonMatch = html.match(/{[\s\S]*?file[\s\S]*?}/);
+                    if (jsonMatch) {
+                        try {
+                            const jsonData = JSON.parse(jsonMatch[0]);
+                            file = jsonData.file || jsonData.url || jsonData.source;
+                            kodk = jsonData.kodk || jsonData.key;
+                            kos = jsonData.kos || jsonData.token;
+                        } catch (e) {
+                            logMessage('JSON parse error: ' + e.message, 'warning');
+                        }
+                    }
+                }
+
+                // 5. Экстренный поиск по ключевым словам
+                if (!file) {
+                    const filePatterns = [
+                        /(https?:\/\/[^\s"'<>]+\.(m3u8|mp4|flv|ts)[^\s"'<>]*)/,
+                        /(https?%3A%2F%2F[^\s"']+)/,
+                        /source\s*:\s*["']([^"']+)["']/
+                    ];
+                    
+                    for (const pattern of filePatterns) {
+                        const match = html.match(pattern);
+                        if (match && match[1]) {
+                            file = decodeURIComponent(match[1]);
+                            break;
+                        }
+                    }
+                }
+
+                // Собираем результаты
+                const params = { kodk, kos, file };
                 state.extractedParams = params;
                 displayParams(params);
-                
+
+                // Проверка результатов
                 if (params.kodk && params.kos && params.file) {
                     updateStatusIndicator(elements.parsingStatus, 'success');
                     logMessage('All parameters extracted successfully', 'success');
@@ -415,7 +513,10 @@
                     if (!params.kos) missing.push('kos');
                     if (!params.file) missing.push('file');
                     
+                    // Сохраняем HTML для анализа
+                    state.htmlContent = html;
                     logMessage(`Missing parameters: ${missing.join(', ')}`, 'error');
+                    
                     throw new Error(`Missing parameters: ${missing.join(', ')}`);
                 }
             } catch (error) {
@@ -433,8 +534,14 @@
             try {
                 elements.player.innerHTML = ''; // Clear loader
                 
+                // Создаем контейнер для плеера
+                const playerContainer = document.createElement('div');
+                playerContainer.id = 'plok';
+                elements.player.appendChild(playerContainer);
+                
+                // Инициализируем плеер
                 new Playerjs({
-                    id: "player",
+                    id: "plok",
                     file: params.file,
                     vars: { 
                         kodk: params.kodk,
@@ -451,19 +558,11 @@
                 logMessage(`Player initialization failed: ${error.message}`, 'error');
                 
                 elements.player.innerHTML = `
-                    <div style="
-                        position:absolute;
-                        top:50%;
-                        left:50%;
-                        transform:translate(-50%,-50%);
-                        text-align:center;
-                        color:white;
-                        padding:20px;
-                        background:rgba(233,69,96,0.3);
-                        border-radius:8px;
-                    ">
-                        <h2>Player Error</h2>
+                    <div class="error-box" style="text-align: center; padding: 40px;">
+                        <h2>Player Initialization Error</h2>
                         <p>${error.message}</p>
+                        <p>Please check the extracted parameters:</p>
+                        <pre>${JSON.stringify(state.extractedParams, null, 2)}</pre>
                         <p>Check debug console for details</p>
                     </div>
                 `;
@@ -491,6 +590,12 @@
             } catch (error) {
                 logMessage(`Fatal error: ${error.message}`, 'error');
                 updateLoader(`Error: ${error.message}. Check debug console.`);
+                
+                // Показать параметры, которые удалось извлечь
+                if (Object.keys(state.extractedParams).length > 0) {
+                    document.getElementById('params-tab').classList.add('active');
+                    document.querySelector('[data-tab="params"]').classList.add('active');
+                }
             }
         }
 
