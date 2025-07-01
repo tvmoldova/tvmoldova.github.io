@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Автогенерация Playerjs</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="p13.js"></script> <!-- Подключи оригинальный Playerjs -->
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Мужское кино</h2>
+    <div id="plok"></div>
+    <div id="status">Загрузка...</div>
+
+    <script>
+    // Подгружаем HTML страницы через CORS-прокси
+    fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://ip.ontivi.net/muzhskoe-kinotv.html"))
+      .then(response => response.json())
+      .then(data => {
+        const html = data.contents;
+
+        const fileMatch = html.match(/file\s*:\s*"(#FI[^"]+)"/);
+        if (!fileMatch) return document.getElementById("status").textContent = "Ошибка: не удалось найти file";
+
+        const file = fileMatch[1];
+        console.log("Найден file:", file);
+
+        // Инициализируем Playerjs с живым file
+        new Playerjs({
+            id: "plok",
+            file: file
+        });
+
+        document.getElementById("status").textContent = "Воспроизведение потока...";
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById("status").textContent = "Ошибка загрузки потока.";
+      });
+    </script>
+</body>
+</html>
