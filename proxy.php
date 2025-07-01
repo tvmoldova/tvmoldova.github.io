@@ -39,7 +39,12 @@ function isValidChannel($channel) {
         return false;
     }
     
-    // Дополнительные проверки при необходимости
+    // Проверка на потенциальные атаки
+    if (strpos($channel, '..') !== false || strpos($channel, '//') !== false) {
+        logMessage("Suspicious channel name: $channel", 'WARN');
+        return false;
+    }
+    
     return true;
 }
 
@@ -63,7 +68,8 @@ function fetchContent($url) {
         CURLOPT_HTTPHEADER => [
             'Accept: text/html,application/xhtml+xml',
             'Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Connection: keep-alive'
+            'Connection: keep-alive',
+            'Cache-Control: no-cache'
         ]
     ]);
     
@@ -120,23 +126,29 @@ if ($response === false) {
 }
 
 // Извлекаем HTTP код и тело ответа
-$httpCode = substr($response, 0, strpos($response, "\r\n\r\n") + 4);
-$body = substr($response, strlen($httpCode));
+$headerSize = strpos($response, "\r\n\r\n") + 4;
+$headers = substr($response, 0, $headerSize);
+$body = substr($response, $headerSize);
 
 // Парсим заголовки
-$headers = [];
-foreach (explode("\r\n", substr($httpCode, 0, strrpos($httpCode, "\r\n"))) as $hdr) {
-    if (empty($hdr)) continue;
-    $parts = explode(': ', $hdr, 2);
+$headerLines = explode("\r\n", substr($headers, 0, strrpos($headers, "\r\n")));
+$parsedHeaders = [];
+foreach ($headerLines as $header) {
+    if (empty($header) continue;
+    $parts = explode(': ', $header, 2);
     if (count($parts) === 2) {
-        $headers[strtolower($parts[0])] = $parts[1];
+        $parsedHeaders[strtolower($parts[0]) = $parts[1];
     }
 }
 
 // Возвращаем результат
 if ($debug) {
     // Режим отладки - показываем подробности
-    echo "<!DOCTYPE html><html><head><title>Proxy Debug</title></head><body>";
+    echo "<!DOCTYPE html><html><head><title>Proxy Debug</title><style>
+        body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+        pre { background: #fff; padding: 15px; border-radius: 5px; overflow: auto; }
+        h2 { margin-top: 25px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+    </style></head><body>";
     echo "<h1>Proxy Debug Information</h1>";
     echo "<h2>Request Details</h2>";
     echo "<p><strong>Channel:</strong> $channel</p>";
@@ -144,7 +156,7 @@ if ($debug) {
     
     echo "<h2>Response Headers</h2>";
     echo "<pre>";
-    print_r($headers);
+    print_r($parsedHeaders);
     echo "</pre>";
     
     echo "<h2>Response Body (first 2000 chars)</h2>";
@@ -160,10 +172,12 @@ if ($debug) {
     echo "</body></html>";
 } else {
     // Режим работы - возвращаем чистый контент
-    foreach ($headers as $name => $value) {
-        // Пропускаем проблемные заголовки
-        if (in_array($name, ['content-length', 'transfer-encoding', 'connection'])) continue;
-        header("$name: $value");
+    // Передаем только безопасные заголовки
+    $safeHeaders = ['content-type', 'cache-control', 'expires', 'last-modified'];
+    foreach ($parsedHeaders as $name => $value) {
+        if (in_array($name, $safeHeaders)) {
+            header("$name: $value");
+        }
     }
     echo $body;
 }
