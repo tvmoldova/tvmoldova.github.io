@@ -1,162 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ontivi Player (Enhanced)</title>
+    <title>Ontivi Player</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/gh/Playerjs/playerjs-stable@latest/dist/playerjs.js"></script>
     <style>
-        :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --text: #e6e6e6;
-            --error: #e94560;
-            --success: #4e9f3d;
-        }
-        
-        * {
-            box-sizing: border-box;
+        body, html {
             margin: 0;
             padding: 0;
-        }
-        
-        body, html {
             height: 100%;
-            background: var(--primary);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            overflow: hidden;
-        }
-        
-        #container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        /* Player Section */
-        #player-section {
-            flex: 1;
-            position: relative;
-            min-height: 300px;
             background: #000;
+            font-family: Arial, sans-serif;
+            color: white;
         }
-        
         #player {
             width: 100%;
             height: 100%;
         }
-        
-        /* Debug Panel */
-        #debug-panel {
-            height: 40%;
-            background: var(--secondary);
-            border-top: 2px solid var(--accent);
-            display: flex;
-            flex-direction: column;
-            transition: height 0.3s ease;
-        }
-        
-        #debug-panel.collapsed {
-            height: 40px;
-        }
-        
-        #panel-header {
-            padding: 10px 15px;
-            background: var(--accent);
-            display: flex;
-            justify-content: space-between;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        #panel-content {
-            flex: 1;
-            overflow: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .tab-container {
-            display: flex;
-            margin-bottom: 15px;
-        }
-        
-        .tab {
-            padding: 8px 15px;
-            background: rgba(255,255,255,0.1);
-            cursor: pointer;
-            border-radius: 4px 4px 0 0;
-            margin-right: 5px;
-        }
-        
-        .tab.active {
-            background: rgba(255,255,255,0.2);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            display: none;
-            flex: 1;
-            overflow: auto;
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 0 0 4px 4px;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        #raw-html {
-            white-space: pre-wrap;
-            font-family: Consolas, Monaco, 'Andale Mono', monospace;
-            font-size: 13px;
-            max-height: 100%;
-            overflow: auto;
-        }
-        
-        #params-display {
-            font-family: monospace;
-            white-space: pre;
-        }
-        
-        /* Status Elements */
-        #status-bar {
-            display: flex;
-            padding: 10px;
-            background: rgba(0,0,0,0.5);
-            border-bottom: 1px solid var(--accent);
-        }
-        
-        .status-item {
-            margin-right: 20px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-            background: #555;
-        }
-        
-        .status-indicator.active {
-            background: var(--success);
-            box-shadow: 0 0 8px var(--success);
-        }
-        
-        .status-indicator.error {
-            background: var(--error);
-            box-shadow: 0 0 8px var(--error);
-        }
-        
-        /* Loader */
-        #loader {
+        #status {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -164,472 +26,83 @@
             text-align: center;
             z-index: 10;
         }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: var(--text);
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+        .error {
+            background: rgba(200, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Error Display */
-        .error-box {
-            background: rgba(233, 69, 96, 0.2);
-            border: 1px solid var(--error);
-            padding: 15px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-        
-        .success-box {
-            background: rgba(78, 159, 61, 0.2);
-            border: 1px solid var(--success);
-            padding: 15px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-        
-        /* Utility */
         .hidden {
             display: none;
         }
-        
-        .monospace {
-            font-family: monospace;
-        }
-        
-        #html-controls {
-            position: sticky;
-            top: 0;
-            background: rgba(0,0,0,0.7);
-            padding: 10px;
-            z-index: 100;
-        }
-        
-        #html-search {
-            padding: 8px;
-            width: 300px;
-            background: #222;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 4px;
-        }
-        
-        mark {
-            background-color: yellow;
-            color: black;
-        }
     </style>
-    <script src="https://cdn.jsdelivr.net/gh/Playerjs/playerjs-stable@latest/dist/playerjs.js"></script>
 </head>
 <body>
-    <div id="container">
-        <div id="status-bar">
-            <div class="status-item">
-                <div class="status-indicator" id="proxy-status"></div>
-                <span>Proxy Connection</span>
-            </div>
-            <div class="status-item">
-                <div class="status-indicator" id="parsing-status"></div>
-                <span>HTML Parsing</span>
-            </div>
-            <div class="status-item">
-                <div class="status-indicator" id="player-status"></div>
-                <span>Player Initialization</span>
-            </div>
-        </div>
-        
-        <div id="player-section">
-            <div id="player">
-                <div id="loader">
-                    <div class="spinner"></div>
-                    <div id="loader-text">Initializing player...</div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="debug-panel">
-            <div id="panel-header">
-                <strong>Debug Console</strong>
-                <span id="toggle-panel">[Collapse]</span>
-            </div>
-            <div id="panel-content">
-                <div class="tab-container">
-                    <div class="tab active" data-tab="html">Raw HTML</div>
-                    <div class="tab" data-tab="params">Extracted Params</div>
-                    <div class="tab" data-tab="logs">Process Log</div>
-                </div>
-                
-                <div class="tab-content active" id="html-tab">
-                    <div id="html-controls">
-                        <input type="text" id="html-search" placeholder="Search in HTML...">
-                        <button onclick="searchInHtml()">Search</button>
-                    </div>
-                    <div id="raw-html">Loading HTML content...</div>
-                </div>
-                
-                <div class="tab-content" id="params-tab">
-                    <pre id="params-display">No parameters extracted yet</pre>
-                </div>
-                
-                <div class="tab-content" id="logs-tab">
-                    <div id="log-entries"></div>
-                </div>
-            </div>
-        </div>
+    <div id="player">
+        <div id="status">Загрузка канала...</div>
     </div>
 
     <script>
-        // ===== Configuration =====
-        const CONFIG = {
-            channelName: 'muzhskoe-kinotv.html',
-            proxyUrl: 'proxy.php?channel=',
-            debugMode: true
-        };
-
-        // ===== State Management =====
-        const state = {
-            proxyResponse: null,
-            htmlContent: '',
-            extractedParams: {},
-            logs: [],
-            playerInitialized: false
-        };
-
-        // ===== DOM References =====
-        const elements = {
-            loader: document.getElementById('loader'),
-            loaderText: document.getElementById('loader-text'),
-            player: document.getElementById('player'),
-            rawHtml: document.getElementById('raw-html'),
-            paramsDisplay: document.getElementById('params-display'),
-            logEntries: document.getElementById('log-entries'),
-            proxyStatus: document.getElementById('proxy-status'),
-            parsingStatus: document.getElementById('parsing-status'),
-            playerStatus: document.getElementById('player-status'),
-            debugPanel: document.getElementById('debug-panel'),
-            togglePanel: document.getElementById('toggle-panel')
-        };
-
-        // ===== Debug Functions =====
-        function logMessage(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = document.createElement('div');
-            
-            logEntry.innerHTML = `
-                <span class="monospace">[${timestamp}]</span>
-                <strong class="${type}">${type.toUpperCase()}</strong>: 
-                ${message}
-            `;
-            
-            if (type === 'error') {
-                logEntry.classList.add('error-box');
-            } else if (type === 'success') {
-                logEntry.classList.add('success-box');
-            }
-            
-            elements.logEntries.prepend(logEntry);
-            state.logs.push({timestamp, type, message});
-        }
-
-        function updateStatusIndicator(element, status) {
-            element.className = 'status-indicator';
-            if (status === 'success') element.classList.add('active');
-            if (status === 'error') element.classList.add('error');
-        }
-
-        function updateLoader(text) {
-            elements.loaderText.textContent = text;
-        }
-
-        function displayRawHtml(html) {
-            // Truncate for performance
-            const truncatedHtml = html.length > 50000 
-                ? html.substring(0, 50000) + '... [TRUNCATED]' 
-                : html;
-            
-            // Escape HTML for safe display
-            elements.rawHtml.textContent = truncatedHtml;
-            state.htmlContent = truncatedHtml;
-        }
-
-        function displayParams(params) {
-            let output = '';
-            for (const [key, value] of Object.entries(params)) {
-                output += `${key}: ${value ? value : '❌ NOT FOUND'}\n`;
-            }
-            elements.paramsDisplay.textContent = output;
-        }
+        // Конфигурация
+        const channel = 'muzhskoe-kinotv.html';
         
-        function searchInHtml() {
-            const searchTerm = document.getElementById('html-search').value;
-            if (!searchTerm || !state.htmlContent) return;
-            
+        // Основная функция
+        async function initPlayer() {
             try {
-                // Create safe regex
-                const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escapedTerm})`, 'gi');
-                
-                // Highlight matches
-                let highlighted = state.htmlContent.replace(regex, '<mark>$1</mark>');
-                
-                // Limit to first 50 matches for performance
-                const matches = highlighted.split('<mark>');
-                if (matches.length > 50) {
-                    highlighted = matches.slice(0, 50).join('<mark>') + '<br>... [TRUNCATED]';
-                }
-                
-                elements.rawHtml.innerHTML = highlighted;
-            } catch (e) {
-                logMessage(`Search error: ${e.message}`, 'error');
-            }
-        }
-
-        // ===== Core Functions =====
-        async function fetchChannelData() {
-            updateLoader('Connecting to proxy...');
-            logMessage(`Fetching data for channel: ${CONFIG.channelName}`);
-            
-            try {
-                const response = await fetch(`${CONFIG.proxyUrl}${encodeURIComponent(CONFIG.channelName)}`);
-                
-                if (!response.ok) {
-                    throw new Error(`Proxy error: ${response.status} ${response.statusText}`);
-                }
+                // 1. Получаем HTML через прокси
+                const response = await fetch(`proxy.php?channel=${encodeURIComponent(channel)}`);
+                if (!response.ok) throw new Error('Ошибка прокси: ' + response.status);
                 
                 const html = await response.text();
-                state.htmlContent = html;
-                state.proxyResponse = response;
                 
-                updateStatusIndicator(elements.proxyStatus, 'success');
-                logMessage('Proxy request successful', 'success');
-                updateLoader('Processing HTML content...');
+                // 2. Ищем нужный скрипт
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const scripts = doc.querySelectorAll('script');
                 
-                return html;
-            } catch (error) {
-                updateStatusIndicator(elements.proxyStatus, 'error');
-                logMessage(`Proxy connection failed: ${error.message}`, 'error');
-                throw error;
-            }
-        }
-
-        function extractParams(html) {
-            logMessage('Parsing HTML for parameters...');
-            updateLoader('Extracting stream parameters...');
-            
-            try {
-                // 1. Улучшенные регулярные выражения
-                const regexPatterns = {
-                    kodk: /var\s+kodk\s*=\s*["']([^"']+)["']/,
-                    kos: /var\s+kos\s*=\s*["']([^"']+)["']/,
-                    file: /file\s*:\s*["']([^"']+)["']/
-                };
-
-                let kodk = null, kos = null, file = null;
-
-                // 2. Поиск в основном HTML
-                kodk = html.match(regexPatterns.kodk)?.[1];
-                kos = html.match(regexPatterns.kos)?.[1];
-                file = html.match(regexPatterns.file)?.[1];
-
-                // 3. Если не найдено - парсим через DOM
-                if (!kodk || !kos || !file) {
-                    logMessage('Direct regex failed, trying DOM parsing...', 'warning');
-                    
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    
-                    // Поиск в скриптах
-                    const scripts = doc.querySelectorAll('script');
-                    for (const script of scripts) {
-                        const content = script.textContent;
-                        
-                        if (!kodk) kodk = content.match(regexPatterns.kodk)?.[1];
-                        if (!kos) kos = content.match(regexPatterns.kos)?.[1];
-                        if (!file) file = content.match(regexPatterns.file)?.[1];
-                    }
-                    
-                    // Поиск в data-атрибутах
-                    if (!file) {
-                        const playerElement = doc.querySelector('[data-file]');
-                        if (playerElement) file = playerElement.dataset.file;
+                let scriptContent = '';
+                for (const script of scripts) {
+                    if (script.textContent.includes('var kodk=')) {
+                        scriptContent = script.textContent;
+                        break;
                     }
                 }
-
-                // 4. Попытка найти в JSON-структурах
-                if (!file) {
-                    const jsonMatch = html.match(/{[\s\S]*?file[\s\S]*?}/);
-                    if (jsonMatch) {
-                        try {
-                            const jsonData = JSON.parse(jsonMatch[0]);
-                            file = jsonData.file || jsonData.url || jsonData.source;
-                            kodk = jsonData.kodk || jsonData.key;
-                            kos = jsonData.kos || jsonData.token;
-                        } catch (e) {
-                            logMessage('JSON parse error: ' + e.message, 'warning');
-                        }
-                    }
-                }
-
-                // 5. Экстренный поиск по ключевым словам
-                if (!file) {
-                    const filePatterns = [
-                        /(https?:\/\/[^\s"'<>]+\.(m3u8|mp4|flv|ts)[^\s"'<>]*)/,
-                        /(https?%3A%2F%2F[^\s"']+)/,
-                        /source\s*:\s*["']([^"']+)["']/
-                    ];
-                    
-                    for (const pattern of filePatterns) {
-                        const match = html.match(pattern);
-                        if (match && match[1]) {
-                            file = decodeURIComponent(match[1]);
-                            break;
-                        }
-                    }
-                }
-
-                // Собираем результаты
-                const params = { kodk, kos, file };
-                state.extractedParams = params;
-                displayParams(params);
-
-                // Проверка результатов
-                if (params.kodk && params.kos && params.file) {
-                    updateStatusIndicator(elements.parsingStatus, 'success');
-                    logMessage('All parameters extracted successfully', 'success');
-                    return params;
-                } else {
-                    updateStatusIndicator(elements.parsingStatus, 'error');
-                    
-                    const missing = [];
-                    if (!params.kodk) missing.push('kodk');
-                    if (!params.kos) missing.push('kos');
-                    if (!params.file) missing.push('file');
-                    
-                    // Сохраняем HTML для анализа
-                    state.htmlContent = html;
-                    logMessage(`Missing parameters: ${missing.join(', ')}`, 'error');
-                    
-                    throw new Error(`Missing parameters: ${missing.join(', ')}`);
-                }
-            } catch (error) {
-                updateStatusIndicator(elements.parsingStatus, 'error');
-                logMessage(`Parsing error: ${error.message}`, 'error');
-                throw error;
-            }
-        }
-
-        function initPlayer(params) {
-            updateLoader('Initializing player...');
-            logMessage('Initializing PlayerJS with parameters: ' + 
-                `file: ${params.file}, kodk: ${params.kodk}, kos: ${params.kos}`);
-            
-            try {
-                elements.player.innerHTML = ''; // Clear loader
                 
-                // Создаем контейнер для плеера
-                const playerContainer = document.createElement('div');
-                playerContainer.id = 'plok';
-                elements.player.appendChild(playerContainer);
+                if (!scriptContent) throw new Error('Скрипт с параметрами не найден');
                 
-                // Инициализируем плеер
+                // 3. Извлекаем параметры
+                const kodk = scriptContent.match(/var kodk="([^"]+)"/)[1];
+                const kos = scriptContent.match(/var kos="([^"]+)"/)[1];
+                const file = scriptContent.match(/file:"([^"]+)"/)[1];
+                
+                // 4. Запускаем плеер
+                document.getElementById('status').classList.add('hidden');
                 new Playerjs({
-                    id: "plok",
-                    file: params.file,
-                    vars: { 
-                        kodk: params.kodk,
-                        kos: params.kos
-                    }
+                    id: "player",
+                    file: file,
+                    vars: { kodk, kos }
                 });
                 
-                state.playerInitialized = true;
-                updateStatusIndicator(elements.playerStatus, 'success');
-                logMessage('Player initialized successfully', 'success');
-                
             } catch (error) {
-                updateStatusIndicator(elements.playerStatus, 'error');
-                logMessage(`Player initialization failed: ${error.message}`, 'error');
-                
-                elements.player.innerHTML = `
-                    <div class="error-box" style="text-align: center; padding: 40px;">
-                        <h2>Player Initialization Error</h2>
+                // Показываем ошибку
+                document.getElementById('status').innerHTML = `
+                    <div class="error">
+                        <h2>Ошибка</h2>
                         <p>${error.message}</p>
-                        <p>Please check the extracted parameters:</p>
-                        <pre>${JSON.stringify(state.extractedParams, null, 2)}</pre>
-                        <p>Check debug console for details</p>
+                        <p>Проверьте:</p>
+                        <ul>
+                            <li>Работу proxy.php</li>
+                            <li>Название канала: ${channel}</li>
+                            <li>Консоль разработчика (F12)</li>
+                        </ul>
                     </div>
                 `;
-                
-                throw error;
+                console.error('Player Error:', error);
             }
         }
-
-        // ===== Main Process =====
-        async function main() {
-            try {
-                // 1. Fetch HTML via proxy
-                const html = await fetchChannelData();
-                displayRawHtml(html);
-                
-                // 2. Extract parameters
-                const params = await extractParams(html);
-                
-                // 3. Initialize player
-                await initPlayer(params);
-                
-                // 4. Finalize
-                elements.loader.classList.add('hidden');
-                
-            } catch (error) {
-                logMessage(`Fatal error: ${error.message}`, 'error');
-                updateLoader(`Error: ${error.message}. Check debug console.`);
-                
-                // Показать параметры, которые удалось извлечь
-                if (Object.keys(state.extractedParams).length > 0) {
-                    document.getElementById('params-tab').classList.add('active');
-                    document.querySelector('[data-tab="params"]').classList.add('active');
-                }
-            }
-        }
-
-        // ===== UI Event Handlers =====
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Deactivate all tabs
-                document.querySelectorAll('.tab, .tab-content').forEach(el => {
-                    el.classList.remove('active');
-                });
-                
-                // Activate selected tab
-                tab.classList.add('active');
-                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
-            });
-        });
-
-        elements.togglePanel.addEventListener('click', () => {
-            elements.debugPanel.classList.toggle('collapsed');
-            elements.togglePanel.textContent = elements.debugPanel.classList.contains('collapsed') 
-                ? '[Expand]' 
-                : '[Collapse]';
-        });
-
-        // ===== Initialization =====
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize status indicators
-            updateStatusIndicator(elements.proxyStatus, 'error');
-            updateStatusIndicator(elements.parsingStatus, 'error');
-            updateStatusIndicator(elements.playerStatus, 'error');
-            
-            // Start the process
-            main();
-        });
+        
+        // Запуск при загрузке страницы
+        window.addEventListener('DOMContentLoaded', initPlayer);
     </script>
 </body>
 </html>
