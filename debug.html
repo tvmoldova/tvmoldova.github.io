@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ontivi Proxy Debugger</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .section {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+            max-height: 500px;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #3a5a80;
+        }
+        .error {
+            color: #ff5555;
+            background: rgba(255, 85, 85, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ff5555;
+        }
+        .success {
+            color: #50fa7b;
+            background: rgba(80, 250, 123, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #50fa7b;
+        }
+        .warning {
+            color: #f1fa8c;
+            background: rgba(241, 250, 140, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #f1fa8c;
+        }
+        .info {
+            color: #8be9fd;
+            background: rgba(139, 233, 253, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #8be9fd;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        h2 {
+            margin: 0;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ontivi Proxy Debugger</h1>
+    
+    <div class="section">
+        <div class="header">
+            <h2>1. Проверка прокси</h2>
+            <button onclick="checkProxy()">Проверить</button>
+        </div>
+        <div id="proxy-result">Нажмите кнопку для проверки прокси</div>
+    </div>
+    
+    <div class="section">
+        <div class="header">
+            <h2>2. Проверка контента</h2>
+            <button onclick="loadContent()">Загрузить</button>
+        </div>
+        <div id="content-result">Статус: Ожидание проверки прокси</div>
+    </div>
+    
+    <div class="section">
+        <div class="header">
+            <h2>3. Проверка ответа</h2>
+            <button onclick="inspectResponse()">Анализировать</button>
+        </div>
+        <div id="inspection-result">Статус: Ожидание загрузки контента</div>
+        <pre id="response-preview"></pre>
+    </div>
+    
+    <div class="section">
+        <div class="header">
+            <h2>4. Диагностика</h2>
+            <button onclick="runDiagnostics()">Запустить</button>
+        </div>
+        <div id="diagnostics-result">Статус: Ожидание данных</div>
+    </div>
+
+    <script>
+    const channel = 'muzhskoe-kinotv.html';
+    let proxyResponse = null;
+    let htmlContent = '';
+    
+    // 1. Проверка доступности прокси
+    async function checkProxy() {
+        try {
+            const proxyUrl = `proxy.php?channel=${channel}`;
+            const response = await fetch(proxyUrl);
+            
+            const resultDiv = document.getElementById('proxy-result');
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <h3>✅ Прокси работает</h3>
+                    <p>Статус: ${response.status} ${response.statusText}</p>
+                    <p>URL: ${proxyUrl}</p>
+                    <p>Размер ответа: ${response.headers.get('content-length') || 'неизвестно'} байт</p>
+                </div>
+            `;
+            
+            proxyResponse = response;
+            
+        } catch (error) {
+            document.getElementById('proxy-result').innerHTML = `
+                <div class="error">
+                    <h3>❌ Ошибка прокси</h3>
+                    <p>${error.message}</p>
+                    <p>Возможные причины:</p>
+                    <ul>
+                        <li>Файл proxy.php отсутствует</li>
+                        <li>Ошибка в коде proxy.php</li>
+                        <li>Хостинг блокирует внешние запросы</li>
+                        <li>Проблемы с сетью</li>
+                    </ul>
+                </div>
+            `;
+        }
+    }
+    
+    // 2. Загрузка контента через прокси
+    async function loadContent() {
+        if (!proxyResponse) {
+            alert('Сначала проверьте прокси');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`proxy.php?channel=${channel}`);
+            htmlContent = await response.text();
+            
+            document.getElementById('content-result').innerHTML = `
+                <div class="success">
+                    <h3>✅ Контент получен</h3>
+                    <p>Размер: ${htmlContent.length} символов</p>
+                    <p>Первые 100 символов: ${htmlContent.substring(0, 100)}</p>
+                </div>
+            `;
+            
+        } catch (error) {
+            document.getElementById('content-result').innerHTML = `
+                <div class="error">
+                    <h3>❌ Ошибка загрузки</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        }
+    }
+    
+    // 3. Анализ ответа
+    function inspectResponse() {
+        if (!htmlContent) {
+            alert('Сначала загрузите контент');
+            return;
+        }
+        
+        const preview = document.getElementById('response-preview');
+        preview.textContent = htmlContent.substring(0, 2000) + 
+            (htmlContent.length > 2000 ? '\n... [TRUNCATED]' : '');
+        
+        // Проверка на наличие ключевых элементов
+        let resultHTML = '<div class="info">';
+        
+        // Проверка DOCTYPE
+        if (htmlContent.includes('<!DOCTYPE')) {
+            resultHTML += '<p>✅ DOCTYPE обнаружен</p>';
+        } else {
+            resultHTML += '<p class="warning">⚠️ DOCTYPE не найден</p>';
+        }
+        
+        // Проверка тега script
+        const scriptCount = (htmlContent.match(/<script/g) || []).length;
+        resultHTML += `<p>✅ Найдено скриптов: ${scriptCount}</p>`;
+        
+        // Проверка наличия ключевых переменных
+        const kodkFound = htmlContent.includes('var kodk');
+        const kosFound = htmlContent.includes('var kos');
+        const fileFound = htmlContent.includes('file:');
+        
+        resultHTML += `
+            <p>${kodkFound ? '✅' : '❌'} Переменная kodk: ${kodkFound ? 'найдена' : 'не найдена'}</p>
+            <p>${kosFound ? '✅' : '❌'} Переменная kos: ${kosFound ? 'найдена' : 'не найдена'}</p>
+            <p>${fileFound ? '✅' : '❌'} Параметр file: ${fileFound ? 'найден' : 'не найден'}</p>
+        `;
+        
+        resultHTML += '</div>';
+        document.getElementById('inspection-result').innerHTML = resultHTML;
+    }
+    
+    // 4. Полная диагностика
+    async function runDiagnostics() {
+        if (!htmlContent) {
+            alert('Сначала загрузите контент');
+            return;
+        }
+        
+        const diagResult = document.getElementById('diagnostics-result');
+        diagResult.innerHTML = '<div class="info">🔍 Запуск диагностики...</div>';
+        
+        try {
+            let diagHTML = '<div class="info"><h3>Результаты диагностики</h3>';
+            
+            // Попытка 1: Прямое извлечение переменных
+            try {
+                const kodkMatch = htmlContent.match(/var kodk\s*=\s*"([^"]+)"/);
+                const kosMatch = htmlContent.match(/var kos\s*=\s*"([^"]+)"/);
+                const fileMatch = htmlContent.match(/file:\s*"([^"]+)"/);
+                
+                diagHTML += '<h4>Попытка 1: Прямое извлечение</h4>';
+                diagHTML += kodkMatch ? `<p>✅ kodk: ${kodkMatch[1]}</p>` : '<p class="error">❌ kodk не извлечен</p>';
+                diagHTML += kosMatch ? `<p>✅ kos: ${kosMatch[1]}</p>` : '<p class="error">❌ kos не извлечен</p>';
+                diagHTML += fileMatch ? `<p>✅ file: ${fileMatch[1]}</p>` : '<p class="error">❌ file не извлечен</p>';
+            } catch (e) {
+                diagHTML += `<p class="error">❌ Ошибка при прямом извлечении: ${e.message}</p>`;
+            }
+            
+            // Попытка 2: DOM-парсинг
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const scripts = doc.querySelectorAll('script');
+                
+                diagHTML += `<h4>Попытка 2: DOM-парсинг (найдено ${scripts.length} скриптов)</h4>`;
+                
+                let targetScript = null;
+                for (let i = 0; i < scripts.length; i++) {
+                    const content = scripts[i].textContent;
+                    if (content.includes('var kodk') || content.includes('file:')) {
+                        targetScript = content;
+                        diagHTML += `<p>✅ Найден скрипт с переменными (длина: ${content.length} симв.)</p>`;
+                        break;
+                    }
+                }
+                
+                if (!targetScript) {
+                    diagHTML += '<p class="error">❌ Скрипт с переменными не найден</p>';
+                }
+            } catch (e) {
+                diagHTML += `<p class="error">❌ Ошибка DOM-парсинга: ${e.message}</p>`;
+            }
+            
+            // Попытка 3: Поиск URL потока
+            try {
+                const streamUrlMatch = htmlContent.match(/(https?:\/\/[^\s"'<>]+\.(m3u8|mp4|flv|ts)[^\s"'<>]*)/i);
+                diagHTML += '<h4>Попытка 3: Поиск URL потока</h4>';
+                
+                if (streamUrlMatch) {
+                    diagHTML += `<p>✅ Найден URL потока: ${streamUrlMatch[0]}</p>`;
+                } else {
+                    diagHTML += '<p class="error">❌ URL потока не найден</p>';
+                }
+            } catch (e) {
+                diagHTML += `<p class="error">❌ Ошибка поиска URL: ${e.message}</p>`;
+            }
+            
+            diagHTML += '</div>';
+            diagResult.innerHTML = diagHTML;
+            
+        } catch (error) {
+            diagResult.innerHTML = `<div class="error">❌ Ошибка диагностики: ${error.message}</div>`;
+        }
+    }
+    </script>
+</body>
+</html>
