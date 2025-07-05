@@ -1,36 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Прямой HLS-поток</title>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <style>
-    body { background: black; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    video { width: 100%; max-width: 720px; height: auto; border: 2px solid #0f0; }
-  </style>
+    <title>Мужское кино онлайн</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stil.css">
+    <script src="jquery.js"></script>
+    <script src="playerjs.js"></script> <!-- Убедись, что он подключён -->
 </head>
 <body>
-  <video id="video" controls autoplay></video>
+    <div id="player">
+        <div id="plok"></div>
+    </div>
 
-  <script>
-    const video = document.getElementById('video');
-    const streamURL = 'http://r1.cdntv.online/high/xm1hzalq26/10.m3u8';
+    <script>
+    // Загружаем оригинальную страницу и извлекаем kodk, kos, file
+    fetch('https://ip.ontivi.net/muzhskoe-kinotv.html')
+        .then(response => response.text())
+        .then(html => {
+            // Вытаскиваем kodk, kos, и file из скрипта
+            const kodkMatch = html.match(/var\s+kodk\s*=\s*"([^"]+)"/);
+            const kosMatch = html.match(/var\s+kos\s*=\s*"([^"]+)"/);
+            const fileMatch = html.match(/file\s*:\s*"(#.*?)"/);
 
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(streamURL);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        video.play();
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = streamURL;
-      video.addEventListener('loadedmetadata', function () {
-        video.play();
-      });
-    } else {
-      alert('Ваш браузер не поддерживает HLS');
-    }
-  </script>
+            if (kodkMatch && kosMatch && fileMatch) {
+                const kodk = kodkMatch[1];
+                const kos = kosMatch[1];
+                const file = fileMatch[1];
+
+                console.log("kodk:", kodk);
+                console.log("kos:", kos);
+                console.log("file:", file);
+
+                new Playerjs({
+                    id: "plok",
+                    file: file
+                });
+            } else {
+                document.getElementById("plok").innerText = "Ошибка: данные не найдены.";
+            }
+        })
+        .catch(error => {
+            document.getElementById("plok").innerText = "Ошибка загрузки: " + error;
+        });
+    </script>
 </body>
 </html>
