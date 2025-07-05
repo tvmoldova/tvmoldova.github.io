@@ -5,3 +5,9 @@ https://pilot.multiscreen.moldtelecom.md/live/eds/National_geographic_IPTV/HLSv4
 
 #EXTINF:-1 tvg-id="Channel8" tvg-logo="https://example.com/logo2.png" group-title="Общие",RU TV
 https://hls-03-video.webcaramba.com/rutv/live.m3u8
+
+#EXTINF:-1 tvg-id="Russia" tvg-logo="https://example.com/logo2.png" group-title="Общие",CTC
+https://edge02r.mediavitrina.ru/hls-livef1/ctc/index.m3u8?token=v2.ejR8G2ZNQdWVa2QFDijlFulh3NZ64p0t_aMm8eMjzic.VVkOy9Ioog_0CmBRRQcyeM51FXAlyBSKUWdeSAqMr58.1752354965.d1ba9863220fed40c0bcbc4841a8c2a9
+
+#EXTINF:-1 tvg-id="Sport" tvg-logo="https://example.com/logo2.png" group-title="Общие",TNT
+https://edge01p.mediavitrina.ru/hls-livef8/tnt/index.m3u8?token=v2.uFz7hF5J8hiPNZUywsJPFDh_LXFaDXf0wCx_oFrKknk.kN-hoh2tqRy0q4y4eLC3Eybb-p4aayFb3VA3IXf5IxA.1752354795.24abe5d0503637d674823269a9d12127
