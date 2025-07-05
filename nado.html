@@ -6,43 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stil.css">
     <script src="jquery.js"></script>
-    <script src="playerjs.js"></script> <!-- Убедись, что он подключён -->
+    <script src="playerjs.js"></script>
 </head>
 <body>
     <div id="player">
         <div id="plok"></div>
     </div>
 
+    <!-- Оригинальный p13.js — он сам задаёт переменные kodk, kos, и кодирует file -->
+    <script src="https://ip.ontivi.net/p13.js"></script>
+
     <script>
-    // Загружаем оригинальную страницу и извлекаем kodk, kos, file
-    fetch('https://ip.ontivi.net/muzhskoe-kinotv.html')
-        .then(response => response.text())
-        .then(html => {
-            // Вытаскиваем kodk, kos, и file из скрипта
-            const kodkMatch = html.match(/var\s+kodk\s*=\s*"([^"]+)"/);
-            const kosMatch = html.match(/var\s+kos\s*=\s*"([^"]+)"/);
-            const fileMatch = html.match(/file\s*:\s*"(#.*?)"/);
-
-            if (kodkMatch && kosMatch && fileMatch) {
-                const kodk = kodkMatch[1];
-                const kos = kosMatch[1];
-                const file = fileMatch[1];
-
-                console.log("kodk:", kodk);
-                console.log("kos:", kos);
-                console.log("file:", file);
-
-                new Playerjs({
-                    id: "plok",
-                    file: file
-                });
-            } else {
-                document.getElementById("plok").innerText = "Ошибка: данные не найдены.";
-            }
-        })
-        .catch(error => {
-            document.getElementById("plok").innerText = "Ошибка загрузки: " + error;
-        });
+    // Ждём полной загрузки p13.js и вызова его переменных
+    window.addEventListener("load", function () {
+        if (typeof kodk !== "undefined" && typeof kos !== "undefined" && typeof file !== "undefined") {
+            new Playerjs({
+                id: "plok",
+                file: file
+            });
+        } else {
+            document.getElementById("plok").innerText = "❌ Не удалось получить параметры.";
+        }
+    });
     </script>
 </body>
 </html>
