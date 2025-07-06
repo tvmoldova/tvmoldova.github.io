@@ -1,0 +1,22 @@
+[
+  {
+    "id": "hitfm",
+    "name": "Hit FM",
+    "stream": "https://diximd.webcaramba.com/diximd-hitfm112.aacp",
+    "logo": "https://www.radio.md/images/logos/hitfm.png",
+    "genre": "Популярная музыка"
+  },
+  {
+    "id": "jazz",
+    "name": "Jazz Moscow",
+    "stream": "https://jazz.stream.url",
+    "logo": "https://jazz.logo.url",
+    "genre": "Джаз"
+  },
+  {
+    "id": "lofi",
+    "name": "Lo-Fi Radio",
+    "stream": "https://lofi.stream.url",
+    "genre": "Lo-Fi"
+  }
+]
