@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мужское кино - Плеер</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="still.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="p13.js"></script>
+    <style>
+        body { 
+            background: #000; 
+            margin: 0; 
+            padding: 0; 
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        #player {
+            max-width: 100%;
+            margin: 0 auto;
+            background: #111;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #plok {
+            min-height: 300px;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 18px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 10px;
+            background: #333;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Мужское кино</h1>
+        <div id="player">
+            <div id="plok">Инициализация плеера...</div>
+        </div>
+        <div class="status" id="status">Загрузка данных...</div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        const SERVER_URL = 'https://dualboot.pagekite.me/data';
+        
+        function updateStatus(message, isError = false) {
+            $('#status').text(message).css('color', isError ? '#ff5555' : '#55ff55');
+        }
+        
+        function initPlayer(data) {
+            if (data.error) {
+                updateStatus('Ошибка: ' + data.error, true);
+                return;
+            }
+            
+            updateStatus('Плеер успешно инициализирован!');
+            
+            console.log('Player data:', data);
+            new Playerjs({
+                id: "plok",
+                file: data.file,
+                poster: "//pics.rutube.ru/video/eb/ebd9f0e8a5b54c1b8c4a8a0a8a0a8a0a.jpg"
+            });
+        }
+        
+        // Основной запрос данных
+        $.ajax({
+            url: SERVER_URL,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                updateStatus('Данные успешно получены');
+                initPlayer(data);
+            },
+            error: function(xhr) {
+                const errorMsg = `Ошибка ${xhr.status}: ${xhr.statusText}`;
+                updateStatus('Ошибка соединения: ' + errorMsg, true);
+                console.error('AJAX error:', xhr);
+                
+                // Попытка повторного подключения через 10 секунд
+                setTimeout(() => {
+                    updateStatus('Повторная попытка подключения...');
+                    $.ajax({
+                        url: SERVER_URL,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: initPlayer,
+                        error: function() {
+                            updateStatus('Ошибка при повторном подключении', true);
+                        }
+                    });
+                }, 10000);
+            }
+        });
+    });
+    </script>
+</body>
+</html>
