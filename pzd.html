@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FM Radio Player</title>
+  <title>FM Radio Player Pro</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #121212, #1f1f1f);
+      background: linear-gradient(to bottom, #121212, #1a1a2e);
       color: white;
       display: flex;
       flex-direction: column;
@@ -17,35 +17,41 @@
       overflow: hidden;
     }
     header {
-      padding: 12px 16px;
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1e1e1e;
+      background: rgba(30, 30, 46, 0.9);
       border-bottom: 1px solid #333;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 30;
     }
     header h1 {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: bold;
       color: #5f77ff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .search {
-      background: #2a2a2a;
-      border-radius: 8px;
-      padding: 8px 14px;
+      background: rgba(42, 42, 58, 0.8);
+      border-radius: 12px;
+      padding: 10px 16px;
       flex: 1;
       margin-left: 15px;
       display: flex;
       align-items: center;
-      transition: background 0.3s;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
     .search:focus-within {
-      background: #333;
+      background: rgba(50, 50, 70, 0.9);
       box-shadow: 0 0 0 2px #5f77ff;
     }
     .search i {
-      margin-right: 8px;
+      margin-right: 10px;
       color: #888;
     }
     .search input {
@@ -53,45 +59,44 @@
       border: none;
       color: white;
       width: 100%;
-      font-size: 14px;
+      font-size: 15px;
       outline: none;
     }
     .grid {
       flex: 1;
       overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
     }
     .card {
-      background: #1f1f1f;
-      border-radius: 12px;
-      padding: 16px;
-      text-align: left;
+      background: rgba(31, 31, 51, 0.8);
+      border-radius: 16px;
+      padding: 20px;
       cursor: pointer;
       transition: all 0.3s;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 15px;
-      width: 100%;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(80, 80, 120, 0.2);
     }
     .card:hover { 
-      background: #292929; 
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      background: rgba(41, 41, 71, 0.9); 
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
     .card .station-logo {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 12px;
       overflow: hidden;
-      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
+      background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
     }
     .card .station-logo img {
       width: 100%;
@@ -99,56 +104,73 @@
       object-fit: cover;
     }
     .card .station-logo i {
-      font-size: 20px;
+      font-size: 48px;
       color: #5f77ff;
     }
     .card .station-info {
-      flex: 1;
-      overflow: hidden;
+      padding: 0 10px;
     }
     .card h3 {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       color: #fff;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .card p {
-      font-size: 13px;
+      font-size: 14px;
       color: #aaa;
-      white-space: nowrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
+    }
+    .card .genre {
+      display: inline-block;
+      background: rgba(95, 119, 255, 0.2);
+      color: #aab8ff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
     }
     #mini-player {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #1e1e1e;
-      border-top: 1px solid #333;
-      padding: 12px 20px;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(30, 30, 46, 0.95);
+      border-radius: 16px;
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       display: none;
-      z-index: 10;
-      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+      z-index: 25;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(80, 80, 120, 0.3);
+      transition: all 0.3s;
+    }
+    #mini-player:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     }
     #mini-player .mini-info {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 15px;
+      flex: 1;
     }
     #mini-player .mini-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #2a2a2a;
+      background: rgba(42, 42, 58, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -160,32 +182,80 @@
     }
     #mini-player .mini-logo i {
       color: #5f77ff;
-      font-size: 16px;
+      font-size: 20px;
     }
-    #mini-player span {
-      font-size: 14px;
+    #mini-player .mini-text {
+      flex: 1;
+      overflow: hidden;
+    }
+    #mini-player .mini-title {
+      font-size: 16px;
       color: #fff;
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    #mini-player button {
-      background: transparent;
+    #mini-player .mini-genre {
+      font-size: 13px;
+      color: #aab8ff;
+      margin-top: 4px;
+    }
+    #mini-player .mini-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    #mini-player .mini-play-toggle {
+      background: #5f77ff;
       border: none;
-      color: #5f77ff;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
       font-size: 18px;
       cursor: pointer;
-      padding: 5px;
+      transition: all 0.2s;
+      box-shadow: 0 0 15px rgba(95, 119, 255, 0.5);
+    }
+    #mini-player .mini-play-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(95, 119, 255, 0.8);
+    }
+    #mini-player .expand-btn {
+      background: rgba(80, 80, 120, 0.4);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aab8ff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #mini-player .expand-btn:hover {
+      background: rgba(95, 119, 255, 0.3);
+      color: white;
+      transform: scale(1.05);
     }
     #player-fullscreen {
       position: fixed;
       inset: 0;
-      background: linear-gradient(to bottom, #121212, #1f1f1f);
+      background: linear-gradient(to bottom, #0f0f1a, #1a1a2e);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      z-index: 20;
+      z-index: 100;
       text-align: center;
+      backdrop-filter: blur(20px);
     }
     #player-fullscreen .back {
       position: absolute;
@@ -195,35 +265,37 @@
       cursor: pointer;
       font-size: 24px;
       background: rgba(255, 255, 255, 0.1);
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.3s;
+      z-index: 10;
     }
     #player-fullscreen .back:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(95, 119, 255, 0.3);
     }
     .station-logo-large {
-      width: 200px;
-      max-width: 60vw;
+      width: 280px;
+      max-width: 70vw;
       aspect-ratio: 1/1;
-      border-radius: 20px;
+      border-radius: 24px;
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 5;
     }
     .station-logo-large img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      padding: 10px;
+      object-fit: cover;
     }
     .station-logo-large .placeholder-logo {
       width: 100%;
@@ -232,83 +304,125 @@
       align-items: center;
       justify-content: center;
       color: #5f77ff;
-      font-size: 48px;
+      font-size: 64px;
     }
     .play-button {
-      width: 80px;
-      height: 80px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       border: 2px solid #5f77ff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 36px;
       color: #ffffff;
-      margin: 25px 0;
+      margin: 30px 0;
       background: rgba(255, 255, 255, 0.05);
-      box-shadow: 0 0 20px #5865f2;
+      box-shadow: 0 0 30px rgba(95, 119, 255, 0.6);
       cursor: pointer;
       transition: all 0.3s;
+      position: relative;
+      z-index: 5;
     }
     .play-button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 30px #5865f2;
+      box-shadow: 0 0 40px rgba(95, 119, 255, 0.8);
     }
     #station-name {
-      font-size: 24px;
+      font-size: 28px;
       margin-bottom: 10px;
       color: #fff;
       font-weight: 600;
+      position: relative;
+      z-index: 5;
     }
-    #station-stream {
-      font-size: 14px;
-      color: #aaa;
-      margin-bottom: 30px;
-      max-width: 80%;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    #station-genre {
+      font-size: 16px;
+      color: #aab8ff;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 5;
     }
     .player-controls {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 25px;
+      gap: 30px;
       width: 100%;
-      max-width: 300px;
+      max-width: 400px;
       margin-bottom: 30px;
+      position: relative;
+      z-index: 5;
     }
     .player-controls i {
-      font-size: 24px;
+      font-size: 28px;
       color: white;
       cursor: pointer;
       transition: transform 0.2s, color 0.2s;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
     .player-controls i:hover {
       transform: scale(1.2);
       color: #5f77ff;
+      background: rgba(95, 119, 255, 0.2);
     }
     .player-controls .active {
       color: #5f77ff;
     }
+    .nav-controls {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 5;
+    }
+    .nav-controls i {
+      font-size: 24px;
+      color: #aab8ff;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(80, 80, 120, 0.3);
+    }
+    .nav-controls i:hover {
+      background: rgba(95, 119, 255, 0.3);
+      color: white;
+      transform: scale(1.1);
+    }
     .volume-container {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 15px;
       width: 80%;
-      max-width: 300px;
+      max-width: 350px;
+      position: relative;
+      z-index: 5;
     }
     .volume-container i {
-      color: #aaa;
-      font-size: 18px;
+      color: #aab8ff;
+      font-size: 20px;
+      width: 30px;
     }
     .volume-slider {
       flex: 1;
     }
     .volume-slider input[type="range"] {
       width: 100%;
-      height: 5px;
+      height: 6px;
       accent-color: #5f77ff;
       cursor: pointer;
+      border-radius: 3px;
+      background: rgba(80, 80, 120, 0.3);
     }
     .loading {
       display: flex;
@@ -318,6 +432,7 @@
       flex: 1;
       gap: 20px;
       color: #aaa;
+      grid-column: 1 / -1;
     }
     .loading i {
       font-size: 48px;
@@ -329,20 +444,73 @@
       to { transform: rotate(360deg); }
     }
     .error {
-      padding: 20px;
+      padding: 30px;
       text-align: center;
       color: #ff6b6b;
+      grid-column: 1 / -1;
     }
     .no-results {
       text-align: center;
-      padding: 30px;
+      padding: 40px;
       color: #aaa;
+      grid-column: 1 / -1;
+    }
+    .background-waves {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%235f77ff" fill-opacity="0.1" d="M0,128L48,117.3C96,107,192,85,288,101.3C384,117,480,171,576,176C672,181,768,139,864,128C960,117,1056,139,1152,149.3C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+      background-size: cover;
+      background-repeat: no-repeat;
+      z-index: 0;
+      opacity: 0.7;
+    }
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+      }
+      .station-logo-large {
+        width: 200px;
+      }
+      .play-button {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+      }
+      #station-name {
+        font-size: 24px;
+      }
     }
     @media (max-width: 480px) {
-      .station-logo-large {
-        width: 160px;
+      header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
       }
-      .card .station-logo {
+      .search {
+        margin-left: 0;
+        width: 100%;
+      }
+      #mini-player {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        padding: 12px;
+      }
+      #mini-player .mini-logo {
+        width: 40px;
+        height: 40px;
+      }
+      #mini-player .mini-play-toggle, 
+      #mini-player .expand-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      .nav-controls i {
         width: 45px;
         height: 45px;
       }
@@ -350,8 +518,10 @@
   </style>
 </head>
 <body>
+  <div class="background-waves"></div>
+  
   <header>
-    <h1>FMPLAY</h1>
+    <h1><i class="fas fa-radio"></i> RADIO WAVE</h1>
     <div class="search">
       <i class="fas fa-search"></i>
       <input type="text" id="search" placeholder="Поиск станции..." />
@@ -370,14 +540,23 @@
       <div class="mini-logo" id="mini-logo">
         <i class="fas fa-radio"></i>
       </div>
-      <span id="mini-title">Станция</span>
+      <div class="mini-text">
+        <div class="mini-title" id="mini-title">Станция</div>
+        <div class="mini-genre" id="mini-genre">Жанр</div>
+      </div>
     </div>
-    <button onclick="openFullscreen()">
-      <i class="fas fa-expand"></i>
-    </button>
+    <div class="mini-controls">
+      <button class="mini-play-toggle" id="mini-play-toggle">
+        <i class="fas fa-play" id="mini-play-icon"></i>
+      </button>
+      <button class="expand-btn" onclick="openFullscreen()">
+        <i class="fas fa-expand"></i>
+      </button>
+    </div>
   </div>
 
   <div id="player-fullscreen">
+    <div class="background-waves"></div>
     <div class="back" onclick="closeFullscreen()">
       <i class="fas fa-chevron-left"></i>
     </div>
@@ -387,15 +566,23 @@
       </div>
     </div>
     <div id="station-name">Название станции</div>
-    <div id="station-stream">Загрузка потока...</div>
+    <div id="station-genre">Жанр</div>
+    
+    <div class="nav-controls">
+      <i class="fas fa-step-backward" id="prev-station" onclick="changeStation(-1)"></i>
+      <i class="fas fa-step-forward" id="next-station" onclick="changeStation(1)"></i>
+    </div>
+    
     <div class="play-button" id="play-toggle">
       <i class="fas fa-play" id="play-icon"></i>
     </div>
+    
     <div class="player-controls">
       <i class="fas fa-heart" id="fav-button"></i>
       <i class="fas fa-redo" id="refresh-button" onclick="refreshPlaylist()"></i>
       <i class="fas fa-circle-info" onclick="alert('Это потоковое радио. Качество и песни зависят от источника.')"></i>
     </div>
+    
     <div class="volume-container">
       <i class="fas fa-volume-down"></i>
       <div class="volume-slider">
@@ -403,12 +590,13 @@
       </div>
       <i class="fas fa-volume-up"></i>
     </div>
+    
     <audio id="audio" autoplay hidden></audio>
   </div>
 
   <script>
     // URL внешнего плейлиста в формате JSON
-    const PLAYLIST_URL = 'https://tvmoldova.github.io/playlist.json';
+    const PLAYLIST_URL = 'https://example.com/radio-playlist.json';
     const CACHE_KEY = 'radio_playlist_cache';
     const CACHE_EXPIRATION = 12 * 60 * 60 * 1000; // 12 часов в миллисекундах
 
@@ -418,18 +606,24 @@
     const audio = document.getElementById("audio");
     const miniPlayer = document.getElementById("mini-player");
     const miniTitle = document.getElementById("mini-title");
+    const miniGenre = document.getElementById("mini-genre");
     const miniLogo = document.getElementById("mini-logo");
+    const miniPlayToggle = document.getElementById("mini-play-toggle");
+    const miniPlayIcon = document.getElementById("mini-play-icon");
     const stationName = document.getElementById("station-name");
-    const stationStream = document.getElementById("station-stream");
+    const stationGenre = document.getElementById("station-genre");
     const stationLogoLarge = document.getElementById("station-logo-large");
     const fullscreen = document.getElementById("player-fullscreen");
     const playToggle = document.getElementById("play-toggle");
     const playIcon = document.getElementById("play-icon");
     const favButton = document.getElementById("fav-button");
     const volumeSlider = document.getElementById("volume-slider");
+    const prevStationBtn = document.getElementById("prev-station");
+    const nextStationBtn = document.getElementById("next-station");
 
     let stations = [];
     let currentStation = null;
+    let currentStationIndex = -1;
     let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 
     // Загрузка плейлиста
@@ -472,10 +666,11 @@
               background: #5f77ff;
               border: none;
               color: white;
-              padding: 10px 20px;
-              border-radius: 8px;
-              margin-top: 15px;
+              padding: 12px 24px;
+              border-radius: 10px;
+              margin-top: 20px;
               cursor: pointer;
+              font-size: 16px;
             ">Повторить попытку</button>
           </div>
         `;
@@ -522,7 +717,7 @@
       }
       
       grid.innerHTML = "";
-      filtered.forEach(station => {
+      filtered.forEach((station, index) => {
         const card = document.createElement("div");
         card.className = "card";
         
@@ -535,11 +730,17 @@
           </div>
           <div class="station-info">
             <h3>${station.name}</h3>
-            <p>${station.genre || 'Разная музыка'}</p>
+            <p>${station.description || 'Слушайте любимую музыку в отличном качестве 24/7'}</p>
+            <div class="genre">${station.genre || 'Музыка'}</div>
           </div>
         `;
         
-        card.onclick = () => playStation(station);
+        card.onclick = () => {
+          playStation(station);
+          // Находим индекс текущей станции в основном массиве
+          currentStationIndex = stations.findIndex(s => s.id === station.id);
+        };
+        
         grid.appendChild(card);
       });
     }
@@ -564,12 +765,12 @@
       audio.src = station.stream;
       
       audio.play().then(() => {
-        playIcon.className = "fas fa-pause";
+        updatePlayIcons(true);
         miniPlayer.style.display = "flex";
         miniTitle.textContent = station.name;
+        miniGenre.textContent = station.genre || 'Разная музыка';
         stationName.textContent = station.name;
-        stationStream.textContent = station.stream;
-        fullscreen.style.display = "flex";
+        stationGenre.textContent = station.genre || 'Разная музыка';
         
         // Обновление логотипов
         updateLogo(miniLogo, station.logo);
@@ -622,11 +823,36 @@
       
       if (audio.paused) {
         audio.play();
-        playIcon.className = "fas fa-pause";
+        updatePlayIcons(true);
       } else {
         audio.pause();
-        playIcon.className = "fas fa-play";
+        updatePlayIcons(false);
       }
+    }
+    
+    // Обновление иконок воспроизведения
+    function updatePlayIcons(isPlaying) {
+      if (isPlaying) {
+        playIcon.className = "fas fa-pause";
+        miniPlayIcon.className = "fas fa-pause";
+      } else {
+        playIcon.className = "fas fa-play";
+        miniPlayIcon.className = "fas fa-play";
+      }
+    }
+
+    // Переключение между станциями
+    function changeStation(direction) {
+      if (stations.length === 0 || currentStationIndex === -1) return;
+      
+      let newIndex = currentStationIndex + direction;
+      
+      // Циклическое переключение
+      if (newIndex < 0) newIndex = stations.length - 1;
+      if (newIndex >= stations.length) newIndex = 0;
+      
+      currentStationIndex = newIndex;
+      playStation(stations[newIndex]);
     }
 
     // Добавление/удаление из избранного
@@ -656,11 +882,13 @@
     // Открытие полноэкранного плеера
     function openFullscreen() {
       fullscreen.style.display = "flex";
+      document.body.style.overflow = "hidden";
     }
 
     // Закрытие полноэкранного плеера
     function closeFullscreen() {
       fullscreen.style.display = "none";
+      document.body.style.overflow = "auto";
     }
 
     // Инициализация приложения
@@ -670,6 +898,7 @@
       
       // Обработчики событий
       playToggle.addEventListener("click", togglePlay);
+      miniPlayToggle.addEventListener("click", togglePlay);
       favButton.addEventListener("click", toggleFavorite);
       search.addEventListener("input", () => renderStations(search.value));
       
@@ -683,13 +912,13 @@
       
       // Обработка окончания потока
       audio.addEventListener("ended", () => {
-        playIcon.className = "fas fa-play";
+        updatePlayIcons(false);
       });
       
       // Обработка ошибок аудио
       audio.addEventListener("error", (e) => {
         console.error('Ошибка аудио:', e);
-        playIcon.className = "fas fa-play";
+        updatePlayIcons(false);
         alert('Произошла ошибка при воспроизведении потока. Попробуйте другую станцию.');
       });
     }
