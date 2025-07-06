@@ -6,9 +6,82 @@
   <title>FM Radio Player</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* ... (предыдущие стили остаются без изменений) ... */
-
-    /* ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #121212, #1f1f1f);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    header h1 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #5f77ff;
+    }
+    .search {
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 8px 14px;
+      flex: 1;
+      margin-left: 15px;
+      display: flex;
+      align-items: center;
+      transition: background 0.3s;
+    }
+    .search:focus-within {
+      background: #333;
+      box-shadow: 0 0 0 2px #5f77ff;
+    }
+    .search i {
+      margin-right: 8px;
+      color: #888;
+    }
+    .search input {
+      background: transparent;
+      border: none;
+      color: white;
+      width: 100%;
+      font-size: 14px;
+      outline: none;
+    }
+    .grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card {
+      background: #1f1f1f;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card:hover { 
+      background: #292929; 
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
     .card .station-logo {
       width: 50px;
       height: 50px;
@@ -20,23 +93,123 @@
       justify-content: center;
       background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
     }
-
     .card .station-logo img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Автоматическое кадрирование */
+      object-fit: cover;
     }
-
     .card .station-logo i {
       font-size: 20px;
       color: #5f77ff;
     }
-
-    /* Для полноэкранного режима */
+    .card .station-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card p {
+      font-size: 13px;
+      color: #aaa;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #mini-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+    }
+    #mini-player .mini-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #mini-player .mini-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #2a2a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #mini-player .mini-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #mini-player .mini-logo i {
+      color: #5f77ff;
+      font-size: 16px;
+    }
+    #mini-player span {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 500;
+    }
+    #mini-player button {
+      background: transparent;
+      border: none;
+      color: #5f77ff;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 5px;
+    }
+    #player-fullscreen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, #121212, #1f1f1f);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 20;
+      text-align: center;
+    }
+    #player-fullscreen .back {
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+    #player-fullscreen .back:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
     .station-logo-large {
       width: 200px;
       max-width: 60vw;
-      aspect-ratio: 1/1; /* Сохраняем квадратную пропорцию */
+      aspect-ratio: 1/1;
       border-radius: 20px;
       overflow: hidden;
       margin-bottom: 20px;
@@ -46,14 +219,12 @@
       background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
-
     .station-logo-large img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Показываем целиком с сохранением пропорций */
-      padding: 10px; /* Отступ для логотипов с прозрачностью */
+      object-fit: contain;
+      padding: 10px;
     }
-
     .station-logo-large .placeholder-logo {
       width: 100%;
       height: 100%;
@@ -63,13 +234,114 @@
       color: #5f77ff;
       font-size: 48px;
     }
-
-    /* Адаптация для мобильных */
+    .play-button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid #5f77ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: #ffffff;
+      margin: 25px 0;
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 20px #5865f2;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .play-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px #5865f2;
+    }
+    #station-name {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #fff;
+      font-weight: 600;
+    }
+    #station-stream {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 30px;
+      max-width: 80%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .player-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 30px;
+    }
+    .player-controls i {
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .player-controls i:hover {
+      transform: scale(1.2);
+      color: #5f77ff;
+    }
+    .player-controls .active {
+      color: #5f77ff;
+    }
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 80%;
+      max-width: 300px;
+    }
+    .volume-container i {
+      color: #aaa;
+      font-size: 18px;
+    }
+    .volume-slider {
+      flex: 1;
+    }
+    .volume-slider input[type="range"] {
+      width: 100%;
+      height: 5px;
+      accent-color: #5f77ff;
+      cursor: pointer;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 20px;
+      color: #aaa;
+    }
+    .loading i {
+      font-size: 48px;
+      color: #5f77ff;
+      animation: spin 1.5s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .error {
+      padding: 20px;
+      text-align: center;
+      color: #ff6b6b;
+    }
+    .no-results {
+      text-align: center;
+      padding: 30px;
+      color: #aaa;
+    }
     @media (max-width: 480px) {
       .station-logo-large {
         width: 160px;
       }
-      
       .card .station-logo {
         width: 45px;
         height: 45px;
@@ -78,12 +350,151 @@
   </style>
 </head>
 <body>
-  <!-- ... (остальная HTML-структура без изменений) ... -->
+  <header>
+    <h1>FMPLAY</h1>
+    <div class="search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search" placeholder="Поиск станции..." />
+    </div>
+  </header>
+
+  <div class="grid" id="station-list">
+    <div class="loading">
+      <i class="fas fa-sync fa-spin"></i>
+      <p>Загрузка радиостанций...</p>
+    </div>
+  </div>
+
+  <div id="mini-player">
+    <div class="mini-info">
+      <div class="mini-logo" id="mini-logo">
+        <i class="fas fa-radio"></i>
+      </div>
+      <span id="mini-title">Станция</span>
+    </div>
+    <button onclick="openFullscreen()">
+      <i class="fas fa-expand"></i>
+    </button>
+  </div>
+
+  <div id="player-fullscreen">
+    <div class="back" onclick="closeFullscreen()">
+      <i class="fas fa-chevron-left"></i>
+    </div>
+    <div class="station-logo-large" id="station-logo-large">
+      <div class="placeholder-logo">
+        <i class="fas fa-radio"></i>
+      </div>
+    </div>
+    <div id="station-name">Название станции</div>
+    <div id="station-stream">Загрузка потока...</div>
+    <div class="play-button" id="play-toggle">
+      <i class="fas fa-play" id="play-icon"></i>
+    </div>
+    <div class="player-controls">
+      <i class="fas fa-heart" id="fav-button"></i>
+      <i class="fas fa-redo" id="refresh-button" onclick="refreshPlaylist()"></i>
+      <i class="fas fa-circle-info" onclick="alert('Это потоковое радио. Качество и песни зависят от источника.')"></i>
+    </div>
+    <div class="volume-container">
+      <i class="fas fa-volume-down"></i>
+      <div class="volume-slider">
+        <input type="range" min="0" max="1" step="0.1" value="1" id="volume-slider">
+      </div>
+      <i class="fas fa-volume-up"></i>
+    </div>
+    <audio id="audio" autoplay hidden></audio>
+  </div>
 
   <script>
-    // ... (предыдущий JavaScript код) ...
+    // URL внешнего плейлиста в формате JSON
+    const PLAYLIST_URL = 'https://example.com/radio-playlist.json';
+    const CACHE_KEY = 'radio_playlist_cache';
+    const CACHE_EXPIRATION = 12 * 60 * 60 * 1000; // 12 часов в миллисекундах
 
-    // Отрисовка станций (обновленная версия)
+    // Элементы DOM
+    const grid = document.getElementById("station-list");
+    const search = document.getElementById("search");
+    const audio = document.getElementById("audio");
+    const miniPlayer = document.getElementById("mini-player");
+    const miniTitle = document.getElementById("mini-title");
+    const miniLogo = document.getElementById("mini-logo");
+    const stationName = document.getElementById("station-name");
+    const stationStream = document.getElementById("station-stream");
+    const stationLogoLarge = document.getElementById("station-logo-large");
+    const fullscreen = document.getElementById("player-fullscreen");
+    const playToggle = document.getElementById("play-toggle");
+    const playIcon = document.getElementById("play-icon");
+    const favButton = document.getElementById("fav-button");
+    const volumeSlider = document.getElementById("volume-slider");
+
+    let stations = [];
+    let currentStation = null;
+    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+    // Загрузка плейлиста
+    async function loadPlaylist() {
+      // Проверка кэша
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        const age = Date.now() - timestamp;
+        
+        if (age < CACHE_EXPIRATION) {
+          stations = data;
+          renderStations();
+          return;
+        }
+      }
+      
+      try {
+        const response = await fetch(PLAYLIST_URL);
+        if (!response.ok) throw new Error('Ошибка сети');
+        
+        stations = await response.json();
+        renderStations();
+        
+        // Сохранение в кэш
+        const cache = {
+          data: stations,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+      } catch (error) {
+        console.error('Ошибка загрузки плейлиста:', error);
+        
+        // Показать сообщение об ошибке
+        grid.innerHTML = `
+          <div class="error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Не удалось загрузить плейлист</p>
+            <button onclick="refreshPlaylist()" style="
+              background: #5f77ff;
+              border: none;
+              color: white;
+              padding: 10px 20px;
+              border-radius: 8px;
+              margin-top: 15px;
+              cursor: pointer;
+            ">Повторить попытку</button>
+          </div>
+        `;
+      }
+    }
+
+    // Обновление плейлиста
+    function refreshPlaylist() {
+      localStorage.removeItem(CACHE_KEY);
+      grid.innerHTML = `
+        <div class="loading">
+          <i class="fas fa-sync fa-spin"></i>
+          <p>Обновление списка станций...</p>
+        </div>
+      `;
+      loadPlaylist();
+    }
+
+    // Отрисовка станций
     function renderStations(filter = "") {
       if (!stations.length) {
         grid.innerHTML = `
@@ -118,8 +529,7 @@
         card.innerHTML = `
           <div class="station-logo">
             ${station.logo ? 
-              `<img src="${station.logo}" alt="${station.name}" 
-                   onerror="handleImageError(this)">` : 
+              `<img src="${station.logo}" alt="${station.name}" onerror="handleImageError(this)">` : 
               `<i class="fas fa-radio"></i>`
             }
           </div>
@@ -134,30 +544,38 @@
       });
     }
 
-    // Воспроизведение станции (обновленная версия)
+    // Обработка ошибок загрузки изображений
+    function handleImageError(img) {
+      img.onerror = null;
+      const container = img.parentElement;
+      container.innerHTML = `<i class="fas fa-radio"></i>`;
+      container.style.background = 'linear-gradient(135deg, #3a3a5a, #2a2a4a)';
+    }
+
+    // Воспроизведение станции
     function playStation(station) {
-      // ... (предыдущий код) ...
+      // Остановить текущее воспроизведение
+      if (audio.src) {
+        audio.pause();
+        audio.src = "";
+      }
+      
+      currentStation = station;
+      audio.src = station.stream;
       
       audio.play().then(() => {
-        // ... (предыдущий код) ...
+        playIcon.className = "fas fa-pause";
+        miniPlayer.style.display = "flex";
+        miniTitle.textContent = station.name;
+        stationName.textContent = station.name;
+        stationStream.textContent = station.stream;
+        fullscreen.style.display = "flex";
         
-        // ОБНОВЛЕННАЯ ЧАСТЬ: Обработка логотипов
-        miniLogo.src = station.logo || '';
-        miniLogo.onerror = () => {
-          miniLogo.style.display = 'none';
-          document.querySelector('#mini-player .mini-info').innerHTML = `
-            <div class="mini-logo-placeholder">
-              <i class="fas fa-radio"></i>
-            </div>
-            <span>${station.name}</span>
-          `;
-        };
+        // Обновление логотипов
+        updateLogo(miniLogo, station.logo);
         
         if (station.logo) {
-          stationLogoLarge.innerHTML = `
-            <img src="${station.logo}" alt="${station.name}" 
-                 onerror="handleLargeImageError(this)">
-          `;
+          stationLogoLarge.innerHTML = `<img src="${station.logo}" alt="${station.name}" onerror="handleLargeImageError(this)">`;
         } else {
           stationLogoLarge.innerHTML = `
             <div class="placeholder-logo">
@@ -173,14 +591,22 @@
       });
     }
 
-    // Обработка ошибок изображений (обновленная версия)
-    function handleImageError(img) {
-      img.onerror = null;
-      const container = img.parentElement;
-      container.innerHTML = `<i class="fas fa-radio"></i>`;
-      container.style.background = 'linear-gradient(135deg, #3a3a5a, #2a2a4a)';
+    // Обновление логотипа в мини-плеере
+    function updateLogo(container, logoUrl) {
+      if (logoUrl) {
+        container.innerHTML = `<img src="${logoUrl}" alt="${currentStation?.name}" onerror="handleMiniImageError(this)">`;
+      } else {
+        container.innerHTML = `<i class="fas fa-radio"></i>`;
+      }
     }
 
+    // Обработка ошибки изображения в мини-плеере
+    function handleMiniImageError(img) {
+      img.onerror = null;
+      miniLogo.innerHTML = `<i class="fas fa-radio"></i>`;
+    }
+
+    // Обработка ошибки большого изображения
     function handleLargeImageError(img) {
       img.onerror = null;
       stationLogoLarge.innerHTML = `
@@ -190,7 +616,86 @@
       `;
     }
 
-    // ... (остальной JavaScript код без изменений) ...
+    // Переключение воспроизведения
+    function togglePlay() {
+      if (!currentStation) return;
+      
+      if (audio.paused) {
+        audio.play();
+        playIcon.className = "fas fa-pause";
+      } else {
+        audio.pause();
+        playIcon.className = "fas fa-play";
+      }
+    }
+
+    // Добавление/удаление из избранного
+    function toggleFavorite() {
+      if (!currentStation) return;
+      
+      const index = favorites.findIndex(s => s.id === currentStation.id);
+      if (index >= 0) {
+        favorites.splice(index, 1);
+      } else {
+        favorites.push(currentStation);
+      }
+      
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      updateFavIcon();
+    }
+
+    // Обновление иконки избранного
+    function updateFavIcon() {
+      if (!currentStation) return;
+      
+      const isFav = favorites.some(s => s.id === currentStation.id);
+      favButton.classList.toggle("active", isFav);
+      favButton.title = isFav ? "Удалить из избранного" : "Добавить в избранное";
+    }
+
+    // Открытие полноэкранного плеера
+    function openFullscreen() {
+      fullscreen.style.display = "flex";
+    }
+
+    // Закрытие полноэкранного плеера
+    function closeFullscreen() {
+      fullscreen.style.display = "none";
+    }
+
+    // Инициализация приложения
+    function init() {
+      // Загрузка плейлиста
+      loadPlaylist();
+      
+      // Обработчики событий
+      playToggle.addEventListener("click", togglePlay);
+      favButton.addEventListener("click", toggleFavorite);
+      search.addEventListener("input", () => renderStations(search.value));
+      
+      // Регулировка громкости
+      volumeSlider.addEventListener("input", () => {
+        audio.volume = volumeSlider.value;
+      });
+      
+      // Обновление громкости при изменении
+      audio.volume = volumeSlider.value;
+      
+      // Обработка окончания потока
+      audio.addEventListener("ended", () => {
+        playIcon.className = "fas fa-play";
+      });
+      
+      // Обработка ошибок аудио
+      audio.addEventListener("error", (e) => {
+        console.error('Ошибка аудио:', e);
+        playIcon.className = "fas fa-play";
+        alert('Произошла ошибка при воспроизведении потока. Попробуйте другую станцию.');
+      });
+    }
+
+    // Запуск приложения при загрузке страницы
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
