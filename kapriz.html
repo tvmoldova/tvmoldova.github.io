@@ -4,110 +4,310 @@
     <title>Мужское кино - Плеер</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="still.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="p13.js"></script>
+    <!-- Стили Video.js -->
+    <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet">
     <style>
-        body { 
-            background: #000; 
-            margin: 0; 
-            padding: 0; 
-            font-family: Arial, sans-serif;
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
             color: #fff;
+            font-family: Arial, sans-serif;
         }
         #player {
-            max-width: 100%;
-            margin: 0 auto;
-            background: #111;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        #plok {
-            min-height: 300px;
-            background: #222;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #aaa;
-            font-size: 18px;
-        }
-        .container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 20px auto;
+            position: relative;
         }
-        .status {
-            padding: 10px;
-            background: #333;
-            margin-top: 10px;
-            border-radius: 4px;
-            font-size: 14px;
+        .vjs-default-skin {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 соотношение */
+        }
+        .video-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #status {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #ffcc00;
+        }
+        .error {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        .loader {
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
         }
     </style>
+    
+    <!-- Подключаем jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Подключаем Playerjs -->
+    <script src="p13.js"></script>
+    <!-- Библиотеки Video.js -->
+    <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-hls@5/dist/videojs-contrib-hls.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Мужское кино</h1>
-        <div id="player">
-            <div id="plok">Инициализация плеера...</div>
+    <div id="player">
+        <!-- Контейнер для Video.js -->
+        <div id="videoContainer" style="display:none">
+            <video id="customVideoPlayer" class="video-js vjs-default-skin" controls playsinline></video>
         </div>
-        <div class="status" id="status">Загрузка данных...</div>
+        
+        <!-- Оригинальный контейнер плеера -->
+        <div id="plok"></div>
+    </div>
+    <div id="status">
+        <span class="loader">⌛</span> Запуск видео-плеера...
     </div>
 
     <script>
-    $(document).ready(function() {
-        const SERVER_URL = 'https://dualboot.pagekite.me/data';
+    // Основные переменные
+    const SERVER_URL = 'https://dualboot.pagekite.me/data';
+    let playerData = null;
+    let playerInstance = null;
+    
+    // Функция для обновления статуса
+    function updateStatus(message, isError = false) {
+        const statusEl = document.getElementById('status');
+        const loader = isError ? '❌' : '⌛';
+        statusEl.innerHTML = `<span class="loader">${loader}</span> ${message}`;
         
-        function updateStatus(message, isError = false) {
-            $('#status').text(message).css('color', isError ? '#ff5555' : '#55ff55');
+        if (isError) {
+            statusEl.innerHTML += '<br><button id="retry-btn" style="margin-top: 10px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Повторить попытку</button>';
+            document.getElementById('retry-btn').addEventListener('click', initSystem);
         }
-        
-        function initPlayer(data) {
-            if (data.error) {
-                updateStatus('Ошибка: ' + data.error, true);
-                return;
+    }
+    
+    // Получение данных с сервера
+    async function fetchPlayerData() {
+        try {
+            updateStatus('Запрос данных с сервера...');
+            
+            // Добавляем случайный параметр для избежания кеширования
+            const response = await fetch(SERVER_URL + '?t=' + Date.now());
+            
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
             }
             
-            updateStatus('Плеер успешно инициализирован!');
+            const data = await response.json();
             
-            console.log('Player data:', data);
-            new Playerjs({
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            if (!data.kodk || !data.kos || !data.file) {
+                throw new Error('Неполные данные от сервера');
+            }
+            
+            return data;
+            
+        } catch (error) {
+            console.error('Ошибка при получении данных:', error);
+            throw error;
+        }
+    }
+    
+    // Инициализация оригинального плеера
+    function initOriginalPlayer(data) {
+        updateStatus('Инициализация плеера...');
+        
+        try {
+            // Создаем экземпляр плеера с полученными данными
+            playerInstance = new Playerjs({
                 id: "plok",
                 file: data.file,
                 poster: "//pics.rutube.ru/video/eb/ebd9f0e8a5b54c1b8c4a8a0a8a0a8a0a.jpg"
             });
+            
+            return true;
+            
+        } catch (error) {
+            console.error('Ошибка инициализации Playerjs:', error);
+            return false;
         }
+    }
+    
+    // Инициализация Video.js
+    function initVideoJS(m3u8Url) {
+        updateStatus('Запуск Video.js...');
         
-        // Основной запрос данных
-        $.ajax({
-            url: SERVER_URL,
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                updateStatus('Данные успешно получены');
-                initPlayer(data);
-            },
-            error: function(xhr) {
-                const errorMsg = `Ошибка ${xhr.status}: ${xhr.statusText}`;
-                updateStatus('Ошибка соединения: ' + errorMsg, true);
-                console.error('AJAX error:', xhr);
-                
-                // Попытка повторного подключения через 10 секунд
-                setTimeout(() => {
-                    updateStatus('Повторная попытка подключения...');
-                    $.ajax({
-                        url: SERVER_URL,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: initPlayer,
-                        error: function() {
-                            updateStatus('Ошибка при повторном подключении', true);
-                        }
-                    });
-                }, 10000);
+        try {
+            // Удаляем оригинальный плеер
+            const plok = document.getElementById('plok');
+            if (plok) {
+                plok.innerHTML = '';
+                plok.style.display = 'none';
             }
-        });
-    });
+            
+            // Показываем контейнер Video.js
+            document.getElementById('videoContainer').style.display = 'block';
+            
+            // Инициализируем Video.js
+            const videoPlayer = videojs('customVideoPlayer', {
+                sources: [{
+                    src: m3u8Url,
+                    type: 'application/x-mpegURL'
+                }],
+                autoplay: true,
+                controls: true,
+                fluid: true,
+                playbackRates: [0.5, 1, 1.5, 2],
+                html5: {
+                    hls: {
+                        overrideNative: true,
+                        enableLowInitialPlaylist: true
+                    }
+                }
+            });
+            
+            // Обработчики событий
+            videoPlayer.on('loadedmetadata', function() {
+                updateStatus('Воспроизведение видео...');
+            });
+            
+            videoPlayer.on('playing', function() {
+                updateStatus('Плеер успешно запущен!');
+            });
+            
+            videoPlayer.on('error', function() {
+                updateStatus('Ошибка воспроизведения видео', true);
+            });
+            
+            return true;
+            
+        } catch (error) {
+            console.error('Ошибка инициализации Video.js:', error);
+            return false;
+        }
+    }
+    
+    // Перехватчик M3U8-ссылки
+    function setupM3U8Interceptor() {
+        window.m3u8Url = null;
+        
+        // Переопределяем XMLHttpRequest
+        const originalXHRSend = XMLHttpRequest.prototype.send;
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this._url = url;
+            return originalXHROpen.apply(this, arguments);
+        };
+        
+        XMLHttpRequest.prototype.send = function(body) {
+            if (this._url && this._url.includes('.m3u8')) {
+                const originalOnReadyStateChange = this.onreadystatechange;
+                this.onreadystatechange = function() {
+                    if (this.readyState === 4) {
+                        window.m3u8Url = this._url;
+                        console.log('[M3U8 Detector] XHR detected:', this._url);
+                    }
+                    if (originalOnReadyStateChange) {
+                        originalOnReadyStateChange.apply(this, arguments);
+                    }
+                };
+            }
+            return originalXHRSend.apply(this, arguments);
+        };
+        
+        // Переопределяем fetch
+        const originalFetch = window.fetch;
+        window.fetch = async function(input, init) {
+            const url = typeof input === 'string' ? input : input.url;
+            if (url && url.includes('.m3u8')) {
+                try {
+                    const response = await originalFetch(input, init);
+                    window.m3u8Url = url;
+                    console.log('[M3U8 Detector] Fetch detected:', url);
+                    return response;
+                } catch (e) {
+                    return originalFetch(input, init);
+                }
+            }
+            return originalFetch(input, init);
+        };
+        
+        // Перехват через MediaSource
+        const originalCreateElement = document.createElement.bind(document);
+        document.createElement = function(tagName, options) {
+            const element = originalCreateElement(tagName, options);
+            if (tagName.toLowerCase() === 'video' || tagName.toLowerCase() === 'audio') {
+                const originalSetSrc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src').set;
+                Object.defineProperty(element, 'src', {
+                    set: function(value) {
+                        if (value.includes('.m3u8')) {
+                            window.m3u8Url = value;
+                            console.log('[M3U8 Detector] Media element detected:', value);
+                        }
+                        return originalSetSrc.call(this, value);
+                    }
+                });
+            }
+            return element;
+        };
+    }
+    
+    // Основная функция инициализации
+    async function initSystem() {
+        try {
+            // Шаг 1: Получаем свежие данные с сервера
+            playerData = await fetchPlayerData();
+            updateStatus('Данные получены!');
+            
+            // Шаг 2: Инициализируем оригинальный плеер
+            const playerSuccess = initOriginalPlayer(playerData);
+            
+            if (!playerSuccess) {
+                updateStatus('Ошибка инициализации основного плеера', true);
+                return;
+            }
+            
+            // Шаг 3: Настраиваем перехватчик M3U8
+            setupM3U8Interceptor();
+            updateStatus('Ожидание видео-потока...');
+            
+            // Шаг 4: Ожидаем появления M3U8-ссылки
+            let detectionAttempts = 0;
+            const maxAttempts = 10;
+            const detectionInterval = 1000;
+            
+            const detectionTimer = setInterval(() => {
+                detectionAttempts++;
+                
+                if (window.m3u8Url) {
+                    clearInterval(detectionTimer);
+                    
+                    // Шаг 5: Инициализируем Video.js с полученной ссылкой
+                    initVideoJS(window.m3u8Url);
+                } 
+                else if (detectionAttempts >= maxAttempts) {
+                    clearInterval(detectionTimer);
+                    updateStatus('M3U8 поток не обнаружен', true);
+                }
+                else {
+                    updateStatus(`Ожидание видео-потока... (попытка ${detectionAttempts}/${maxAttempts})`);
+                }
+            }, detectionInterval);
+            
+        } catch (error) {
+            updateStatus(`Ошибка: ${error.message}`, true);
+            console.error('System initialization error:', error);
+        }
+    }
+    
+    // Запускаем систему при загрузке страницы
+    document.addEventListener('DOMContentLoaded', initSystem);
     </script>
 </body>
 </html>
