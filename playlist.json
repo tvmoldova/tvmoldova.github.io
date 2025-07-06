@@ -7,11 +7,11 @@
     "genre": "Популярная музыка"
   },
   {
-    "id": "jazz",
+    "id": "Dance",
     "name": "Jazz Moscow",
-    "stream": "https://jazz.stream.url",
-    "logo": "https://jazz.logo.url",
-    "genre": "Джаз"
+    "stream": "https://air.radiorecord.md/recordmdhd",
+    "logo": "https://www.radio.md/images/logos/radiorecord.png",
+    "genre": "Танцевальная"
   },
   {
     "id": "lofi",
