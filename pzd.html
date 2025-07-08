@@ -1,588 +1,524 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FM Radio Player</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #121212, #1a1a2e);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-    header {
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(30, 30, 46, 0.9);
-      border-bottom: 1px solid #333;
-      position: relative;
-      z-index: 30;
-    }
-    header h1 {
-      font-size: 20px;
-      font-weight: bold;
-      color: #5f77ff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .search {
-      background: rgba(42, 42, 58, 0.8);
-      border-radius: 8px;
-      padding: 8px 14px;
-      flex: 1;
-      margin-left: 15px;
-      display: flex;
-      align-items: center;
-      transition: all 0.3s;
-    }
-    .search:focus-within {
-      background: rgba(50, 50, 70, 0.9);
-      box-shadow: 0 0 0 2px #5f77ff;
-    }
-    .search i {
-      margin-right: 8px;
-      color: #888;
-    }
-    .search input {
-      background: transparent;
-      border: none;
-      color: white;
-      width: 100%;
-      font-size: 14px;
-      outline: none;
-    }
-    .grid {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .card {
-      background: rgba(31, 31, 51, 0.8);
-      border-radius: 12px;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      width: 100%;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(80, 80, 120, 0.2);
-    }
-    .card:hover { 
-      background: rgba(41, 41, 71, 0.9); 
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    .card .station-logo {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
-      overflow: hidden;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
-    }
-    .card .station-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .card .station-logo i {
-      font-size: 20px;
-      color: #5f77ff;
-    }
-    .card .station-info {
-      flex: 1;
-      overflow: hidden;
-    }
-    .card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .card p {
-      font-size: 13px;
-      color: #aaa;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .card .genre {
-      font-size: 12px;
-      color: #aab8ff;
-      margin-top: 4px;
-    }
-    #mini-player {
-      position: fixed;
-      bottom: 15px;
-      left: 15px;
-      right: 15px;
-      background: rgba(30, 30, 46, 0.95);
-      border-radius: 12px;
-      padding: 12px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      display: none;
-      z-index: 25;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(80, 80, 120, 0.3);
-    }
-    #mini-player .mini-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1;
-    }
-    #mini-player .mini-logo {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      overflow: hidden;
-      flex-shrink: 0;
-      background: rgba(42, 42, 58, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #mini-player .mini-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    #mini-player .mini-logo i {
-      color: #5f77ff;
-      font-size: 16px;
-    }
-    #mini-player .mini-text {
-      flex: 1;
-      overflow: hidden;
-    }
-    #mini-player .mini-title {
-      font-size: 14px;
-      color: #fff;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    #mini-player .mini-genre {
-      font-size: 12px;
-      color: #aab8ff;
-      margin-top: 2px;
-    }
-    #mini-player .mini-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    #mini-player .mini-play-toggle {
-      background: #5f77ff;
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    #mini-player .mini-play-toggle:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 10px rgba(95, 119, 255, 0.8);
-    }
-    #mini-player .expand-btn {
-      background: rgba(80, 80, 120, 0.4);
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aab8ff;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    #mini-player .expand-btn:hover {
-      background: rgba(95, 119, 255, 0.3);
-      color: white;
-    }
-    #player-fullscreen {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(to bottom, #0f0f1a, #1a1a2e);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 100;
-      text-align: center;
-    }
-    #player-fullscreen .back {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s;
-      z-index: 10;
-    }
-    #player-fullscreen .back:hover {
-      background: rgba(95, 119, 255, 0.3);
-    }
-    .station-logo-large {
-      width: 200px;
-      max-width: 70vw;
-      aspect-ratio: 1/1;
-      border-radius: 20px;
-      overflow: hidden;
-      margin-bottom: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      position: relative;
-      z-index: 5;
-    }
-    .station-logo-large img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .station-logo-large .placeholder-logo {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #5f77ff;
-      font-size: 48px;
-    }
-    .play-button {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 2px solid #5f77ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      color: #ffffff;
-      margin: 20px 0;
-      background: rgba(255, 255, 255, 0.05);
-      box-shadow: 0 0 25px rgba(95, 119, 255, 0.5);
-      cursor: pointer;
-      transition: all 0.3s;
-      position: relative;
-      z-index: 5;
-    }
-    .play-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 35px rgba(95, 119, 255, 0.7);
-    }
-    #station-name {
-      font-size: 24px;
-      margin-bottom: 5px;
-      color: #fff;
-      font-weight: 600;
-      position: relative;
-      z-index: 5;
-    }
-    #station-genre {
-      font-size: 15px;
-      color: #aab8ff;
-      margin-bottom: 30px;
-      position: relative;
-      z-index: 5;
-    }
-    .player-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 25px;
-      width: 100%;
-      max-width: 300px;
-      margin-bottom: 25px;
-      position: relative;
-      z-index: 5;
-    }
-    .player-controls i {
-      font-size: 22px;
-      color: white;
-      cursor: pointer;
-      transition: transform 0.2s, color 0.2s;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-    .player-controls i:hover {
-      transform: scale(1.2);
-      color: #5f77ff;
-      background: rgba(95, 119, 255, 0.2);
-    }
-    .player-controls .active {
-      color: #5f77ff;
-    }
-    .nav-controls {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-      position: relative;
-      z-index: 5;
-    }
-    .nav-controls i {
-      font-size: 20px;
-      color: #aab8ff;
-      cursor: pointer;
-      transition: all 0.2s;
-      width: 45px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: rgba(80, 80, 120, 0.3);
-    }
-    .nav-controls i:hover {
-      background: rgba(95, 119, 255, 0.3);
-      color: white;
-    }
-    .volume-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 80%;
-      max-width: 300px;
-      position: relative;
-      z-index: 5;
-    }
-    .volume-container i {
-      color: #aab8ff;
-      font-size: 18px;
-      width: 24px;
-    }
-    .volume-slider {
-      flex: 1;
-    }
-    .volume-slider input[type="range"] {
-      width: 100%;
-      height: 5px;
-      accent-color: #5f77ff;
-      cursor: pointer;
-      border-radius: 3px;
-      background: rgba(80, 80, 120, 0.3);
-    }
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      gap: 20px;
-      color: #aaa;
-    }
-    .loading i {
-      font-size: 40px;
-      color: #5f77ff;
-      animation: spin 1.5s linear infinite;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .error {
-      padding: 20px;
-      text-align: center;
-      color: #ff6b6b;
-    }
-    .no-results {
-      text-align: center;
-      padding: 30px;
-      color: #aaa;
-    }
-    .background-waves {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 40%;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%235f77ff" fill-opacity="0.1" d="M0,128L48,117.3C96,107,192,85,288,101.3C384,117,480,171,576,176C672,181,768,139,864,128C960,117,1056,139,1152,149.3C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-      background-size: cover;
-      background-repeat: no-repeat;
-      z-index: 0;
-      opacity: 0.7;
-    }
-    @media (max-width: 768px) {
-      .station-logo-large {
-        width: 180px;
-      }
-      .play-button {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
-      }
-      #station-name {
-        font-size: 22px;
-      }
-      .grid {
-        padding: 10px;
-      }
-    }
-    @media (max-width: 480px) {
-      header {
-        padding: 10px;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .search {
-        margin-left: 0;
-        width: 100%;
-      }
-      #mini-player {
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-        padding: 10px;
-      }
-      .card {
-        padding: 12px;
-        gap: 12px;
-      }
-      .card .station-logo {
-        width: 45px;
-        height: 45px;
-      }
-      .card h3 {
-        font-size: 15px;
-      }
-      .nav-controls i {
-        width: 40px;
-        height: 40px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MDFM Radio Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #0a0a0a, #121212);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Шапка в монохромной гамме */
+        header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: #0f0f0f;
+            border-bottom: 1px solid #1f1f1f;
+            position: relative;
+            z-index: 30;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e0e0e0;
+            white-space: nowrap;
+        }
+
+        .search {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 8px 14px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            border: 1px solid #2a2a2a;
+        }
+
+        .search i {
+            margin-right: 8px;
+            color: #888;
+        }
+
+        .search input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Карточки станций */
+        .card {
+            background: #121212;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .card:hover { 
+            background: #1a1a1a;
+            border-color: #2a2a2a;
+        }
+
+        .card.active {
+            background: #1f1f1f;
+            border-color: #888;
+            box-shadow: 0 0 15px rgba(150, 150, 150, 0.1);
+        }
+
+        .card .station-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a, #121212);
+        }
+
+        .card .station-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card .station-logo i {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .card .station-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .card h3 {
+            font-size: 15px;
+            font-weight: 500;
+            color: #bbb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card.active h3 {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        #mini-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f0f0f;
+            border-top: 1px solid #1f1f1f;
+            padding: 10px 16px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 25;
+        }
+
+        #mini-player .mini-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #mini-player .mini-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mini-player .mini-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #mini-player .mini-logo i {
+            color: #888;
+            font-size: 14px;
+        }
+
+        #mini-player .mini-title {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #mini-player .mini-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #mini-player .mini-play-toggle {
+            background: #333;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #mini-player .mini-play-toggle:hover {
+            background: #444;
+            transform: scale(1.1);
+        }
+
+        /* Полноэкранный плеер */
+        #player-fullscreen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, #0a0a0a, #121212);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            z-index: 100;
+            text-align: center;
+        }
+
+        #player-fullscreen .back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        #player-fullscreen .back:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .station-logo-large {
+            width: 200px;
+            height: 200px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a, #121212);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border: 1px solid #2a2a2a;
+        }
+
+        .station-logo-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .station-logo-large i {
+            color: #888;
+            font-size: 50px;
+        }
+
+        #station-name {
+            font-size: 24px;
+            margin-bottom: 40px;
+            color: #fff;
+            font-weight: 600;
+            padding: 0 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .navigation-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .navigation-controls .nav-button {
+            font-size: 24px;
+            color: #ccc;
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(50, 50, 50, 0.3);
+            transition: all 0.3s;
+        }
+
+        .navigation-controls .nav-button:hover {
+            background: rgba(100, 100, 100, 0.2);
+            transform: scale(1.1);
+        }
+
+        .navigation-controls .play-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .navigation-controls .play-button:hover {
+            background: rgba(100, 100, 100, 0.2);
+            box-shadow: 0 0 20px rgba(150, 150, 150, 0.4);
+            transform: scale(1.05);
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 80%;
+            max-width: 350px;
+            margin-top: 30px;
+        }
+
+        .volume-container i {
+            color: #ccc;
+            font-size: 18px;
+            width: 24px;
+        }
+
+        .volume-slider {
+            flex: 1;
+        }
+
+        .volume-slider input[type="range"] {
+            width: 100%;
+            height: 5px;
+            background: rgba(80, 80, 80, 0.3);
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #888;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .volume-slider input[type="range"]::-webkit-slider-thumb:hover {
+            background: #aaa;
+            transform: scale(1.2);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 20px;
+            color: #888;
+        }
+
+        .loading i {
+            font-size: 40px;
+            color: #888;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            padding: 20px;
+            text-align: center;
+            color: #ff6b6b;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .station-logo-large { 
+                width: 170px;
+                height: 170px;
+            }
+            #station-name { font-size: 22px; }
+            .navigation-controls { gap: 30px; }
+            .navigation-controls .play-button { 
+                width: 70px; 
+                height: 70px; 
+                font-size: 24px; 
+            }
+            .navigation-controls .nav-button { 
+                width: 50px; 
+                height: 50px; 
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px;
+            }
+            .card { padding: 10px; }
+            .card .station-logo { width: 36px; height: 36px; }
+            .station-logo-large { 
+                width: 150px;
+                height: 150px;
+            }
+            #station-name { 
+                font-size: 20px;
+                margin-bottom: 30px;
+            }
+            .navigation-controls { 
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .navigation-controls .nav-button { 
+                width: 45px; 
+                height: 45px; 
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="background-waves"></div>
-  
-  <header>
-    <h1><i class="fas fa-radio"></i> RADIO PLAYER</h1>
-    <div class="search">
-      <i class="fas fa-search"></i>
-      <input type="text" id="search" placeholder="Поиск станции..." />
-    </div>
-  </header>
+    <header>
+        <h1>MDFM</h1>
+        <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search" placeholder="Поиск станции..." />
+        </div>
+    </header>
 
-  <div class="grid" id="station-list">
-    <div class="loading">
-      <i class="fas fa-sync fa-spin"></i>
-      <p>Загрузка радиостанций...</p>
+    <div class="grid" id="station-list">
+        <div class="loading">
+            <i class="fas fa-sync fa-spin"></i>
+            <p>Загрузка радиостанций...</p>
+        </div>
     </div>
-  </div>
 
-  <div id="mini-player">
-    <div class="mini-info">
-      <div class="mini-logo" id="mini-logo">
-        <i class="fas fa-radio"></i>
-      </div>
-      <div class="mini-text">
-        <div class="mini-title" id="mini-title">Станция</div>
-        <div class="mini-genre" id="mini-genre">Жанр</div>
-      </div>
+    <div id="mini-player">
+        <div class="mini-info">
+            <div class="mini-logo" id="mini-logo"></div>
+            <div class="mini-title" id="mini-title">Станция</div>
+        </div>
+        <div class="mini-controls">
+            <button class="mini-play-toggle" id="mini-play-toggle">
+                <i class="fas fa-play" id="mini-play-icon"></i>
+            </button>
+        </div>
     </div>
-    <div class="mini-controls">
-      <button class="mini-play-toggle" id="mini-play-toggle">
-        <i class="fas fa-play" id="mini-play-icon"></i>
-      </button>
-      <button class="expand-btn" onclick="openFullscreen()">
-        <i class="fas fa-expand"></i>
-      </button>
-    </div>
-  </div>
 
-  <div id="player-fullscreen">
-    <div class="background-waves"></div>
-    <div class="back" onclick="closeFullscreen()">
-      <i class="fas fa-chevron-left"></i>
-    </div>
-    <div class="station-logo-large" id="station-logo-large">
-      <div class="placeholder-logo">
-        <i class="fas fa-radio"></i>
-      </div>
-    </div>
-    <div id="station-name">Название станции</div>
-    <div id="station-genre">Жанр</div>
-    
-    <div class="nav-controls">
-      <i class="fas fa-step-backward" id="prev-station" onclick="changeStation(-1)"></i>
-      <i class="fas fa-step-forward" id="next-station" onclick="changeStation(1)"></i>
-    </div>
-    
-    <div class="play-button" id="play-toggle">
-      <i class="fas fa-play" id="play-icon"></i>
-    </div>
-    
-    <div class="player-controls">
-      <i class="fas fa-heart" id="fav-button"></i>
-      <i class="fas fa-redo" id="refresh-button" onclick="refreshPlaylist()"></i>
-      <i class="fas fa-circle-info" onclick="alert('Это потоковое радио. Качество и песни зависят от источника.')"></i>
-    </div>
-    
-    <div class="volume-container">
-      <i class="fas fa-volume-down"></i>
-      <div class="volume-slider">
-        <input type="range" min="0" max="1" step="0.1" value="1" id="volume-slider">
-      </div>
-      <i class="fas fa-volume-up"></i>
-    </div>
-    
-    <audio id="audio" autoplay hidden></audio>
-  </div>
+    <div id="player-fullscreen">
+        <div class="back" onclick="closeFullscreen()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
 
-  <script>
-    // URL внешнего плейлиста в формате JSON
+        <div class="station-logo-large" id="station-logo-large"></div>
+
+        <div id="station-name">Название станции</div>
+
+        <div class="navigation-controls">
+            <div class="nav-button" id="prev-station" onclick="changeStation(-1)">
+                <i class="fas fa-step-backward"></i>
+            </div>
+            <div class="play-button" id="play-toggle">
+                <i class="fas fa-play" id="play-icon"></i>
+            </div>
+            <div class="nav-button" id="next-station" onclick="changeStation(1)">
+                <i class="fas fa-step-forward"></i>
+            </div>
+        </div>
+
+        <div class="volume-container">
+            <i class="fas fa-volume-down"></i>
+            <div class="volume-slider">
+                <input type="range" min="0" max="1" step="0.05" value="1" id="volume-slider">
+            </div>
+            <i class="fas fa-volume-up"></i>
+        </div>
+
+        <audio id="audio" autoplay hidden></audio>
+    </div>
+
+<script>
     const PLAYLIST_URL = 'https://tvmoldova.github.io/playlist.json';
     const CACHE_KEY = 'radio_playlist_cache';
-    const CACHE_EXPIRATION = 12 * 60 * 60 * 1000; // 12 часов в миллисекундах
+    const CACHE_EXPIRATION = 12 * 60 * 60 * 1000; // 12 часов
 
     // Элементы DOM
     const grid = document.getElementById("station-list");
@@ -590,324 +526,255 @@
     const audio = document.getElementById("audio");
     const miniPlayer = document.getElementById("mini-player");
     const miniTitle = document.getElementById("mini-title");
-    const miniGenre = document.getElementById("mini-genre");
     const miniLogo = document.getElementById("mini-logo");
     const miniPlayToggle = document.getElementById("mini-play-toggle");
     const miniPlayIcon = document.getElementById("mini-play-icon");
     const stationName = document.getElementById("station-name");
-    const stationGenre = document.getElementById("station-genre");
     const stationLogoLarge = document.getElementById("station-logo-large");
     const fullscreen = document.getElementById("player-fullscreen");
     const playToggle = document.getElementById("play-toggle");
     const playIcon = document.getElementById("play-icon");
-    const favButton = document.getElementById("fav-button");
     const volumeSlider = document.getElementById("volume-slider");
-    const prevStationBtn = document.getElementById("prev-station");
-    const nextStationBtn = document.getElementById("next-station");
-
+    
     let stations = [];
     let currentStation = null;
     let currentStationIndex = -1;
-    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 
-    // Загрузка плейлиста
+    // Загрузка плейлиста с кэшированием
     async function loadPlaylist() {
-      // Проверка кэша
-      const cachedData = localStorage.getItem(CACHE_KEY);
-      if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        const age = Date.now() - timestamp;
-        
-        if (age < CACHE_EXPIRATION) {
-          stations = data;
-          renderStations();
-          return;
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        if (cachedData) {
+            const { data, timestamp } = JSON.parse(cachedData);
+            if (Date.now() - timestamp < CACHE_EXPIRATION) {
+                stations = data;
+                renderStations();
+                return;
+            }
         }
-      }
-      
-      try {
-        const response = await fetch(PLAYLIST_URL);
-        if (!response.ok) throw new Error('Ошибка сети');
-        
-        stations = await response.json();
-        renderStations();
-        
-        // Сохранение в кэш
-        const cache = {
-          data: stations,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-      } catch (error) {
-        console.error('Ошибка загрузки плейлиста:', error);
-        
-        // Показать сообщение об ошибке
-        grid.innerHTML = `
-          <div class="error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>Не удалось загрузить плейлист</p>
-            <button onclick="refreshPlaylist()" style="
-              background: #5f77ff;
-              border: none;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 8px;
-              margin-top: 15px;
-              cursor: pointer;
-            ">Повторить попытку</button>
-          </div>
-        `;
-      }
+
+        try {
+            const response = await fetch(PLAYLIST_URL);
+            if (!response.ok) throw new Error('Ошибка сети');
+            stations = await response.json();
+            renderStations();
+            const cache = { data: stations, timestamp: Date.now() };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+        } catch (error) {
+            console.error('Ошибка загрузки плейлиста:', error);
+            grid.innerHTML = `
+                <div class="error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Не удалось загрузить плейлист</p>
+                    <button onclick="refreshPlaylist()" style="
+                        background: #333;
+                        border: 1px solid #444;
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        margin-top: 15px;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    ">Повторить</button>
+                </div>
+            `;
+        }
     }
 
     // Обновление плейлиста
     function refreshPlaylist() {
-      localStorage.removeItem(CACHE_KEY);
-      grid.innerHTML = `
-        <div class="loading">
-          <i class="fas fa-sync fa-spin"></i>
-          <p>Обновление списка станций...</p>
-        </div>
-      `;
-      loadPlaylist();
+        localStorage.removeItem(CACHE_KEY);
+        grid.innerHTML = `
+            <div class="loading">
+                <i class="fas fa-sync fa-spin"></i>
+                <p>Обновление списка станций...</p>
+            </div>
+        `;
+        loadPlaylist();
     }
 
     // Отрисовка станций
     function renderStations(filter = "") {
-      if (!stations.length) {
-        grid.innerHTML = `
-          <div class="error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>Нет доступных станций</p>
-          </div>
-        `;
-        return;
-      }
-      
-      const filtered = stations.filter(s => 
-        s.name.toLowerCase().includes(filter.toLowerCase()) || 
-        (s.genre && s.genre.toLowerCase().includes(filter.toLowerCase()))
-      );
-      
-      if (!filtered.length) {
-        grid.innerHTML = `
-          <div class="no-results">
-            <i class="fas fa-search"></i>
-            <p>Станций не найдено</p>
-          </div>
-        `;
-        return;
-      }
-      
-      grid.innerHTML = "";
-      filtered.forEach((station, index) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        
-        card.innerHTML = `
-          <div class="station-logo">
-            ${station.logo ? 
-              `<img src="${station.logo}" alt="${station.name}" onerror="handleImageError(this)">` : 
-              `<i class="fas fa-radio"></i>`
+        if (!stations.length) {
+            grid.innerHTML = `
+                <div class="error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Нет доступных станций</p>
+                </div>
+            `;
+            return;
+        }
+
+        const lowerCaseFilter = filter.toLowerCase();
+        const filtered = stations.filter(s => 
+            s.name.toLowerCase().includes(lowerCaseFilter) ||
+            (s.genre && s.genre.toLowerCase().includes(lowerCaseFilter))
+        );
+
+        if (!filtered.length) {
+            grid.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <p>Станций не найдено</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = "";
+        filtered.forEach(station => {
+            const card = document.createElement("div");
+            card.className = "card";
+            if (currentStation && station.id === currentStation.id) {
+                card.classList.add("active");
             }
-          </div>
-          <div class="station-info">
-            <h3>${station.name}</h3>
-            <p>${station.description || 'Потоковое радио'}</p>
-            <div class="genre">${station.genre || 'Музыка'}</div>
-          </div>
-        `;
-        
-        card.onclick = () => {
-          playStation(station);
-          // Находим индекс текущей станции в основном массиве
-          currentStationIndex = stations.findIndex(s => s.id === station.id);
-        };
-        
-        grid.appendChild(card);
-      });
+            card.innerHTML = `
+                <div class="station-logo">
+                    ${station.logo ? 
+                        `<img src="${station.logo}" alt="${station.name}" onerror="handleImageError(this)">` : 
+                        `<i class="fas fa-radio"></i>`
+                    }
+                </div>
+                <div class="station-info">
+                    <h3>${station.name}</h3>
+                </div>
+            `;
+            card.onclick = () => {
+                currentStationIndex = stations.findIndex(s => s.id === station.id);
+                playStation(station);
+            };
+            grid.appendChild(card);
+        });
     }
 
     // Обработка ошибок загрузки изображений
     function handleImageError(img) {
-      img.onerror = null;
-      const container = img.parentElement;
-      container.innerHTML = `<i class="fas fa-radio"></i>`;
-      container.style.background = 'linear-gradient(135deg, #3a3a5a, #2a2a4a)';
+        img.onerror = null;
+        const container = img.parentElement;
+        container.innerHTML = `<i class="fas fa-radio"></i>`;
     }
 
     // Воспроизведение станции
     function playStation(station) {
-      // Остановить текущее воспроизведение
-      if (audio.src) {
-        audio.pause();
-        audio.src = "";
-      }
-      
-      currentStation = station;
-      audio.src = station.stream;
-      
-      audio.play().then(() => {
-        updatePlayIcons(true);
-        miniPlayer.style.display = "flex";
-        miniTitle.textContent = station.name;
-        miniGenre.textContent = station.genre || 'Разная музыка';
-        stationName.textContent = station.name;
-        stationGenre.textContent = station.genre || 'Разная музыка';
+        if (!station || !station.stream) return;
         
-        // Обновление логотипов
-        updateLogo(miniLogo, station.logo);
-        
-        if (station.logo) {
-          stationLogoLarge.innerHTML = `<img src="${station.logo}" alt="${station.name}" onerror="handleLargeImageError(this)">`;
-        } else {
-          stationLogoLarge.innerHTML = `
-            <div class="placeholder-logo">
-              <i class="fas fa-radio"></i>
-            </div>
-          `;
+        // Остановить текущее воспроизведение
+        if (audio.src) {
+            audio.pause();
+            audio.src = "";
         }
         
-        updateFavIcon();
-      }).catch(error => {
-        console.error('Ошибка воспроизведения:', error);
-        alert(`Не удалось воспроизвести станцию ${station.name}. Попробуйте другую станцию.`);
-      });
+        currentStation = station;
+        audio.src = station.stream;
+        audio.play().then(() => {
+            updatePlayIcons(true);
+            miniPlayer.style.display = "flex";
+            updatePlayerUI(station);
+            renderStations(search.value); // Перерисовываем для выделения активной станции
+        }).catch(error => {
+            console.error('Ошибка воспроизведения:', error);
+            alert(`Не удалось воспроизвести станцию: ${station.name}.`);
+            updatePlayIcons(false);
+        });
     }
 
-    // Обновление логотипа в мини-плеере
-    function updateLogo(container, logoUrl) {
-      if (logoUrl) {
-        container.innerHTML = `<img src="${logoUrl}" alt="${currentStation?.name}" onerror="handleMiniImageError(this)">`;
-      } else {
-        container.innerHTML = `<i class="fas fa-radio"></i>`;
-      }
-    }
-
-    // Обработка ошибки изображения в мини-плеере
-    function handleMiniImageError(img) {
-      img.onerror = null;
-      miniLogo.innerHTML = `<i class="fas fa-radio"></i>`;
-    }
-
-    // Обработка ошибки большого изображения
-    function handleLargeImageError(img) {
-      img.onerror = null;
-      stationLogoLarge.innerHTML = `
-        <div class="placeholder-logo">
-          <i class="fas fa-radio"></i>
-        </div>
-      `;
-    }
-
-    // Переключение воспроизведения
-    function togglePlay() {
-      if (!currentStation) return;
-      
-      if (audio.paused) {
-        audio.play();
-        updatePlayIcons(true);
-      } else {
-        audio.pause();
-        updatePlayIcons(false);
-      }
+    // Обновление UI плееров
+    function updatePlayerUI(station) {
+        miniTitle.textContent = station.name;
+        stationName.textContent = station.name;
+        
+        updateLogo(miniLogo, station.logo);
+        updateLogo(stationLogoLarge, station.logo, true);
     }
     
-    // Обновление иконок воспроизведения
+    // Универсальное обновление логотипов
+    function updateLogo(container, logoUrl, isLarge = false) {
+        container.innerHTML = '';
+        
+        if (logoUrl) {
+            const img = document.createElement('img');
+            img.src = logoUrl;
+            img.alt = currentStation?.name || 'Radio logo';
+            img.onerror = function() {
+                container.innerHTML = isLarge 
+                    ? '<i class="fas fa-radio"></i>' 
+                    : '<i class="fas fa-radio"></i>';
+            };
+            container.appendChild(img);
+        } else {
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-radio';
+            container.appendChild(icon);
+        }
+    }
+
+    // Переключение состояния play/pause
+    function togglePlay() {
+        if (!currentStation) return;
+        if (audio.paused) {
+            audio.play().catch(e => console.error("Ошибка воспроизведения:", e));
+        } else {
+            audio.pause();
+        }
+    }
+
+    // Обновление иконок play/pause
     function updatePlayIcons(isPlaying) {
-      if (isPlaying) {
-        playIcon.className = "fas fa-pause";
-        miniPlayIcon.className = "fas fa-pause";
-      } else {
-        playIcon.className = "fas fa-play";
-        miniPlayIcon.className = "fas fa-play";
-      }
+        const iconClass = isPlaying ? "fas fa-pause" : "fas fa-play";
+        playIcon.className = iconClass;
+        miniPlayIcon.className = iconClass;
     }
-
-    // Переключение между станциями
+    
+    // Переключение станций (вперед/назад)
     function changeStation(direction) {
-      if (stations.length === 0 || currentStationIndex === -1) return;
-      
-      let newIndex = currentStationIndex + direction;
-      
-      // Циклическое переключение
-      if (newIndex < 0) newIndex = stations.length - 1;
-      if (newIndex >= stations.length) newIndex = 0;
-      
-      currentStationIndex = newIndex;
-      playStation(stations[newIndex]);
+        if (stations.length === 0 || currentStationIndex === -1) return;
+        let newIndex = currentStationIndex + direction;
+        if (newIndex < 0) newIndex = stations.length - 1;
+        if (newIndex >= stations.length) newIndex = 0;
+        currentStationIndex = newIndex;
+        playStation(stations[newIndex]);
     }
 
-    // Добавление/удаление из избранного
-    function toggleFavorite() {
-      if (!currentStation) return;
-      
-      const index = favorites.findIndex(s => s.id === currentStation.id);
-      if (index >= 0) {
-        favorites.splice(index, 1);
-      } else {
-        favorites.push(currentStation);
-      }
-      
-      localStorage.setItem("favorites", JSON.stringify(favorites));
-      updateFavIcon();
+    function openFullscreen() { 
+        fullscreen.style.display = "flex"; 
+        document.body.style.overflow = "hidden";
+    }
+    
+    function closeFullscreen() { 
+        fullscreen.style.display = "none"; 
+        document.body.style.overflow = "auto";
     }
 
-    // Обновление иконки избранного
-    function updateFavIcon() {
-      if (!currentStation) return;
-      
-      const isFav = favorites.some(s => s.id === currentStation.id);
-      favButton.classList.toggle("active", isFav);
-      favButton.title = isFav ? "Удалить из избранного" : "Добавить в избранное";
-    }
-
-    // Открытие полноэкранного плеера
-    function openFullscreen() {
-      fullscreen.style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-
-    // Закрытие полноэкранного плеера
-    function closeFullscreen() {
-      fullscreen.style.display = "none";
-      document.body.style.overflow = "auto";
-    }
-
-    // Инициализация приложения
+    // Инициализация
     function init() {
-      // Загрузка плейлиста
-      loadPlaylist();
-      
-      // Обработчики событий
-      playToggle.addEventListener("click", togglePlay);
-      miniPlayToggle.addEventListener("click", togglePlay);
-      favButton.addEventListener("click", toggleFavorite);
-      search.addEventListener("input", () => renderStations(search.value));
-      
-      // Регулировка громкости
-      volumeSlider.addEventListener("input", () => {
+        loadPlaylist();
+
+        // Слушатели событий
+        playToggle.addEventListener("click", togglePlay);
+        miniPlayToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            togglePlay();
+        });
+        miniPlayer.addEventListener("click", (e) => {
+            if (!e.target.closest('.mini-play-toggle')) openFullscreen();
+        });
+        search.addEventListener("input", () => renderStations(search.value));
+        volumeSlider.addEventListener("input", () => audio.volume = volumeSlider.value);
+
+        // Установка громкости
         audio.volume = volumeSlider.value;
-      });
-      
-      // Обновление громкости при изменении
-      audio.volume = volumeSlider.value;
-      
-      // Обработка окончания потока
-      audio.addEventListener("ended", () => {
-        updatePlayIcons(false);
-      });
-      
-      // Обработка ошибок аудио
-      audio.addEventListener("error", (e) => {
-        console.error('Ошибка аудио:', e);
-        updatePlayIcons(false);
-        alert('Произошла ошибка при воспроизведении потока. Попробуйте другую станцию.');
-      });
+        
+        // Обработчики событий аудио
+        audio.addEventListener("play", () => updatePlayIcons(true));
+        audio.addEventListener("pause", () => updatePlayIcons(false));
+        audio.addEventListener("ended", () => updatePlayIcons(false));
+        audio.addEventListener("error", (e) => {
+            console.error('Ошибка аудио:', e);
+            updatePlayIcons(false);
+            alert('Ошибка воспроизведения потока. Попробуйте другую станцию.');
+        });
     }
 
-    // Запуск приложения при загрузке страницы
     window.addEventListener('DOMContentLoaded', init);
-  </script>
+</script>
 </body>
 </html>
