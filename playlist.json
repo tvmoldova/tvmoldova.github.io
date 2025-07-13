@@ -1,22 +1,30 @@
 [
   {
     "id": "hitfm",
-    "name": "Hit FM",
+    "name": "Hit FM Moldova",
     "stream": "https://diximd.webcaramba.com/diximd-hitfm112.aacp",
-    "logo": "https://top-radio.ru/assets/image/radio/180/hit-fm-moldova.png",
-    "genre": "Популярная музыка"
+    "logo": "https://top-radio.ru/assets/image/radio/180/hit-fm-moldova.png"
   },
   {
-    "id": "Dance",
-    "name": "Jazz Moscow",
+    "id": "radiorecord",
+    "name": "Radio Record",
     "stream": "https://air.radiorecord.md/recordmdhd",
-    "logo": "https://www.radio.md/images/logos/radiorecord.png",
-    "genre": "Танцевальная"
+    "logo": "https://www.radio.md/images/logos/radiorecord.png"
   },
   {
     "id": "lofi",
-    "name": "Lo-Fi Radio",
-    "stream": "https://lofi.stream.url",
-    "genre": "Lo-Fi"
+    "name": "Lo-Fi Beats",
+    "stream": "https://lofi.stream.url"
+  },
+  {
+    "id": "rockfm",
+    "name": "Rock FM",
+    "stream": "https://rock.stream.url",
+    "logo": "https://example.com/rockfm.png"
+  },
+  {
+    "id": "jazz",
+    "name": "Smooth Jazz",
+    "stream": "https://jazz.stream.url"
   }
 ]
