@@ -1,957 +1,1037 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Tv Box</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://vjs.zencdn.net/8.23.3/video-js.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.css" rel="stylesheet">
-    <link href="https://unpkg.com/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      html, body {
-        height: 100%;
-        background: linear-gradient(135deg, #0a192f 0%, #0d1b34 100%);
-        color: #e6f1ff;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        overflow: hidden;
-      }
-      .app-wrapper {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        padding: 10px;
-        gap: 10px;
-      }
-      @media (orientation: landscape) and (min-width: 768px) {
-        .app-wrapper {
-          flex-direction: row;
-        }
-        .top-section {
-          width: 33%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-        .bottom-section {
-          width: 67%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-        .video-container {
-          height: 100%;
-        }
-      }
-      @media (orientation: portrait), (max-width: 767px) {
-        .app-wrapper {
-          flex-direction: column;
-          height: 100%;
-          padding: 10px;
-          gap: 10px;
-        }
-        .top-section {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          flex: 0 0 auto;
-        }
-        .bottom-section {
-          width: 100%;
-          flex: 1 1 auto;
-          min-height: 0;
-          display: flex;
-          flex-direction: column;
-        }
-        .video-container {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 16/9; /* Основной метод для соотношения сторон */
-          max-height: 50vh; /* Максимальная высота */
-          min-height: 150px; /* Минимальная высота для очень маленьких экранов */
-        }
-        /* Fallback для браузеров без поддержки aspect-ratio */
-        @supports not (aspect-ratio: 16/9) {
-          .video-container {
-            height: 0;
-            padding-top: 56.25%; /* 16:9 aspect ratio */
-          }
-        }
-      }
-      .search-container {
-        position: relative;
-        height: 40px;
-      }
-      #search-input {
-        width: 100%;
-        height: 100%;
-        padding: 10px 40px 10px 15px;
-        border-radius: 8px;
-        border: 1px solid #1e2a47;
-        background: rgba(14, 22, 40, 0.8);
-        color: #e6f1ff;
-        font-size: 14px;
-        outline: none;
-      }
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #64ffda;
-        font-size: 16px;
-        pointer-events: none;
-      }
-      .video-container {
-        width: 100%;
-        position: relative;
-        background: rgba(14, 22, 40, 0.6);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      #my-video {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-      #video-placeholder {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: #64ffda;
-        font-size: 16px;
-        text-align: center;
-        opacity: 0.8;
-      }
-      .content-container {
-        flex: 1;
-        overflow-y: auto;
-        min-height: 0;
-      }
-      .back-button-container {
-        display: none;
-        padding: 10px 0;
-        text-align: center;
-        background: rgba(14, 22, 40, 0.8);
-        border-top: 1px solid #1e2a47;
-      }
-      .back-button {
-        background: #1e2a47;
-        color: #64ffda;
-        border: 1px solid #64ffda;
-        border-radius: 20px;
-        padding: 8px 20px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .back-button:hover {
-        background: rgba(100, 255, 218, 0.1);
-        box-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
-      }
-      .back-button i {
-        margin-right: 5px;
-      }
-      .search-results-header {
-        font-size: 18px;
-        margin: 0;
-        color: #64ffda;
-      }
-      .search-results-count {
-        font-size: 14px;
-        margin: 0 0 5px;
-      }
-      .categories {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        overflow-y: auto;
-      }
-      .category {
-        background: #1e2a47;
-        border: 1px solid #64ffda44;
-        padding: 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: all 0.2s ease;
-      }
-      .category:hover, .category:focus {
-        background: rgba(100, 255, 218, 0.15);
-        outline: none;
-      }
-      .category.active {
-        background: rgba(100, 255, 218, 0.25);
-        border-color: #64ffda;
-      }
-      #playlist-container {
-        display: none;
-      }
-      #playlist-header {
-        font-size: 16px;
-        color: #64ffda;
-        margin-bottom: 5px;
-      }
-      #playlist {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        max-height: 100%;
-        overflow-y: auto;
-      }
-      .channel {
-        background: #223;
-        padding: 8px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .channel:hover, .channel:focus {
-        background: rgba(100, 255, 218, 0.15);
-        outline: none;
-      }
-      .channel.active {
-        background: rgba(100, 255, 218, 0.25);
-      }
-      .search-category {
-        font-size: 14px;
-        color: #64ffda;
-        margin-top: 10px;
-        padding: 5px 0;
-        border-bottom: 1px solid #64ffda44;
-      }
-      .video-js .vjs-control-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 3.5em;
-        padding: 0 10px;
-        background: rgba(14, 22, 40, 0.9) !important;
-        backdrop-filter: blur(5px);
-      }
-      .video-js .vjs-control {
-        flex: 0 0 auto;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-      }
-      .video-js .vjs-button {
-        width: auto !important;
-        min-width: 36px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .video-js .vjs-icon-placeholder:before {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #e6f1ff;
-        line-height: 1;
-      }
-      .vjs-live-control {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        text-align: center;
-        color: #64ffda;
-      }
-      .vjs-pip-button .vjs-icon-placeholder::before {
-        content: "" !important;
-        font-family: inherit !important;
-      }
-      .vjs-pip-button .vjs-icon-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 15px;
-        height: 15px;
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15"><path fill="white" d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/><path fill="white" d="M15 15h5v3h-5z"/></svg>') center/contain no-repeat;
-      }
-      .vjs-pip-button.vjs-pip-active .vjs-icon-placeholder {
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15"><path fill="%2364ffda" d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/><path fill="%2364ffda" d="M15 15h5v3h-5z"/></svg>') center/contain no-repeat;
-      }
-      .vjs-control-bar {
-        display: none !important;
-      }
-      .video-js.vjs-has-started .vjs-control-bar {
-        display: flex !important;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      .categories, #playlist {
-        animation: fadeIn 0.3s ease-in-out;
-      }
-      .vjs-chromecast-button .vjs-icon-placeholder::before {
-        content: "" !important;
-        font-family: inherit !important;
-      }
-      .vjs-chromecast-button .vjs-icon-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 16px;
-        height: 16px;
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zM21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>') center/contain no-repeat;
-        transform: scale(0.9);
-        transition: transform 0.2s ease;
-      }
-      .vjs-chromecast-button:hover .vjs-icon-placeholder {
-        transform: scale(1.0);
-      }
-      .vjs-chromecast-button.vjs-chromecast-casting .vjs-icon-placeholder {
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2364ffda" d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zM21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>');
-      }
-      .vjs-chromecast-button {
-        margin: 0 5px !important;
-      }
-      .vjs-control-bar .vjs-control.hidden-control {
-        display: none !important;
-      }
-      .swipe-indicator-bar {
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        max-width: 350px;
-        background: rgba(14, 22, 40, 0.9);
-        backdrop-filter: blur(5px);
-        display: none;
-        align-items: center;
-        padding: 8px 15px;
-        border-radius: 10px;
-        z-index: 21;
-        pointer-events: none;
-      }
-      .swipe-indicator-bar .indicator-icon {
-        color: #64ffda;
-        font-size: 16px;
-        margin-right: 12px;
-      }
-      .swipe-indicator-bar .indicator-track {
-        flex-grow: 1;
-        height: 8px;
-        background-color: rgba(255, 255, 255, 0.3);
-        border-radius: 3px;
-        overflow: hidden;
-        margin-right: 12px;
-      }
-      .swipe-indicator-bar .indicator-progress {
-        height: 100%;
-        width: 0%;
-        background-color: #64ffda;
-        border-radius: 3px;
-      }
-      .swipe-indicator-bar .indicator-value {
-        color: #e6f1ff;
-        font-size: 16px;
-        min-width: 50px;
-        text-align: right;
-      }
-      @media (max-width: 767px) {
-        .app-wrapper.keyboard-open .top-section {
-          flex: 0 0 auto !important;
-          height: auto !important;
-        }
-        .app-wrapper.keyboard-open .video-container {
-          display: none;
-        }
-        .app-wrapper.keyboard-open .bottom-section {
-          flex: 1 1 auto !important;
-          min-height: 0;
-          height: calc(100% - 60px) !important; /* Учитываем высоту поиска */
-        }
-        
-        /* Динамическое изменение для экранов с очень маленькой высотой */
-        @media (max-height: 500px) {
-          .video-container {
-            max-height: 40vh !important;
-          }
-        }
-        @media (max-height: 400px) {
-          .video-container {
-            max-height: 30vh !important;
-          }
-        }
-      }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.05, maximum-scale=1.05, user-scalable=no" />
+<title>MDFM Radio Player</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+/* Все стили остаются без изменений */
+:root {
+  --bg-main: #121212;
+  --bg-element: #1e1e1e;
+  --bg-element-hover: #282828;
+  --text-primary: #eaeaea;
+  --text-secondary: #b3b3b3;
+  --accent: #1DB954;
+  --accent-hover: #1ed760;
+  --border-color: #2c2c2c;
+  --card-border: rgba(30, 215, 96, 0.27);
+  --player-bg: #0a0a0a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  z-index: 30;
+  gap: 15px;
+  width: 100%;
+}
+header h1 {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.search {
+  background: var(--bg-element);
+  border-radius: 8px;
+  padding: 8px 14px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  min-width: 0;
+}
+.search i {
+  margin-right: 8px;
+  color: var(--accent);
+}
+.search input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  width: 100%;
+  font-size: 14px;
+  outline: none;
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+}
+.grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.card {
+  background: var(--bg-element);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  outline: none;
+  contain: content;
+  transition: none !important;
+  border: 1px solid var(--card-border);
+}
+.card:hover, .card:active {
+  background: var(--bg-element-hover) !important;
+  border-color: var(--card-border) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.card .station-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  /* Запрет на выделение и перетаскивание */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.card .station-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Запрет на выделение и перетаскивание */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none; /* Блокировка событий мыши */
+}
+.card .station-logo i {
+  font-size: 16px;
+  color: var(--accent);
+}
+.card .station-info {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+.card h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-loader {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #333;
+  overflow: hidden;
+}
+.card-loader::before {
+  content: '';
+  position: absolute;
+  height: 2px;
+  width: 50%;
+  background: var(--accent);
+  animation: loading 1.5s infinite ease-in-out;
+  backface-visibility: hidden;
+}
+@keyframes loading {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(200%, 0, 0); }
+}
+#mini-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-element);
+  border-top: 1px solid var(--border-color);
+  padding: 10px 16px;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 25;
+  width: 100%;
+  box-sizing: border-box;
+}
+#mini-player .mini-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+#mini-player .mini-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--card-border);
+  /* Запрет на выделение и перетаскивание */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+#mini-player .mini-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Запрет на выделение и перетаскивание */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none; /* Блокировка событий мыши */
+}
+#mini-player .mini-logo i {
+  color: var(--accent);
+  font-size: 14px;
+}
+#mini-player .mini-title {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+#mini-player .mini-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 0;
+}
+#mini-player .mini-play-toggle {
+  background: var(--bg-element);
+  border: 1px solid var(--accent);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: all 0.3s ease;
+}
+#mini-player .mini-play-toggle:hover {
+  background: rgba(30, 215, 96, 0.1);
+  box-shadow: 0 0 10px rgba(30, 215, 96, 0.3);
+  transform: scale(1.1);
+}
+#player-fullscreen {
+  position: fixed;
+  inset: 0;
+  background: var(--player-bg);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  z-index: 100;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#player-fullscreen .back {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+#player-fullscreen .back:hover {
+  background: rgba(30, 215, 96, 0.1);
+  box-shadow: 0 0 10px rgba(30, 215, 96, 0.3);
+}
+.player-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  height: 100%;
+  justify-content: space-around;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+.station-logo-large {
+  width: 30vh;
+  height: 30vh;
+  max-width: 250px;
+  max-height: 250px;
+  min-width: 150px;
+  min-height: 150px;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--accent);
+  /* Запрет на выделение и перетаскивание */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.station-logo-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Запрет на выделение и перетаскивание */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none; /* Блокировка событий мыши */
+}
+.station-logo-large i {
+  color: var(--accent);
+  font-size: 50px;
+}
+#station-name {
+  font-size: 24px;
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 0 20px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.navigation-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+.navigation-controls .nav-button {
+  font-size: 24px;
+  color: var(--accent);
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.8);
+  border: 1px solid var(--card-border);
+  transform: translateZ(0);
+  will-change: transform;
+  transition: all 0.3s ease;
+}
+.navigation-controls .play-button {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+  background: var(--accent);
+  cursor: pointer;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: all 0.3s ease;
+}
+
+/* --- ИСПРАВЛЕННЫЕ СТИЛИ ДЛЯ НАЖАТИЯ --- */
+
+/* Этот стиль применяется JS в момент нажатия/касания */
+.navigation-controls .nav-button.active-state {
+  background: rgba(30, 215, 96, 0.2);
+  box-shadow: 0 0 10px rgba(30, 215, 96, 0.3);
+  transform: scale(1.1);
+}
+.navigation-controls .play-button.active-state {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px rgba(30, 215, 96, 0.4);
+  transform: scale(1.05);
+}
+
+/* Этот стиль применяется ТОЛЬКО на устройствах с мышью при наведении */
+@media (hover: hover) and (pointer: fine) {
+  .navigation-controls .nav-button:hover {
+    background: rgba(30, 215, 96, 0.2);
+    box-shadow: 0 0 10px rgba(30, 215, 96, 0.3);
+    transform: scale(1.1);
+  }
+  .navigation-controls .play-button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 0 20px rgba(30, 215, 96, 0.4);
+    transform: scale(1.05);
+  }
+}
+
+.volume-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 80%;
+  max-width: 280px;
+  margin: 20px 0;
+}
+.volume-container i {
+  color: var(--accent);
+  font-size: 20px;
+  width: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.volume-slider {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.volume-slider input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  transition: background 0.3s ease;
+}
+.volume-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.volume-slider input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--accent-hover);
+  transform: scale(1.2);
+}
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 20px;
+  color: var(--accent);
+}
+.loading i {
+  font-size: 40px;
+  color: var(--accent);
+  animation: spin 1.5s linear infinite;
+  backface-visibility: hidden;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.error {
+  padding: 20px;
+  text-align: center;
+  color: #ff6b6b;
+}
+.no-results {
+  text-align: center;
+  padding: 30px;
+  color: var(--accent);
+}
+.custom-error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 18, 18, 0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.custom-error.show {
+  display: flex;
+  opacity: 1;
+}
+.custom-error-content {
+  background: var(--bg-element);
+  padding: 25px 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--accent);
+  max-width: 90%;
+  width: 380px;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+.custom-error.show .custom-error-content {
+    transform: scale(1);
+}
+.custom-error-content p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .card-loader::before {
+    display: none;
+  }
+  .loading i {
+    animation: none;
+  }
+  #mini-player .mini-play-toggle:hover,
+  .navigation-controls .nav-button:hover,
+  .navigation-controls .play-button:hover,
+  .volume-slider input[type="range"]::-webkit-slider-thumb:hover {
+    transform: none !important;
+  }
+}
+@media (max-width: 768px) {
+  .station-logo-large {
+    width: 25vh;
+    height: 25vh;
+    max-width: 200px;
+    max-height: 200px;
+  }
+  #station-name { font-size: 22px; }
+  .navigation-controls { gap: 30px;
+  }
+  .navigation-controls .play-button {
+    width: 70px;
+    height: 70px;
+    font-size: 24px;
+  }
+  .navigation-controls .nav-button {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+}
+@media (max-width: 480px) {
+  header { padding: 10px; }
+  .card { padding: 10px;
+  }
+  .card .station-logo { width: 36px; height: 36px; }
+  .station-logo-large {
+    width: 20vh;
+    height: 20vh;
+    min-width: 120px;
+    min-height: 120px;
+  }
+  #station-name { font-size: 18px; }
+  .navigation-controls { gap: 20px;
+  }
+  .navigation-controls .nav-button {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  .volume-container {
+    max-width: 240px;
+    gap: 8px;
+  }
+}
+</style>
 </head>
 <body>
-  <div class="app-wrapper" id="app-wrapper">
-    <div class="top-section">
-      <div class="search-container">
-        <input type="text" id="search-input" placeholder="Поиск по всем каналам...">
-        <div class="search-icon"><i class="fas fa-search"></i></div>
+<header>
+  <h1>MDFM</h1>
+  <div class="search">
+    <i class="fas fa-search"></i>
+    <input type="text" id="search" placeholder="Поиск станции..." />
+  </div>
+</header>
+
+<div class="grid" id="station-list">
+  <div class="loading">
+    <i class="fas fa-sync fa-spin"></i>
+    <p>Загрузка радиостанций...</p>
+  </div>
+</div>
+
+<div id="mini-player">
+  <div class="mini-info">
+    <div class="mini-logo" id="mini-logo"></div>
+    <div class="mini-title" id="mini-title">Станция</div>
+  </div>
+  <div class="mini-controls">
+    <button class="mini-play-toggle" id="mini-play-toggle">
+      <i class="fas fa-play" id="mini-play-icon"></i>
+    </button>
+  </div>
+</div>
+
+<div id="player-fullscreen">
+  <div class="back" onclick="closeFullscreen()">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+  <div class="player-content">
+ 
+    <div class="station-logo-large" id="station-logo-large"></div>
+    <div id="station-name">Название станции</div>
+    <div class="navigation-controls">
+      <div class="nav-button" id="prev-station" onclick="changeStation(-1)">
+        <i class="fas fa-step-backward"></i>
       </div>
-      <div class="video-container" id="video-container">
-        <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous" controlslist="nodownload noplaybackrate"></video>
-        <div id="video-placeholder">Выберите канал из списка</div>
+      <div class="play-button" id="play-toggle">
+        <i class="fas fa-play" id="play-icon"></i>
+      </div>
+      <div class="nav-button" id="next-station" onclick="changeStation(1)">
+        <i class="fas fa-step-forward"></i>
       </div>
     </div>
-    <div class="bottom-section">
-      <div class="content-container">
-        <div class="search-results-header" id="search-results-header" style="display:none">Результаты поиска</div>
-        <div class="search-results-count" id="search-results-count" style="display:none">Найдено каналов: <div id="results-count">0</div></div>
-        <div class="categories" id="categories"></div>
-        <div id="playlist-container">
-          <div id="playlist-header">Каналы</div>
-          <div id="playlist"></div>
-        </div>
+    <div class="volume-container">
+      <i class="fas fa-volume-down"></i>
+      <div class="volume-slider">
+        <input type="range" min="0" max="1" step="0.05" value="1" id="volume-slider">
       </div>
-      <div class="back-button-container" id="back-button-container">
-        <button class="back-button" id="back-button"><i class="fas fa-arrow-left"></i> Назад</button>
-      </div>
+      <i class="fas fa-volume-up"></i>
     </div>
   </div>
+</div>
 
-  <script src="https://vjs.zencdn.net/8.23.3/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@4.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.min.js"></script>
-  <script src="https://unpkg.com/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.js"></script>
-  <script>
-    window.SILVERMINE_VIDEOJS_CHROMECAST_CONFIG = { preloadWebComponents: true };
-  </script>
-  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+<div id="custom-error" class="custom-error">
+  <div class="custom-error-content">
+    <p id="custom-error-message"></p>
+  </div>
+</div>
 
-  <script>
-  (function() {
-    'use strict';
+<audio id="audio" autoplay hidden></audio>
 
-    const SWIPE_THRESHOLD = 10;
-    const playlistUrl = "http://cdntv.online/high/xm1hzalq26/playlist.m3u8";
-    const fallbackChannels = {
-        "Спорт": [
-            { name: "Eurosport 1 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_1_IPTV/HLSv4/Eurosport_1_IPTV.m3u8", category: "Спорт" },
-            { name: "Eurosport 2 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Eurosport_2_IPTV/HLSv4/Eurosport_2_IPTV.m3u8", category: "Спорт" },
-            { name: "WE SPORT HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/We_Sport_IPTV/HLSv4/We_Sport_IPTV.m3u8", category: "Спорт" },
-            { name: "Setanta HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_IPTV/HLSv4/Setanta_IPTV.m3u8", category: "Спорт" },
-            { name: "Setanta 1 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta1_IPTV/HLSv4/Setanta1_IPTV.m3u8", category: "Спорт" },
-            { name: "Setanta 2 HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Setanta_2IPTV/HLSv4/Setanta_2IPTV.m3u8", category: "Спорт" },
-            { name: "Q Sport HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/Q_Sport_IPTV/HLSv4/Q_Sport_IPTV.m3u8", category: "Спорт" },
-            { name: "KHL Prime HD", url: "https://pilot.multiscreen.moldtelecom.md/live/eds/KHL_Prime_HD/HLSv4/KHL_Prime_HD.m3u8", category: "Спорт" }
-        ]
-    };
+<script>
+const PLAYLIST_URL = 'https://tvmoldova.github.io/playlist.json';
+const CACHE_KEY = 'radio_playlist_cache';
 
-    let allChannels = {};
-    let wasPlayingBeforePiP = false;
-    let hideTimeout = null;
-    let isChannelLoaded = false;
-    let touchStartCoords = null;
-    let isSwiping = false;
-    let currentControlType = null;
-    let lastY = 0;
+const grid = document.getElementById("station-list");
+const search = document.getElementById("search");
+const audio = document.getElementById("audio");
+const miniPlayer = document.getElementById("mini-player");
+const miniTitle = document.getElementById("mini-title");
+const miniLogo = document.getElementById("mini-logo");
+const miniPlayToggle = document.getElementById("mini-play-toggle");
+const miniPlayIcon = document.getElementById("mini-play-icon");
+const stationName = document.getElementById("station-name");
+const stationLogoLarge = document.getElementById("station-logo-large");
+const fullscreen = document.getElementById("player-fullscreen");
+const playToggle = document.getElementById("play-toggle");
+const playIcon = document.getElementById("play-icon");
+const volumeSlider = document.getElementById("volume-slider");
+const customError = document.getElementById("custom-error");
+const customErrorMessage = document.getElementById("custom-error-message");
 
-    const Button = videojs.getComponent('Button');
-    class PipButton extends Button {
-      constructor(player, options) {
-        super(player, options);
-        this.addClass('vjs-pip-button');
-        this.controlText('Картинка в картинке');
-        this.updateIcon();
-      }
-      
-      handleClick() {
-        const videoElement = this.player().tech().el();
-        if (!videoElement || !document.pictureInPictureEnabled) {
-          alert('Picture-in-Picture не поддерживается вашим браузером');
-          return;
-        }
-        
-        if (document.pictureInPictureElement) {
-          document.exitPictureInPicture().catch(error => console.error('Ошибка выхода из PiP:', error));
+let stations = [];
+let currentStation = null;
+let currentStationIndex = -1;
+let errorTimeout = null;
+
+// Функция для экранирования HTML
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+async function loadPlaylist() {
+  try {
+    const response = await fetch(PLAYLIST_URL + '?t=' + new Date().getTime());
+    if (!response.ok) throw new Error('Ошибка сети, попытка загрузить из кэша');
+    stations = await response.json();
+    renderStations();
+    const cache = { data: stations, timestamp: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch (error) {
+    console.warn(error.message);
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      console.log('Загрузка плейлиста из кэша.');
+      const { data } = JSON.parse(cachedData);
+      stations = data;
+      renderStations();
+    } else {
+      console.error('Ошибка загрузки плейлиста и отсутствие кэша.');
+      grid.innerHTML = `
+      <div class="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>Не удалось загрузить плейлист</p>
+        <button onclick="refreshPlaylist()" style="background: var(--bg-element); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 8px; margin-top: 15px; cursor: pointer; transition: all 0.3s ease;">Повторить</button>
+      </div>`;
+    }
+  }
+}
+
+function refreshPlaylist() {
+  localStorage.removeItem(CACHE_KEY);
+  grid.innerHTML = `
+    <div class="loading">
+      <i class="fas fa-sync fa-spin"></i>
+      <p>Обновление списка станций...</p>
+    </div>`;
+  loadPlaylist();
+}
+
+function renderStations(filter = "") {
+  if (!stations || stations.length === 0) {
+    grid.innerHTML = `
+      <div class="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>Нет доступных станций</p>
+      </div>`;
+    return;
+  }
+
+  const lowerCaseFilter = filter.toLowerCase();
+  const filtered = stations.filter(s =>
+    s.name.toLowerCase().includes(lowerCaseFilter) ||
+    (s.genre && s.genre.toLowerCase().includes(lowerCaseFilter))
+  );
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="no-results">
+        <i class="fas fa-search"></i>
+        <p>Станций не найдено</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = "";
+  filtered.forEach(station => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.stationId = station.id;
+    card.tabIndex = -1;
+
+    const escapedName = escapeHtml(station.name);
+    let logoContent;
+    if (station.logo) {
+      const escapedLogo = escapeHtml(station.logo);
+      logoContent = `<img src="${escapedLogo}" alt="${escapedName}" draggable="false" oncontextmenu="return false;" onerror="handleImageError(this)">`;
+    } else {
+      logoContent = `<i class="fas fa-radio"></i>`;
+    }
+
+    card.innerHTML = `
+      <div class="station-logo">${logoContent}</div>
+      <div class="station-info">
+        <h3>${escapedName}</h3>
+      </div>
+    `;
+
+    card.onclick = () => {
+      card.blur();
+      // Если это текущая станция и она уже играет, то ставим на паузу
+      if (currentStation && currentStation.id === station.id) {
+        if (!audio.paused) {
+          audio.pause();
         } else {
-          wasPlayingBeforePiP = !this.player().paused();
-          videoElement.requestPictureInPicture().catch(error => console.error('Ошибка входа в PiP:', error));
+          audio.play().catch(e => console.error("Ошибка воспроизведения:", e));
         }
-      }
-      
-      updateIcon() {
-        if (document.pictureInPictureElement) {
-          this.addClass('vjs-pip-active');
-          this.controlText('Закрыть картинку в картинке');
-        } else {
-          this.removeClass('vjs-pip-active');
-          this.controlText('Картинка в картинке');
-        }
-      }
-    }
-    videojs.registerComponent('PipButton', PipButton);
-    
-    const player = videojs('my-video', {
-      techOrder: ['chromecast', 'html5'],
-      plugins: { chromecast: {} },
-      fluid: true,
-      autoplay: false,
-      muted: true,
-      bigPlayButton: false,
-      html5: { vhs: { overrideNative: true } },
-      controlBar: {
-        children: ['playToggle', 'volumePanel', 'liveDisplay', 'audioTrackButton', 'qualitySelector', 'pipButton', 'chromecastButton', 'fullscreenToggle']
-      }
-    });
-
-    function debounce(func, delay) {
-      let timeout;
-      return function(...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), delay);
-      };
-    }
-
-    function adaptControlBar() {
-      const controlBar = player.controlBar?.el();
-      if (!controlBar) return;
-      const priorityList = ['.vjs-live-display', '.vjs-pip-button', '.vjs-chromecast-button', '.vjs-quality-selector', '.vjs-audio-track-button', '.vjs-volume-panel', '.vjs-fullscreen-control'];
-      
-      priorityList.forEach(selector => {
-        const element = controlBar.querySelector(selector);
-        if (element) element.classList.remove('hidden-control');
-      });
-
-      let totalWidth = Array.from(controlBar.children)
-        .filter(el => window.getComputedStyle(el).display !== 'none' && !el.classList.contains('hidden-control'))
-        .reduce((acc, el) => {
-          const style = window.getComputedStyle(el);
-          return acc + el.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-        }, 0);
-
-      if (totalWidth <= controlBar.offsetWidth) return;
-      
-      for (const selector of priorityList) {
-        const element = controlBar.querySelector(selector);
-        if (element) {
-          element.classList.add('hidden-control');
-          
-          let currentWidth = Array.from(controlBar.children)
-            .filter(el => !el.classList.contains('hidden-control'))
-            .reduce((acc, el) => {
-              const style = window.getComputedStyle(el);
-              return acc + el.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-            }, 0);
-
-          if (currentWidth <= controlBar.offsetWidth) break;
-        }
-      }
-    }
-
-    player.ready(() => {
-      const debouncedAdapt = debounce(adaptControlBar, 100);
-      const videoElement = player.tech().el();
-      
-      if (videoElement) {
-        const pipButton = player.controlBar.getChild('pipButton');
-        videoElement.addEventListener('enterpictureinpicture', () => pipButton?.updateIcon());
-        videoElement.addEventListener('leavepictureinpicture', () => {
-          pipButton?.updateIcon();
-          if (wasPlayingBeforePiP && player.paused()) {
-            player.play().catch(error => console.log('Ошибка при возобновлении воспроизведения:', error));
-          }
-        });
-      }
-
-      adaptControlBar();
-      player.hlsQualitySelector({ displayCurrentQuality: true });
-
-      player.on('loadedmetadata', function() {
-        const qualityLevels = player.qualityLevels();
-        const qualityButton = player.controlBar.el().querySelector('.vjs-quality-selector');
-        if (qualityButton) {
-          qualityButton.style.display = (qualityLevels && qualityLevels.length > 1) ? 'flex' : 'none';
-        }
-        debouncedAdapt();
-      });
-
-      window.addEventListener('resize', debouncedAdapt);
-      player.on('controlsenabled', debouncedAdapt);
-      player.on('controlsdisabled', debouncedAdapt);
-      
-      const observer = new MutationObserver(debouncedAdapt);
-      if (player.controlBar.el()) {
-        observer.observe(player.controlBar.el(), { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-      }
-    });
-
-    async function loadM3UPlaylist(url) {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const playlistText = await response.text();
-        const channelsByCategory = {};
-        const lines = playlistText.split('\n');
-        let currentChannel = null;
-
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-
-          if (line.startsWith('#EXTINF')) {
-            const groupMatch = line.match(/group-title\s*=\s*"([^"]+)"/i);
-            const nameMatch = line.match(/,(.*)$/);
-            
-            currentChannel = {
-              name: nameMatch ? nameMatch[1].trim() : `Канал ${i}`,
-              url: "",
-              category: (groupMatch && groupMatch[1]) ? groupMatch[1].trim() : "Другие"
-            };
-          } else if (line.startsWith('#EXTGRP:') && currentChannel) {
-            currentChannel.category = line.substring(8).trim();
-          } else if (line.startsWith('http')) {
-            if (currentChannel) {
-              currentChannel.url = line;
-              if (!channelsByCategory[currentChannel.category]) {
-                channelsByCategory[currentChannel.category] = [];
-              }
-              channelsByCategory[currentChannel.category].push(currentChannel);
-              currentChannel = null;
-            }
-          }
-        }
-        return channelsByCategory;
-      } catch (error) {
-        console.error('Ошибка загрузки плейлиста:', error);
-        return fallbackChannels;
-      }
-    }
-
-    function createCategories() {
-      const categoriesEl = document.getElementById('categories');
-      categoriesEl.innerHTML = '';
-      const fragment = document.createDocumentFragment();
-
-      Object.keys(allChannels).sort().forEach(category => {
-        const categoryEl = document.createElement('div');
-        categoryEl.className = 'category';
-        categoryEl.textContent = category;
-        categoryEl.dataset.category = category;
-        categoryEl.setAttribute('role', 'button');
-        categoryEl.setAttribute('tabindex', '0');
-        fragment.appendChild(categoryEl);
-      });
-      categoriesEl.appendChild(fragment);
-    }
-
-    function displayChannels(channels) {
-      const playlistEl = document.getElementById('playlist');
-      playlistEl.innerHTML = '';
-      const fragment = document.createDocumentFragment();
-
-      if (channels.length === 0) {
-        const noResults = document.createElement('div');
-        noResults.textContent = 'Каналы не найдены';
-        fragment.appendChild(noResults);
       } else {
-        channels.forEach(channel => {
-          const channelEl = document.createElement('div');
-          channelEl.className = 'channel';
-          channelEl.textContent = channel.name;
-          channelEl.dataset.name = channel.name;
-          channelEl.dataset.url = channel.url;
-          channelEl.dataset.category = channel.category;
-          channelEl.setAttribute('role', 'button');
-          channelEl.setAttribute('tabindex', '0');
-          fragment.appendChild(channelEl);
-        });
+        // Если это другая станция, запускаем ее
+        playStation(station);
       }
-      playlistEl.appendChild(fragment);
+    };
+    grid.appendChild(card);
+  });
+}
+
+function handleImageError(img) {
+  img.onerror = null;
+  const container = img.parentElement;
+  if (container) {
+    container.innerHTML = `<i class="fas fa-radio"></i>`;
+  }
+}
+
+function updateCardLoader(stationId, show) {
+  const existingLoader = grid.querySelector('.card-loader');
+  if (existingLoader) {
+    existingLoader.remove();
+  }
+
+  if (show && stationId) {
+    const card = grid.querySelector(`.card[data-station-id='${stationId}']`);
+    if (card) {
+      const loader = document.createElement("div");
+      loader.className = "card-loader";
+      card.appendChild(loader);
     }
-    
-    function showView(view) {
-        const categories = document.getElementById('categories');
-        const playlistContainer = document.getElementById('playlist-container');
-        const backButton = document.getElementById('back-button-container');
-        const searchHeader = document.getElementById('search-results-header');
-        const searchCount = document.getElementById('search-results-count');
+  }
+}
 
-        categories.style.display = 'none';
-        playlistContainer.style.display = 'none';
-        backButton.style.display = 'none';
-        searchHeader.style.display = 'none';
-        searchCount.style.display = 'none';
+function playStation(station) {
+  if (!station || !station.stream) return;
+  if (audio.src) {
+    audio.pause();
+  }
 
-        switch(view) {
-            case 'playlist':
-                playlistContainer.style.display = 'block';
-                backButton.style.display = 'block';
-                break;
-            case 'search':
-                playlistContainer.style.display = 'block';
-                backButton.style.display = 'block';
-                searchHeader.style.display = 'block';
-                searchCount.style.display = 'block';
-                break;
-            case 'categories':
-            default:
-                categories.style.display = 'flex';
-                break;
-        }
-    }
+  currentStation = station;
+  currentStationIndex = stations.findIndex(s => s.id === station.id);
+  
+  updateCardLoader(station.id, true);
 
-    function loadCategory(category) {
-      document.getElementById('playlist-header').textContent = category;
-      document.querySelectorAll('.category').forEach(el => {
-          el.classList.toggle('active', el.dataset.category === category);
+  miniPlayer.style.display = "flex";
+  updatePlayerUI(station);
+  
+  initMediaSession(station);
+
+  audio.src = station.stream;
+  audio.play().then(() => {
+    updateCardLoader(null, false);
+    updatePlayIcons(true);
+  }).catch(error => {
+    console.error('Ошибка воспроизведения:', error);
+    updateCardLoader(station.id, false);
+    updatePlayIcons(false);
+    handleStreamError();
+  });
+}
+
+function initMediaSession(station) {
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: station.name,
+        artist: 'MDFM Radio',
+        artwork: station.logo ? [{ src: station.logo, sizes: '256x256' }] : []
       });
-      displayChannels(allChannels[category]);
-      showView('playlist');
+      navigator.mediaSession.setActionHandler('play', function() { togglePlay(); });
+      navigator.mediaSession.setActionHandler('pause', function() { togglePlay(); });
+      navigator.mediaSession.setActionHandler('previoustrack', function() { changeStation(-1); });
+      navigator.mediaSession.setActionHandler('nexttrack', function() { changeStation(1); });
+      navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+    } catch (error) {
+      console.error('Ошибка Media Session API:', error);
     }
-    
-    function searchChannels(query) {
-      if (!query) {
-        showView('categories');
-        return;
-      }
-      
-      const resultsContainer = document.getElementById('playlist');
-      resultsContainer.innerHTML = '';
-      const fragment = document.createDocumentFragment();
-      const searchLower = query.toLowerCase();
-      let resultsCount = 0;
+  }
+}
 
-      Object.keys(allChannels).forEach(category => {
-        const categoryResults = allChannels[category].filter(channel => channel.name.toLowerCase().includes(searchLower));
-        if (categoryResults.length > 0) {
-          resultsCount += categoryResults.length;
-          const categoryHeader = document.createElement('div');
-          categoryHeader.className = 'search-category';
-          categoryHeader.textContent = category;
-          fragment.appendChild(categoryHeader);
-          
-          categoryResults.forEach(channel => {
-            const channelEl = document.createElement('div');
-            channelEl.className = 'channel';
-            channelEl.textContent = channel.name;
-            channelEl.dataset.name = channel.name;
-            channelEl.dataset.url = channel.url;
-            channelEl.dataset.category = channel.category;
-            channelEl.setAttribute('role', 'button');
-            channelEl.setAttribute('tabindex', '0');
-            fragment.appendChild(channelEl);
-          });
-        }
-      });
+function handleStreamError() {
+  if (!currentStation) return;
 
-      document.getElementById('results-count').textContent = resultsCount;
-      if (resultsCount === 0) {
-        const noResults = document.createElement('div');
-        noResults.textContent = 'Ничего не найдено';
-        fragment.appendChild(noResults);
-      }
-      resultsContainer.appendChild(fragment);
-      document.getElementById('playlist-header').textContent = 'Результаты поиска';
-      showView('search');
+  const stationName = currentStation.name;
+  showCustomError(`Станция "${stationName}" недоступна. Включаем следующую.`);
+
+  clearTimeout(errorTimeout);
+  errorTimeout = setTimeout(() => {
+    closeCustomError();
+    changeStation(1);
+  }, 2500);
+}
+
+function updatePlayerUI(station) {
+  miniTitle.textContent = station.name;
+  stationName.textContent = station.name;
+  updateLogo(miniLogo, station.logo);
+  updateLogo(stationLogoLarge, station.logo);
+}
+
+function updateLogo(container, logoUrl) {
+  container.innerHTML = '';
+  if (logoUrl) {
+    const img = document.createElement('img');
+    img.src = logoUrl;
+    img.alt = currentStation?.name || 'Radio logo';
+    img.draggable = false;
+    img.oncontextmenu = (e) => e.preventDefault();
+    img.onerror = function() {
+      container.innerHTML = '<i class="fas fa-radio"></i>';
+    };
+    container.appendChild(img);
+  } else {
+    container.innerHTML = '<i class="fas fa-radio"></i>';
+  }
+}
+
+function togglePlay() {
+  if (!currentStation) return;
+  if (audio.paused) {
+    audio.play().catch(e => console.error("Ошибка воспроизведения:", e));
+  } else {
+    audio.pause();
+  }
+}
+
+function updatePlayIcons(isPlaying) {
+  const iconClass = isPlaying ? "fas fa-pause" : "fas fa-play";
+  playIcon.className = iconClass;
+  miniPlayIcon.className = iconClass;
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+  }
+}
+
+function changeStation(direction) {
+  if (stations.length === 0 || currentStationIndex === -1) return;
+  let newIndex = currentStationIndex + direction;
+  if (newIndex < 0) newIndex = stations.length - 1;
+  if (newIndex >= stations.length) newIndex = 0;
+  
+  playStation(stations[newIndex]);
+}
+
+function openFullscreen() {
+  fullscreen.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeFullscreen() {
+  fullscreen.style.display = "none"; 
+  document.body.style.overflow = "auto";
+}
+
+function showCustomError(message) {
+  customErrorMessage.textContent = message;
+  customError.classList.add('show');
+}
+
+function closeCustomError() {
+  customError.classList.remove('show');
+}
+
+function init() {
+  loadPlaylist();
+
+  // Запрет контекстного меню на логотипах
+  grid.addEventListener('contextmenu', function(e) {
+    if (e.target.closest('.station-logo, .mini-logo, .station-logo-large')) {
+      e.preventDefault();
     }
-    
-    function resetBrightness() {
-      const videoEl = player.tech().el();
-      if (videoEl) videoEl.style.filter = 'brightness(1)';
-    }
+  });
+  
+  miniLogo.addEventListener('contextmenu', e => e.preventDefault());
+  stationLogoLarge.addEventListener('contextmenu', e => e.preventDefault());
+  
+  // Запрет перетаскивания для всех изображений
+  document.querySelectorAll('img').forEach(img => {
+    img.draggable = false;
+  });
 
-    function loadChannel(channel, event) {
-      document.getElementById('video-placeholder').style.display = 'none';
-      document.getElementById('my-video').style.visibility = 'visible';
-      
-      player.pause();
-      player.src({ src: channel.url, type: 'application/x-mpegURL' });
-      player.muted(false);
-      player.play().catch(e => console.error("Play failed:", e));
-      
-      resetBrightness();
-      isChannelLoaded = true;
+  playToggle.addEventListener("click", togglePlay);
 
-      document.querySelectorAll('.channel').forEach(el => el.classList.remove('active'));
-      if (event?.target) {
-        const targetChannel = event.target.closest('.channel');
-        if (targetChannel) {
-            targetChannel.classList.add('active');
-            targetChannel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      }
-    }
-    
-    function handleTouchStart(e) {
-      if (!isChannelLoaded || (e.type === 'mousedown' && e.button !== 0)) return;
-      
-      const rect = e.currentTarget.getBoundingClientRect();
-      const startX = e.clientX ?? e.touches?.[0]?.clientX;
-      const startY = e.clientY ?? e.touches?.[0]?.clientY;
-      if (startX === undefined || startY === undefined) return;
+  miniPlayToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    togglePlay();
+  });
 
-      touchStartCoords = { x: startX, y: startY };
-      lastY = startY;
-      isSwiping = false; 
-      currentControlType = (startX < rect.left + rect.width / 2) ? 'volume' : 'brightness';
-    }
+  miniPlayer.addEventListener("click", (e) => {
+    if (!e.target.closest('.mini-play-toggle')) openFullscreen();
+  });
+  
+  search.addEventListener("input", () => renderStations(search.value));
+  volumeSlider.addEventListener("input", () => audio.volume = volumeSlider.value);
+  
+  audio.volume = volumeSlider.value;
 
-    function handleTouchMove(e) {
-      if (!isChannelLoaded || !touchStartCoords) return;
-      
-      const currentY = e.clientY ?? e.touches?.[0]?.clientY;
-      if (currentY === undefined) return;
+  audio.addEventListener("play", () => updatePlayIcons(true));
+  audio.addEventListener("pause", () => updatePlayIcons(false));
+  audio.addEventListener("ended", () => updatePlayIcons(false));
+  audio.addEventListener("error", handleStreamError);
 
-      const currentX = e.clientX ?? e.touches?.[0]?.clientX;
-      const totalDeltaY = touchStartCoords.y - currentY;
-      const totalDeltaX = touchStartCoords.x - currentX;
+  // Логика для управления эффектом нажатия на кнопках
+  const prevStationBtn = document.getElementById("prev-station");
+  const nextStationBtn = document.getElementById("next-station");
+  const buttonsToAnimate = [prevStationBtn, nextStationBtn, playToggle];
 
-      if (!isSwiping && Math.abs(totalDeltaY) > SWIPE_THRESHOLD && Math.abs(totalDeltaY) > Math.abs(totalDeltaX)) {
-        isSwiping = true;
-        document.getElementById('swipe-indicator-bar').style.display = 'flex';
-        lastY = currentY; 
-      }
+  buttonsToAnimate.forEach(button => {
+    const addActive = () => button.classList.add('active-state');
+    const removeActive = () => button.classList.remove('active-state');
 
-      if (isSwiping) {
-        e.preventDefault();
-        const deltaY = lastY - currentY;
-        lastY = currentY;
-        const sensitivity = 0.005;
-        const change = deltaY * sensitivity;
+    button.addEventListener('mousedown', addActive);
+    button.addEventListener('touchstart', addActive, { passive: true });
 
-        const indicatorProgress = document.getElementById('indicator-progress');
-        const indicatorValue = document.getElementById('indicator-value');
-        const iconEl = document.getElementById('indicator-icon');
-        
-        if (currentControlType === 'volume') {
-          let newValue = Math.max(0, Math.min(1, player.volume() + change));
-          player.volume(newValue);
-          if (newValue === 0) iconEl.className = 'indicator-icon fas fa-volume-mute';
-          else if (newValue <= 0.5) iconEl.className = 'indicator-icon fas fa-volume-down';
-          else iconEl.className = 'indicator-icon fas fa-volume-up';
-          indicatorProgress.style.width = `${newValue * 100}%`;
-          indicatorValue.textContent = `${Math.round(newValue * 100)}%`;
-        } else { // brightness
-          const videoEl = player.tech().el();
-          if (!videoEl) return;
-          const match = videoEl.style.filter.match(/brightness\(([\d.]+)\)/);
-          const currentBrightness = match ? parseFloat(match[1]) : 1;
-          let newValue = Math.max(0.1, Math.min(1.5, currentBrightness + change));
-          videoEl.style.filter = `brightness(${newValue})`;
-          iconEl.className = 'indicator-icon fas fa-sun';
-          indicatorProgress.style.width = `${(newValue / 1.5) * 100}%`;
-          indicatorValue.textContent = `${Math.round(newValue * 100)}%`;
-        }
-        
-        clearTimeout(hideTimeout);
-        hideTimeout = setTimeout(() => {
-            document.getElementById('swipe-indicator-bar').style.display = 'none';
-        }, 1500);
-      }
-    }
+    button.addEventListener('mouseup', removeActive);
+    button.addEventListener('mouseleave', removeActive);
+    button.addEventListener('touchend', removeActive);
+  });
+}
 
-    function handleTouchEnd() {
-      if (isSwiping) {
-        clearTimeout(hideTimeout);
-        hideTimeout = setTimeout(() => {
-            document.getElementById('swipe-indicator-bar').style.display = 'none';
-        }, 500);
-      }
-      isSwiping = false;
-      touchStartCoords = null;
-      currentControlType = null;
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      const playerEl = player.el();
-      const appWrapper = document.getElementById('app-wrapper');
-      const searchInput = document.getElementById('search-input');
-      const categoriesEl = document.getElementById('categories');
-      const playlistEl = document.getElementById('playlist');
-
-      const indicatorBar = document.createElement('div');
-      indicatorBar.id = 'swipe-indicator-bar';
-      indicatorBar.className = 'swipe-indicator-bar';
-      indicatorBar.innerHTML = `
-          <i id="indicator-icon" class="indicator-icon fas fa-volume-up"></i>
-          <div class="indicator-track">
-            <div id="indicator-progress" class="indicator-progress"></div>
-          </div>
-          <div id="indicator-value" class="indicator-value">100%</div>
-      `;
-      playerEl.appendChild(indicatorBar);
-
-      let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      let originalHeight = window.innerHeight;
-      const handleResize = () => {
-        if (!isMobile) return;
-        appWrapper.classList.toggle('keyboard-open', window.innerHeight < originalHeight);
-      };
-      window.addEventListener('resize', handleResize);
-      window.addEventListener('orientationchange', handleResize);
-      
-      document.getElementById('back-button').addEventListener('click', () => {
-        showView('categories');
-        searchInput.value = "";
-      });
-      
-      searchInput.addEventListener('input', (e) => {
-        searchChannels(e.target.value.trim());
-      });
-
-      // --- Event Delegation ---
-      const handleActivation = (e, callback) => {
-        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
-            if(e.type !== 'click') e.preventDefault();
-            callback(e);
-        }
-      };
-
-      categoriesEl.addEventListener('click', (e) => handleActivation(e, (evt) => {
-        const categoryEl = evt.target.closest('.category');
-        if (categoryEl) loadCategory(categoryEl.dataset.category);
-      }));
-
-      categoriesEl.addEventListener('keydown', (e) => handleActivation(e, (evt) => {
-        const categoryEl = evt.target.closest('.category');
-        if (categoryEl) loadCategory(categoryEl.dataset.category);
-      }));
-
-      playlistEl.addEventListener('click', (e) => handleActivation(e, (evt) => {
-          const channelEl = evt.target.closest('.channel');
-          if (channelEl) loadChannel(channelEl.dataset, evt);
-      }));
-
-      playlistEl.addEventListener('keydown', (e) => handleActivation(e, (evt) => {
-          const channelEl = evt.target.closest('.channel');
-          if (channelEl) loadChannel(channelEl.dataset, evt);
-      }));
-
-      // --- Touch/Mouse Swipe Controls ---
-      playerEl.addEventListener('touchstart', handleTouchStart, { passive: false });
-      playerEl.addEventListener('mousedown', handleTouchStart);
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('mousemove', handleTouchMove);
-      document.addEventListener('touchend', handleTouchEnd);
-      document.addEventListener('mouseup', handleTouchEnd);
-      document.addEventListener('mouseleave', handleTouchEnd);
-      
-      allChannels = await loadM3UPlaylist(playlistUrl);
-      if (Object.keys(allChannels).length === 0) allChannels = fallbackChannels;
-      createCategories();
-    });
-  })();
-  </script>
+window.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
