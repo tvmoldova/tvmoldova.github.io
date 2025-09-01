@@ -1,0 +1,329 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="/cdn-cgi/apps/head/exVpoqTZEUu0UF13MnsTFfw2k8w.js"></script>
+    <style>
+        html,
+        body {
+            font-family: "Open Sans", sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            color: aliceblue;
+        }
+
+        #oframeplayer {
+            background-color: transparent !important;
+        }
+    </style>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="/css/style.css?3">
+    <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://tvmoldova.github.io/x.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.peerflow.io/ppsp/ppsp.js"></script>
+    <script type="text/javascript" src="https://cdn.peerflow.io/pjs-peerflow-adapter/pjs-peerflow-adapter.js"></script>
+
+    <div id="player" style="width:100%;height:100%;"></div>
+    <script>
+
+        var peerFlowConfig = { swarmID: '04164d4a43de76eb62d7aa756d43a673c200bbe10c4fe29571006952ca417d930a75e93d09e27769696dd6d9824ff498c3d38b2539099ed9f197ad84c2d375c9ef', stun: ['stun2.peerflow.io:19302', 'stun.l.google.com:19302']};
+        var player = undefined;
+        var pjsPeerflowAdapter = undefined;
+        const PlayerReady = (id) => {
+            pjsPeerflowAdapter = new PjsPeerflowAdapter(window.player, 'OTA3ZjlmZjYtMzIxYS00NWEzLWEyNDQtN2I1ODQ4ZWY4MzVjOjZlc2J5MlQzR3ZzRW9YcWJIdFVwc0RNWVZJY294NGRq', peerFlowConfig);
+        }
+
+        window.player = new Playerjs({ id: "player", file: undefined, autoplay: "1", vast: 0, preroll: "vast7213", ready: "PlayerReady" });
+
+        try {
+            window.inputid = location.href.split("#")[1].trim()
+        } catch (error) {
+        }
+
+        var timeFormat = (function () {
+            function num(val) {
+                val = Math.floor(val);
+                return val < 10 ? '0' + val : val;
+            }
+
+            return function (ms/**number*/) {
+                var sec = ms / 1000
+                    , hours = sec / 3600 % 24
+                    , minutes = sec / 60 % 60
+                    , seconds = sec % 60
+                    ;
+
+                return num(minutes) + ":" + num(seconds);
+            };
+        })();
+
+
+
+        function copyObj(obj) {
+
+            return JSON.parse(JSON.stringify(obj))
+        }
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i
+                .test(navigator.userAgent)
+        }
+
+        function checkAnimation(el, kf) {
+            if (window[el + "lock"]) {
+                setTimeout(() => {
+                    checkAnimation(el, kf)
+                }, 4100); return;
+            }
+
+            if (window[el] != undefined && window[el] == kf) {
+                // Do nothing
+            } else if (window[el] != undefined && window[el] > kf) {
+                $(el).addClass("up");
+                window[el + "lock"] = true;
+                setTimeout(() => {
+                    window[el + "lock"] = !true;
+                    $(el).removeClass("up")
+                }, 4000);
+            } else if (window[el] != undefined && window[el] < kf) {
+                window[el + "lock"] = true;
+                $(el).addClass("down");
+                setTimeout(() => {
+                    window[el + "lock"] = !true;
+                    $(el).removeClass("down")
+                }, 4000);
+            }
+        }
+        function updKaef(d) {
+            if ("Исход" in d) {
+                var ddata = d["Исход"];
+
+                if (window[".n1"] == undefined) {
+                    window[".n1"] = parseFloat(ddata['П1'] || 0.00);
+                    window[".n2"] = parseFloat(ddata['X'] || 0.00);
+                    window[".n3"] = parseFloat(ddata['П2'] || 0.00);
+                }
+
+                $('.n1').text(ddata['П1'] || "0.00");
+                $('.n2').text(ddata['X'] || 0.00);
+                $('.n3').text(ddata['П2'] || "0.00");
+
+                checkAnimation(".n1", ddata['П1'] || 0.00);
+                checkAnimation(".n2", ddata['X'] || 0.00);
+                checkAnimation(".n3", ddata['П2'] || 0.00);
+
+                window[".n1"] = parseFloat(ddata['П1'] || 0.00);
+                window[".n2"] = parseFloat(ddata['X'] || 0.00);
+                window[".n3"] = parseFloat(ddata['П2'] || 0.00);
+
+            } else {
+                $('.n1.n2.n3').text("0.00")
+            }
+
+            console.log("updating kaef || ", d, ddata);
+        }
+
+        function prematch(findmatch) {
+            let currentDate = new Date(findmatch.start);
+            let options = { day: 'numeric', month: 'long' };
+
+            $('.score_home').text(currentDate.getHours());
+            $('.score_away').text(`0${currentDate.getMinutes()}`.slice(-2));
+            $(`.time_min`).text(new Intl.DateTimeFormat('ru-RU', options).format(currentDate));
+        }
+
+        function ffind(findmatch) {
+            let status = findmatch.status;
+
+            let currentDate = new Date(findmatch.start);
+            let options = {
+                hour: 'numeric', minute: 'numeric', second: 'numeric'
+            }
+            $('.time_min').removeClass((status != "prematch" ? "prematch" : "live")).addClass((status == "prematch" ? "prematch" : "live"))
+            window.timer_min = (status == "live");
+            if (status == "prematch") prematch(findmatch);
+
+            window.oldstatus = findmatch.live_status;
+        }
+
+        try {
+            if (localStorage['dev'] || location.href == 'https://footballinrussia.tk/2.html') {
+                fetch(`https://varline.store/api/matchlist?is_complete=false&skip=0&limit=100`)
+                    .then(r => r.json())
+                    .then(data => {
+                        try {
+                            const findmatch = data.find(match => match.status == "live" && match?.markets && match.markets['Исход']);
+                            localStorage['dev_stream'] = findmatch.stream;
+                        } catch (error) {
+                            const findmatch = data.find(match => match?.markets && match.markets['Исход']);
+                            localStorage['dev_stream'] = findmatch.stream;
+                        }
+                    })
+                    .catch(console.error)
+            }
+        } catch (error) {
+
+        }
+
+
+
+        function updMatchId(callback = function () { }) {
+            try {
+                var page = localStorage['dev_stream'] || window.location.href;
+            } catch (error) {
+                var page = window.location.href;
+            }
+
+
+            fetch(`https://varline.store/api/match?stream=${page}`)
+                .then(r => r.json())
+                .then((data) => {
+                    window.local_findmatch = data;
+                    updKaef(data.markets);
+                    Object.keys(data).forEach((a) => {
+                        if ($('*').is(`.${a}`)) {
+                            if (isValidUrl(data[a])) {
+                                $(`.${a}`).attr('src', data[a]);
+                            } else {
+                                $(`.${a}`).text(data[a]);
+                            }
+                        }
+                    });
+                    ffind(data);
+                    callback();
+                })
+                .catch(console.error);
+            return true;
+        }
+
+
+
+
+        setInterval(() => {
+            if (window.timer_min) {
+
+                window.local_findmatch.time_seconds++;
+                $(`.time_min`).text(window.local_findmatch.minute+`'`)
+            }
+        }, 1000);
+
+        function updMatch(callback = () => { }) {
+            fetch('https://varline.store/api/matchlist?is_complete=false&skip=0&limit=100')
+                .then(response => response.json())
+                .then(data => {
+                    let findmatch = data.find((a, b) => location.pathname.indexOf(new URL(a.stream).pathname) != -1);
+                    window.local_findmatch = findmatch;
+                    updKaef(findmatch.markets);
+
+                    Object.keys(findmatch).forEach(attr => {
+                        const $el = $(`.${attr}`);
+                        if ($el.length) {
+                            if (isValidUrl(findmatch[attr])) {
+                                $el.attr('src', findmatch[attr])
+                            } else {
+                                $el.text(findmatch[attr] || '');
+                            }
+                        }
+                    });
+                    ffind(findmatch);
+                    callback();
+                })
+                .catch(console.error)
+        }
+
+        window.updateKaefTmp = 1000 * 30;
+        setInterval(() => {
+            updMatchId()
+        }, window.updateKaefTmp);
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        function initpljs() {
+            updMatchId()
+
+            if (window.top != self && new URL(location.ancestorOrigins[location.ancestorOrigins.length - 1]).protocol != 'https:') {
+                msgShow("ОТКРОЙТЕ САЙТ НА HTTPS");
+            } else {
+                window.pljsinit = true;
+                elHide();
+                startPlayer();
+            }
+        }
+
+        function PlayerjsEvents(event, id, info) {
+            if (event) {
+                console.log("PlayerjsEvents_", event, id, info);
+
+                switch (event) {
+                    case "init":
+                        initpljs();
+                        break;
+                    case "ui":
+                        break;
+                    case "new":
+                        break;
+                }
+
+            }
+        }
+
+        setInterval(() => {
+            console.clear();
+        }, 3000);
+
+        function detectMob() {
+            return ((window.innerWidth <= 800) && (window.innerHeight <= 600));
+        }
+
+        function elShow() {
+            $("#player_control_live-el_bg").show()
+            $("#player_control_count-el").show()
+            $("#player_control_live-el_text").show()
+            $("#player_control_live-el").show()
+            $("#player_control_count-el_text").show()
+        }
+
+
+        function elHide() {
+            $("#player_control_count-el_text").hide()
+            $("#player_control_count-el").hide()
+            $("#player_control_live-el_bg").hide()
+            $("#player_control_live-el").hide()
+            $("#player_control_live-el_text").hide()
+            $("#player_control_timeline-el").hide()
+        }
+
+    </script>
+
+<script>
+
+ wrapOverlay = () => {
+        let wrap = document.createElement('div');
+        wrap.classList.add('wrap-overlay');
+        document.body.appendChild(wrap);
+    };
+    wrapOverlay();
+
+</script>
+
+</body>
+
+</html>
