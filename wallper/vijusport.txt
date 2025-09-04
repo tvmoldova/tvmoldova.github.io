@@ -1,0 +1,54 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        html, body {
+            font-family: "Open Sans", sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            color: aliceblue;
+        }
+        #oframeplayer {
+            background-color: transparent !important;
+        }
+    </style>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player</title>
+</head>
+<body>
+    <div id="player" style="width:100%;height:100%;"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://tvmoldova.github.io/x.js"></script>
+    <script src="https://cdn.peerflow.io/ppsp/ppsp.js"></script>
+    <script src="https://cdn.peerflow.io/pjs-peerflow-adapter/pjs-peerflow-adapter.js"></script>
+
+    <script>
+        var peerFlowConfig = {
+            swarmID: '045e2cf71ac6a6d032041452c8d0a6ad50d2c7dea3ccb2264363019914a5d2726bdfe18c79c5dc5ed923d8321a158d35473708293117b41d1919a364753dfc03a4',
+            stun: ['stun2.peerflow.io:19302', 'stun.l.google.com:19302']
+        };
+
+        var pjsPeerflowAdapter;
+        const PlayerReady = (id) => {
+            pjsPeerflowAdapter = new PjsPeerflowAdapter(
+                window.player,
+                'OTA3ZjlmZjYtMzIxYS00NWEzLWEyNDQtN2I1ODQ4ZWY4MzVjOjZlc2J5MlQzR3ZzRW9YcWJIdFVwc0RNWVZJY294NGRq',
+                peerFlowConfig
+            );
+        };
+
+        window.player = new Playerjs({
+            id: "player",
+            file: undefined,
+            preroll: 0,
+            autoplay: "1",
+            ready: "PlayerReady"
+        });
+    </script>
+</body>
+</html>
