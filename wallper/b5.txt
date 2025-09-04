@@ -46,7 +46,7 @@
             id: "player",
             file: undefined,
             preroll: 0,
-            autoplay: "0.1",
+            autoplay: "1",
             ready: "PlayerReady"
         });
     </script>
