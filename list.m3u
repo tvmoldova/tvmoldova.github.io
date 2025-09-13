@@ -43,5 +43,5 @@
 #EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Мужское кино
 https://ip.ontivi.net/muzhskoe-kinotv.html
 
-EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Мульт
+#EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Мульт
 https://ip.ontivi.net/multtv.html
