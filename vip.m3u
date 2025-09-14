@@ -35,3 +35,8 @@
 #EXTINF:-1 tvg-id="setantakz" group-title="Спорт",Setanta KZ https://tvmoldova.github.io/wallper/setantakz.txt
 
 #EXTINF:-1 tvg-id="vijusport" group-title="Спорт",Viju Sport https://tvmoldova.github.io/wallper/vijusport.txt
+
+#EXTINF:-1 tvg-id="ru-tv" group-title="Музыкальные",РУ ТВ https://telik.live/ru-tv.html
+
+#EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",Муз-ТВ
+https://telik.live/muz-tv.html
