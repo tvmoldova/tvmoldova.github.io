@@ -57,3 +57,8 @@ https://telik.live/music-box-russia.html
 
 #EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",Bridge TV
 https://telik.live/bridge-tv.html
+
+#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",RU TV
+https://telik.live/ru-tv.html
+
+
