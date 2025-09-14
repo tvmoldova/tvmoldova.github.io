@@ -48,3 +48,6 @@ https://telik.live/shanson-tv.html
 
 #EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Nick Jr
 https://pirilampo.tv/live-tv/vivid-tv.html
+
+#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",SONGTV Россия
+https://telik.live/songtv-rossiya.html
