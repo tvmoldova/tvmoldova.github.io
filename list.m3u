@@ -1,64 +1,132 @@
-#EXTM3U
-
-Плейлист спортивных каналов
-
-Спорт
-
-#EXTINF:-1 tvg-id="b5" group-title="Спорт",Беларусь 5 https://tvmoldova.github.io/wallper/b5.txt
-
-#EXTINF:-1 tvg-id="eurosport1" group-title="Спорт",Eurosport 1 HD https://tvmoldova.github.io/wallper/eurosport1.txt
-
-#EXTINF:-1 tvg-id="eurosport2" group-title="Спорт",Eurosport 2 HD https://tvmoldova.github.io/wallper/eurosport2.txt
-
-#EXTINF:-1 tvg-id="fotbalru" group-title="Спорт",Футбол HD https://tvmoldova.github.io/wallper/fotbalru.txt
-
-#EXTINF:-1 tvg-id="kazsport" group-title="Спорт",Qazsport HD https://tvmoldova.github.io/wallper/kazsport.txt
-
-#EXTINF:-1 tvg-id="khl" group-title="Спорт",KHL HD https://tvmoldova.github.io/wallper/khl.txt
-
-#EXTINF:-1 tvg-id="khlprime" group-title="Спорт",KHL Prime HD https://tvmoldova.github.io/wallper/khlprime.txt
-
-#EXTINF:-1 tvg-id="match" group-title="Спорт",Матч ТВ HD https://tvmoldova.github.io/wallper/match.txt
-
-#EXTINF:-1 tvg-id="matcharena" group-title="Спорт",Матч Арена HD https://tvmoldova.github.io/wallper/matcharena.txt
-
-#EXTINF:-1 tvg-id="matchboyets" group-title="Спорт",Матч Боец HD https://tvmoldova.github.io/wallper/matchboyets.txt
-
-#EXTINF:-1 tvg-id="mf1" group-title="Спорт",Матч Футбол HD https://tvmoldova.github.io/wallper/mf1.txt
-
-#EXTINF:-1 tvg-id="mf2" group-title="Спорт",Матч Футбол 2 HD https://tvmoldova.github.io/wallper/mf2.txt
-
-#EXTINF:-1 tvg-id="mf3" group-title="Спорт",Матч Футбол 3 HD https://tvmoldova.github.io/wallper/mf3.txt
-
-#EXTINF:-1 tvg-id="mpremier" group-title="Спорт",Матч Премьер HD https://tvmoldova.github.io/wallper/mpremier.txt
-
-#EXTINF:-1 tvg-id="okkosport" group-title="Спорт",OKKO Sport HD https://tvmoldova.github.io/wallper/okkosport.txt
-
-#EXTINF:-1 tvg-id="setanta1" group-title="Спорт",Setanta HD https://tvmoldova.github.io/wallper/setanta1.txt
-
-#EXTINF:-1 tvg-id="setantakz" group-title="Спорт",Setanta KZ HD https://tvmoldova.github.io/wallper/setantakz.txt
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Спорт",Viju Sport HD https://tvmoldova.github.io/wallper/vijusport.txt
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Мужское кино
+#EXTINF:-1 group-title="Фильмы и Сериалы",Дом кино
+https://ip.ontivi.net/036112-domkino.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Дом кино Премиум
+https://ip.ontivi.net/071815-dom-kino-premium.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Душевное HD
+https://ip.ontivi.net/nash-kinoroman9.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Русский роман
+https://ip.ontivi.net/081717-russkiy-roman.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Русский детектив
+https://ip.ontivi.net/russkiy-detektivtv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Русский бестселлер
+https://ip.ontivi.net/russkiy-bestseller3.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Кино ТВ
+https://ip.ontivi.net/071024-kino-tv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Романтичное HD
+https://ip.ontivi.net/romantichnoe4.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Турецкие сериалы
+https://ip.ontivi.net/dizi.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Русский иллюзион
+https://ip.ontivi.net/illuzionrus9.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Остросюжетное HD
+https://ip.ontivi.net/ostrosjuzhetnoe44.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Блокбастер HD
+https://ip.ontivi.net/blokbaster-hd.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Странное HD
+https://ip.ontivi.net/083317-strashnoe-hd.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Комедийное HD
+https://ip.ontivi.net/komedijnoe-hd5.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Премиальное HD
+https://ip.ontivi.net/premialnoe-hd31.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Хит HD
+https://ip.ontivi.net/xit-hd.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Мосфильм
+https://ip.ontivi.net/mosfilm23.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Советское кино
+https://ip.ontivi.net/sovetskoe-kino.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Любимое HD
+https://ip.ontivi.net/lyubimoe12.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Красная линия
+https://ip.ontivi.net/krasnaya-liniya.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Победа
+https://ip.ontivi.net/pobeda14.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",КиноСат
+https://ip.ontivi.net/kinosat5.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",КиноСезон
+https://ip.ontivi.net/kinosezon.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Кинопоказ
+https://ip.ontivi.net/kinopokaz15.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Cinema
+https://ip.ontivi.net/cinema3.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",FilmBox
+https://ip.ontivi.net/film-box3.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Наше крутое
+https://ip.ontivi.net/nashe-ktytoe13.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Мужское кино
 https://ip.ontivi.net/muzhskoe-kinotv.html
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Мульт
-https://telik.live/shanson-tv.html
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Мультики",Nick Jr
-https://pirilampo.tv/live-tv/vivid-tv.html
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",SONGTV Россия
-https://telik.live/songtv-rossiya.html
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",MUSICBOX
-https://telik.live/music-box-russia.html
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",Bridge TV
-https://telik.live/bridge-tv.html
-
-#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",RU TV
-https://telik.live/ru-tv.html
-
-
+#EXTINF:-1 group-title="Фильмы и Сериалы",Киносвидание
+https://ip.ontivi.net/kinosvidanie14.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Кинопремьера
+https://ip.ontivi.net/kinopremera17.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Киноужас
+https://ip.ontivi.net/kinouzhas3.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Киномакс
+https://ip.ontivi.net/kinomiks35.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Кинокомедия
+https://ip.ontivi.net/kinokomediyatv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Киносемья
+https://ip.ontivi.net/kinosemya18.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Кинохит
+https://ip.ontivi.net/kinohit51.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Родное Кино
+https://ip.ontivi.net/rodnoe-kinotv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",TV1000
+https://ip.ontivi.net/tv1000tv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",TV1000 Action
+https://ip.ontivi.net/tv1000actiontv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",TV1000 Русское Кино
+https://ip.ontivi.net/tv1000ryskinotv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",VIP Comedy HD
+https://ip.ontivi.net/comedytv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",VIP Premiere HD
+https://ip.ontivi.net/premieretv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",VIP Megahit HD
+https://ip.ontivi.net/megahittv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Шокирующее HD
+https://ip.ontivi.net/shokirujuschee12.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",НСТ
+https://ip.ontivi.net/nst17.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Horror
+https://ip.ontivi.net/horror.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Scream
+https://ip.ontivi.net/scream.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Наше любимое кино
+https://ip.ontivi.net/072715-lyubimoe-kino.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Hollywood
+https://ip.ontivi.net/hollywood9.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Hollywood HD
+https://ip.ontivi.net/hollywood-hd7.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Комедия
+https://ip.ontivi.net/084901-komedija.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",НТВ Хит
+https://ip.ontivi.net/ntv-hit9.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",НТВ Сериал
+https://ip.ontivi.net/ntv-serial5.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Мир сериала
+https://ip.ontivi.net/mir-serialatv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Киносерия
+https://ip.ontivi.net/kinoserija1.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Индийское кино
+https://ip.ontivi.net/indiya-kinotv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Дорама
+https://ip.ontivi.net/doramatv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Индия
+https://ip.ontivi.net/zee-tvtv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Bollywood
+https://ip.ontivi.net/bollywoodtv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Enter-фильм
+https://ip.ontivi.net/039612-enter-film.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",ЕвроКино
+https://ip.ontivi.net/evrokino9.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",TV 21
+https://ip.ontivi.net/tv-21.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",FX
+https://ip.ontivi.net/fx-tv.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",FX Life
+https://ip.ontivi.net/fx-life.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Red
+https://ip.ontivi.net/sony-channel2.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",BLACK
+https://ip.ontivi.net/sony-turbo.html
+#EXTINF:-1 group-title="Фильмы и Сериалы",Sci-Fi
+https://ip.ontivi.net/sonyscifi2.html
