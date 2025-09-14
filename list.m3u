@@ -51,3 +51,6 @@ https://pirilampo.tv/live-tv/vivid-tv.html
 
 #EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",SONGTV Россия
 https://telik.live/songtv-rossiya.html
+
+#EXTINF:-1 tvg-id="vijusport" group-title="Музыкальные",MUSICBOX
+https://telik.live/music-box-russia.html
