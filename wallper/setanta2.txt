@@ -1,8 +1,10 @@
 <html>
+
 <head>
     <meta charset="utf-8">
     <style>
-        html, body {
+        html,
+        body {
             font-family: "Open Sans", sans-serif;
             margin: 0;
             padding: 0;
@@ -11,6 +13,7 @@
             background: #000000;
             color: aliceblue;
         }
+
         #oframeplayer {
             background-color: transparent !important;
         }
@@ -19,17 +22,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player</title>
 </head>
+
 <body>
     <div id="player" style="width:100%;height:100%;"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://tvmoldova.github.io/x.js"></script>
     <script src="https://cdn.peerflow.io/ppsp/ppsp.js"></script>
     <script src="https://cdn.peerflow.io/pjs-peerflow-adapter/pjs-peerflow-adapter.js"></script>
 
     <script>
         var peerFlowConfig = {
-            swarmID: '',
+            swarmID: '04baf746978af3c3c525e3895b5c5471bdfa8b1b8092530e9b9aba4ab1b870a4fddf31bd12e889610941881d4c6180327e77e8917854fc152b774cac4588e2b7a0',
             stun: ['stun2.peerflow.io:19302', 'stun.l.google.com:19302']
         };
 
@@ -51,4 +54,5 @@
         });
     </script>
 </body>
+
 </html>
