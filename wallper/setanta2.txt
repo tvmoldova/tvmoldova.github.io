@@ -29,11 +29,12 @@
 
     <script>
         var peerFlowConfig = {
-            swarmID: '04baf746978af3c3c525e3895b5c5471bdfa8b1b8092530e9b9aba4ab1b870a4fddf31bd12e889610941881d4c6180327e77e8917854fc152b774cac4588e2b7a0',
+            swarmID: '0431972eb52651702f029d930d7379d7287f34e71e5b4bf92a35df4eaf6d3d86f33337f8afef4ada869f542243c7077727778682acf83825483f64b1347facceef',
             stun: ['stun2.peerflow.io:19302', 'stun.l.google.com:19302']
         };
 
         var pjsPeerflowAdapter;
+        
         const PlayerReady = (id) => {
             pjsPeerflowAdapter = new PjsPeerflowAdapter(
                 window.player,
