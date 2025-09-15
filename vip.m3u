@@ -41,5 +41,5 @@
 #EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",Муз-ТВ
 https://tvmoldova.github.io/test2.html
 
-EXTINF:-1 tvg-id="redlips" group-title="Взрослые",RED LIPS
+#EXTINF:-1 tvg-id="redlips" group-title="Взрослые",RED LIPS
 https://pirilampo.tv/live-tv/red-lips.html
