@@ -41,8 +41,8 @@
 #EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",Муз-ТВ
 https://tvmoldova.github.io/test2.html
 
-#EXTINF:-1 tvg-id="redlips" group-title="Взрослые",RED LIPS
-https://pirilampo.tv/live-tv/red-lips.html
+#EXTINF:-1 tvg-id="tntmusic" group-title="Музыкальные",ТНТ-Music
+https://telik.live/tnt-music.html
 
 #EXTINF:-1 tvg-id="karusel" group-title="Мультфильмы",Карусель
 https://smotru.tv/karusel.html
