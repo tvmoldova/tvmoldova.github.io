@@ -36,7 +36,8 @@
 
 #EXTINF:-1 tvg-id="vijusport" group-title="Спорт",Viju Sport https://tvmoldova.github.io/wallper/vijusport.txt
 
-#EXTINF:-1 tvg-id="ru-tv" group-title="Музыкальные",РУ ТВ https://tvmoldova.github.io/europa.html
+#EXTINF:-1 tvg-id="ru-tv" group-title="Музыкальные",РУ ТВ 
+https://tvmoldova.github.io/europa.html
 
 #EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",Муз-ТВ
 https://tvmoldova.github.io/test2.html
