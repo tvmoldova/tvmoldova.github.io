@@ -53,3 +53,7 @@ https://tv-russia.live/europa-plus-tv.html
 
 #EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",Europa Plus1
 http://oxax.tv/sl-hot1.html
+
+#EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
+http://oxax.tv/sl-hot1.html
+https://tv-russia.live/muzyka-pervogo.html
