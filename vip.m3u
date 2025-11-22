@@ -48,11 +48,14 @@ https://telik.live/tnt-music.html
 #EXTINF:-1 tvg-id="karusel" group-title="Мультфильмы",Карусель
 https://smotru.tv/karusel.html
 
-#EXTINF:-1 tvg-id="europaplus" group-title="Музыкальные",Europa Plus
-https://vkvsd76.okcdn.ru/cmaf/1063414204970/sig/t0Sdw1Fon2M/srcIp/109.185.20.224/urls/185.226.52.96/expires/1764301592253/clientType/14/srcAg/CHROME_ANDROID/fromCache/1/mid/2275019336490/id/1063414204970/get/dash_2275019336490.8kNPl0dYS4g.mpd
+#EXTINF:-1 tvg-id="russian box" group-title="Музыкальные",Russian MUSICBOX
+https://smotret-online.tv/russian-musicbox.html
 
-#EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",Europa Plus1
+#EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",hi
 http://oxax.tv/sl-hot1.html
+
+#EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
+https://tv-russia.live/muzyka-pervogo.html
 
 #EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
 https://tv-russia.live/muzyka-pervogo.html
