@@ -37,10 +37,10 @@
 #EXTINF:-1 tvg-id="vijusport" group-title="Спорт",Viju Sport https://tvmoldova.github.io/wallper/vijusport.txt
 
 #EXTINF:-1 tvg-id="ru-tv" group-title="Музыкальные",РУ ТВ 
-https://smotret.tv/belarus-24
+https://smotret.tv/music/rutv
 
-#EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",Муз-ТВ
-https://tvmoldova.github.io/test2.html
+#EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",MIXM TV
+https://smotret.tv/music/mixm-tv
 
 #EXTINF:-1 tvg-id="tntmusic" group-title="Музыкальные",ТНТ-Music
 https://telik.live/tnt-music.html
@@ -49,7 +49,7 @@ https://telik.live/tnt-music.html
 https://smotru.tv/karusel.html
 
 #EXTINF:-1 tvg-id="europaplus" group-title="Музыкальные",Europa Plus
-https://github.io/test777.html
+http://gipnomag.ru/europaplus-online.html
 
 #EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",Europa Plus1
 http://oxax.tv/sl-hot1.html
