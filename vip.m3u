@@ -48,6 +48,21 @@ https://telik.live/tnt-music.html
 #EXTINF:-1 tvg-id="karusel" group-title="Мультфильмы",Карусель
 https://smotru.tv/karusel.html
 
+#EXTINF:-1 tvg-id="mult" group-title="Мультфильмы",Мульт HD
+https://yootv.host/mult-channel.html
+
+#EXTINF:-1 tvg-id="mama" group-title="Мультфильмы",Мама ТВ
+https://yootv.host/mama-tv.html
+
+#EXTINF:-1 tvg-id="ani" group-title="Мультфильмы",Ani ТВ
+https://yootv.host/ani-tv.html
+
+#EXTINF:-1 tvg-id="smile" group-title="Мультфильмы",Смайлик ТВ
+https://yootv.host/smaylik-tv.html
+
+EXTINF:-1 tvg-id="sovet" group-title="Мультфильмы",Советские Мультфильмы
+https://yootv.host/sovetskie-multfilmy-children-tv.html
+
 #EXTINF:-1 tvg-id="russian box" group-title="Музыкальные",Russian MUSICBOX
 https://tv-russia.live/music-box-russia.html
 
