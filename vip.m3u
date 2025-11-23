@@ -57,4 +57,7 @@ https://tvmoldova.github.io/europaplustv.html
 #EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
 https://tv-russia.live/muzyka-pervogo.html
 
+#EXTINF:-1 tvg-id="music2" group-title="Музыкальные",test
+https://vk.ru/video_ext.php?oid=-19043&id=456239355&hash=c51d82b4949e260b%3Fautoplay%3D1
+
 
