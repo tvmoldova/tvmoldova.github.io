@@ -51,11 +51,10 @@ https://smotru.tv/karusel.html
 #EXTINF:-1 tvg-id="russian box" group-title="Музыкальные",Russian MUSICBOX
 https://tv-russia.live/music-box-russia.html
 
-#EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",hi
-http://oxax.tv/sl-hot1.html
+#EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",Europa Plus
+rustvlive.com/music-channels/europa-plus.html
 
 #EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
 https://tv-russia.live/muzyka-pervogo.html
 
-#EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
-https://tv-russia.live/muzyka-pervogo.html
+
