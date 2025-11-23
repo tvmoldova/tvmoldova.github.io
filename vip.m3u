@@ -60,7 +60,7 @@ https://yootv.host/ani-tv.html
 #EXTINF:-1 tvg-id="smile" group-title="Мультфильмы",Смайлик ТВ
 https://yootv.host/smaylik-tv.html
 
-EXTINF:-1 tvg-id="sovet" group-title="Мультфильмы",Советские Мультфильмы
+#EXTINF:-1 tvg-id="sovet" group-title="Мультфильмы",Советские Мультфильмы
 https://yootv.host/sovetskie-multfilmy-children-tv.html
 
 #EXTINF:-1 tvg-id="russian box" group-title="Музыкальные",Russian MUSICBOX
