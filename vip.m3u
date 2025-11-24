@@ -52,7 +52,7 @@ https://smotru.tv/karusel.html
 https://yootv.host/mult-channel.html
 
 #EXTINF:-1 tvg-id="mama" group-title="Мультфильмы",Мама ТВ
-http://magtv.top/online/mama
+https://stv.mediacdn.ru/live/cdn/mama/playlist.m3u8
 
 #EXTINF:-1 tvg-id="ani" group-title="Мультфильмы",Ani ТВ
 http://vsetv.click/ani
