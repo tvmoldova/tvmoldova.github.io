@@ -79,7 +79,8 @@ https://smotru.tv/europa-plus-tv.html
 #EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
 https://tv-russia.live/muzyka-pervogo.html
 
-#EXTINF:-1 tvg-id="music2" group-title="Музыкальные",Europa Plus
+#EXTINF:-1 tvg-id="music2" group-title="Музыкальные",VIVA TV Russia
+https://tv-russia.live/viva-tv-russia.html
 https://smotret.tv/music/europa-plus-tv
 
 #EXTINF:-1 tvg-id="tiurima" group-title="Новостные",РБК ТВ
