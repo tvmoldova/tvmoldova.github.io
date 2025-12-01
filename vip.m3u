@@ -39,6 +39,9 @@
 #EXTINF:-1 tvg-id="ru-tv" group-title="Музыкальные",РУ ТВ 
 https://smotret.tv/music/rutv
 
+#EXTINF:-1 tvg-id="muz" group-title="Музыкальные",Муз ТВ
+http://vsetv.click/muz-tv
+
 #EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",MIXM TV
 https://smotret.tv/music/mixm-tv
 
