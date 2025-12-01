@@ -79,6 +79,9 @@ https://vk.ru/video_ext.php?oid=-22186156&id=456239617&hash=dfc9ce404aae4243%22
 #EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
 https://tv-russia.live/muzyka-pervogo.html
 
+#EXTINF:-1 tvg-id="шансон" group-title="Музыкальные",Шансон ТВ
+https://playercdn.cdnvideo.ru/aloha/players/shansontv_sd_player.html
+
 #EXTINF:-1 tvg-id="music2" group-title="Музыкальные",VIVA TV Russia
 https://rutube.ru/channel/26127387
 
