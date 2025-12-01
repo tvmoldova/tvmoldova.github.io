@@ -79,15 +79,15 @@ https://smotru.tv/europa-plus-tv.html
 #EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
 https://tv-russia.live/muzyka-pervogo.html
 
-#EXTINF:-1 tvg-id="music2" group-title="Музыкальные",Europa Plus Radio
+#EXTINF:-1 tvg-id="music2" group-title="Музыкальные",Europa Plus
 https://smotret.tv/music/europa-plus-tv
 
-#EXTINF:-1 tvg-id="tiurima" group-title="Колекция Фильмов",Побег из Шоушенка
-https://rezka.ag/films/drama/806-pobeg-iz-shoushenka-1994-latest.html
+#EXTINF:-1 tvg-id="tiurima" group-title="Новостные",РБК ТВ
+https://telik.live/rbk-tv.html
 
-#EXTINF:-1 tvg-id="monstr" group-title="Колекция Фильмов",Франкенштейн
-https://kinogo.ec/121087-frankenshtejn.html
+#EXTINF:-1 tvg-id="monstr" group-title="Новостные",Россия 24
+https://telik.live/rossiya-24.html
 
-#EXTINF:-1 tvg-id="dreams" group-title="Колекция Фильмов",carl
-https://m.youtube.com/watch?v=1VYJ3UQCmtM
+#EXTINF:-1 tvg-id="dreams" group-title="Новостные", Мир 24
+https://telik.live/mir-24.html
 
