@@ -1,101 +1,115 @@
-#EXTINF:-1 tvg-id="b5" group-title="Спорт",Беларусь 5 https://tvmoldova.github.io/wallper/b5.txt
+#EXTM3U x-tvg-url="http://epg.one/epg.xml.gz"
 
-#EXTINF:-1 tvg-id="eurosport1" group-title="Спорт",Eurosport 1 https://tvmoldova.github.io/wallper/eurosport1.txt
+#EXTINF:0 group-title="Спорт" tvg-id="b5" tvg-logo="http://epg.one/img/b5.png" tvg-rec="0",Беларусь 5
+https://tvmoldova.github.io/wallper/b5.txt
 
-#EXTINF:-1 tvg-id="eurosport2" group-title="Спорт",Eurosport 2 https://tvmoldova.github.io/wallper/eurosport2.txt
+#EXTINF:0 group-title="Спорт" tvg-id="eurosport1" tvg-logo="http://epg.one/img/eurosport1.png" tvg-rec="0",Eurosport 1
+https://tvmoldova.github.io/wallper/eurosport1.txt
 
-#EXTINF:-1 tvg-id="fotbalru" group-title="Спорт",Футбол https://tvmoldova.github.io/wallper/fotbalru.txt
+#EXTINF:0 group-title="Спорт" tvg-id="eurosport2" tvg-logo="http://epg.one/img/eurosport2.png" tvg-rec="0",Eurosport 2
+https://tvmoldova.github.io/wallper/eurosport2.txt
 
-#EXTINF:-1 tvg-id="kazsport" group-title="Спорт",Qazsport https://tvmoldova.github.io/wallper/kazsport.txt
+#EXTINF:0 group-title="Спорт" tvg-id="fotbalru" tvg-logo="http://epg.one/img/fotbalru.png" tvg-rec="0",Футбол
+https://tvmoldova.github.io/wallper/fotbalru.txt
 
-#EXTINF:-1 tvg-id="khl" group-title="Спорт",KHL HD https://tvmoldova.github.io/wallper/khl.txt
+#EXTINF:0 group-title="Спорт" tvg-id="kazsport" tvg-logo="http://epg.one/img/kazsport.png" tvg-rec="0",Qazsport
+https://tvmoldova.github.io/wallper/kazsport.txt
 
-#EXTINF:-1 tvg-id="khlprime" group-title="Спорт",KHL Prime https://tvmoldova.github.io/wallper/khlprime.txt
+#EXTINF:0 group-title="Спорт" tvg-id="khl" tvg-logo="http://epg.one/img/khl.png" tvg-rec="0",KHL HD
+https://tvmoldova.github.io/wallper/khl.txt
 
-#EXTINF:-1 tvg-id="match" group-title="Спорт",Матч ТВ https://tvmoldova.github.io/wallper/match.txt
+#EXTINF:0 group-title="Спорт" tvg-id="khlprime" tvg-logo="http://epg.one/img/khlprime.png" tvg-rec="0",KHL Prime
+https://tvmoldova.github.io/wallper/khlprime.txt
 
-#EXTINF:-1 tvg-id="matcharena" group-title="Спорт",Матч Арена https://tvmoldova.github.io/wallper/matcharena.txt
+#EXTINF:0 group-title="Спорт" tvg-id="match" tvg-logo="http://epg.one/img/match.png" tvg-rec="0",Матч ТВ
+https://tvmoldova.github.io/wallper/match.txt
 
-#EXTINF:-1 tvg-id="matchboyets" group-title="Спорт",Матч Боец https://tvmoldova.github.io/wallper/matchboyets.txt
+#EXTINF:0 group-title="Спорт" tvg-id="matcharena" tvg-logo="http://epg.one/img/matcharena.png" tvg-rec="0",Матч Арена
+https://tvmoldova.github.io/wallper/matcharena.txt
 
-#EXTINF:-1 tvg-id="mf1" group-title="Спорт",Матч Футбол https://tvmoldova.github.io/wallper/mf1.txt
+#EXTINF:0 group-title="Спорт" tvg-id="matchboyets" tvg-logo="http://epg.one/img/matchboyets.png" tvg-rec="0",Матч Боец
+https://tvmoldova.github.io/wallper/matchboyets.txt
 
-#EXTINF:-1 tvg-id="mf2" group-title="Спорт",Матч Футбол 2 https://tvmoldova.github.io/wallper/mf2.txt
+#EXTINF:0 group-title="Спорт" tvg-id="mf1" tvg-logo="http://epg.one/img/mf1.png" tvg-rec="0",Матч Футбол
+https://tvmoldova.github.io/wallper/mf1.txt
 
-#EXTINF:-1 tvg-id="mf3" group-title="Спорт",Матч Футбол 3 https://tvmoldova.github.io/wallper/mf3.txt
+#EXTINF:0 group-title="Спорт" tvg-id="mf2" tvg-logo="http://epg.one/img/mf2.png" tvg-rec="0",Матч Футбол 2
+https://tvmoldova.github.io/wallper/mf2.txt
 
-#EXTINF:-1 tvg-id="mpremier" group-title="Спорт",Матч Премьер https://tvmoldova.github.io/wallper/mpremier.txt
+#EXTINF:0 group-title="Спорт" tvg-id="mf3" tvg-logo="http://epg.one/img/mf3.png" tvg-rec="0",Матч Футбол 3
+https://tvmoldova.github.io/wallper/mf3.txt
 
-#EXTINF:-1 tvg-id="okkosport" group-title="Спорт",OKKO Sport https://tvmoldova.github.io/wallper/okkosport.txt
+#EXTINF:0 group-title="Спорт" tvg-id="mpremier" tvg-logo="http://epg.one/img/mpremier.png" tvg-rec="0",Матч Премьер
+https://tvmoldova.github.io/wallper/mpremier.txt
 
-#EXTINF:-1 tvg-id="setanta1" group-title="Спорт",Setanta https://tvmoldova.github.io/wallper/setanta1.txt
+#EXTINF:0 group-title="Спорт" tvg-id="okkosport" tvg-logo="http://epg.one/img/okkosport.png" tvg-rec="0",OKKO Sport
+https://tvmoldova.github.io/wallper/okkosport.txt
 
-#EXTINF:-1 tvg-id="setanta2" group-title="Спорт",Setanta 2 https://tvmoldova.github.io/wallper/setanta2.txt
+#EXTINF:0 group-title="Спорт" tvg-id="setanta1" tvg-logo="http://epg.one/img/setanta1.png" tvg-rec="0",Setanta
+https://tvmoldova.github.io/wallper/setanta1.txt
 
-#EXTINF:-1 tvg-id="setantakz" group-title="Спорт",Setanta KZ https://tvmoldova.github.io/wallper/setantakz.txt
+#EXTINF:0 group-title="Спорт" tvg-id="setanta2" tvg-logo="http://epg.one/img/setanta2.png" tvg-rec="0",Setanta 2
+https://tvmoldova.github.io/wallper/setanta2.txt
 
-#EXTINF:-1 tvg-id="vijusport" group-title="Спорт",Viju Sport https://tvmoldova.github.io/wallper/vijusport.txt
+#EXTINF:0 group-title="Спорт" tvg-id="setantakz" tvg-logo="http://epg.one/img/setantakz.png" tvg-rec="0",Setanta KZ
+https://tvmoldova.github.io/wallper/setantakz.txt
 
-#EXTINF:-1 tvg-id="ru-tv" group-title="Музыкальные",РУ ТВ 
+#EXTINF:0 group-title="Спорт" tvg-id="vijusport" tvg-logo="http://epg.one/img/vijusport.png" tvg-rec="0",Viju Sport
+https://tvmoldova.github.io/wallper/vijusport.txt
+
+#EXTINF:0 group-title="Музыкальные" tvg-id="ru-tv" tvg-logo="http://epg.one/img/ru-tv.png" tvg-rec="0",РУ ТВ
 https://smotret.tv/music/rutv
 
-#EXTINF:-1 tvg-id="muz" group-title="Музыкальные",Муз ТВ
+#EXTINF:0 group-title="Музыкальные" tvg-id="muz" tvg-logo="http://epg.one/img/muz.png" tvg-rec="0",Муз ТВ
 http://vsetv.click/muz-tv
 
-#EXTINF:-1 tvg-id="muztv" group-title="Музыкальные",MIXM TV
+#EXTINF:0 group-title="Музыкальные" tvg-id="muztv" tvg-logo="http://epg.one/img/muztv.png" tvg-rec="0",MIXM TV
 https://smotret.tv/music/mixm-tv
 
-#EXTINF:-1 tvg-id="tntmusic" group-title="Музыкальные",ТНТ-Music
+#EXTINF:0 group-title="Музыкальные" tvg-id="tntmusic" tvg-logo="http://epg.one/img/tntmusic.png" tvg-rec="0",ТНТ-Music
 https://telik.live/tnt-music.html
 
-#EXTINF:-1 tvg-id="karusel" group-title="Мультфильмы",Карусель
+#EXTINF:0 group-title="Мультфильмы" tvg-id="karusel" tvg-logo="http://epg.one/img/karusel.png" tvg-rec="0",Карусель
 https://smotru.tv/karusel.html
 
-#EXTINF:-1 tvg-id="mult" group-title="Мультфильмы",Мульт HD
+#EXTINF:0 group-title="Мультфильмы" tvg-id="mult" tvg-logo="http://epg.one/img/mult.png" tvg-rec="0",Мульт HD
 http://smotrim.org/mult
 
-#EXTINF:-1 tvg-id="mama" group-title="Мультфильмы",Мама ТВ
+#EXTINF:0 group-title="Мультфильмы" tvg-id="mama" tvg-logo="http://epg.one/img/mama.png" tvg-rec="0",Мама ТВ
 https://stv.mediacdn.ru/live/cdn/mama/playlist.m3u8
 
-#EXTINF:-1 tvg-id="ani" group-title="Мультфильмы",Ani ТВ
+#EXTINF:0 group-title="Мультфильмы" tvg-id="ani" tvg-logo="http://epg.one/img/ani.png" tvg-rec="0",Ani ТВ
 http://vsetv.click/ani
 
-#EXTINF:-1 tvg-id="mir" group-title="Мультфильмы",Детский Мир
+#EXTINF:0 group-title="Мультфильмы" tvg-id="mir" tvg-logo="http://epg.one/img/mir.png" tvg-rec="0",Детский Мир
 https://telik.live/detskij-mir.html
 
-#EXTINF:-1 tvg-id="smile" group-title="Мультфильмы",Смайлик ТВ
+#EXTINF:0 group-title="Мультфильмы" tvg-id="smile" tvg-logo="http://epg.one/img/smile.png" tvg-rec="0",Смайлик ТВ
 https://yootv.host/smaylik-tv.html
 
-#EXTINF:-1 tvg-id="sovet" group-title="Мультфильмы",Советские Мультфильмы
+#EXTINF:0 group-title="Мультфильмы" tvg-id="sovet" tvg-logo="http://epg.one/img/sovet.png" tvg-rec="0",Советские Мультфильмы
 https://yootv.host/sovetskie-multfilmy-children-tv.html
 
-#EXTINF:-1 tvg-id="russian box" group-title="Музыкальные",Russian MUSICBOX
+#EXTINF:0 group-title="Музыкальные" tvg-id="russian box" tvg-logo="http://epg.one/img/russian_box.png" tvg-rec="0",Russian MUSICBOX
 https://pervyi-tv.online/musicbox
-https://tv-russia.live/music-box-russia.html
 
-#EXTINF:-1 tvg-id="europaplus1" group-title="Музыкальные",Europa Plus TV
+#EXTINF:0 group-title="Музыкальные" tvg-id="europaplus1" tvg-logo="http://epg.one/img/europaplus1.png" tvg-rec="0",Europa Plus TV
 https://vk.ru/video_ext.php?oid=-22186156&id=456239617&hash=dfc9ce404aae4243%22
 
-#EXTINF:-1 tvg-id="music1" group-title="Музыкальные",Музыка Первого
+#EXTINF:0 group-title="Музыкальные" tvg-id="music1" tvg-logo="http://epg.one/img/music1.png" tvg-rec="0",Музыка Первого
 https://tas-ix.tv/tv_tasix/86-muzyka-pervogo.html
-https://tv-russia.live/muzyka-pervogo.html
 
-#EXTINF:-1 tvg-id="шансон" group-title="Музыкальные",Шансон ТВ
-https://playercdn.cdnvideo.ru/aloha/players/shansontv_sd_player.html
-
-#EXTINF:-1 tvg-id="music2" group-title="Музыкальные",VIVA TV Russia
+#EXTINF:0 group-title="Музыкальные" tvg-id="music2" tvg-logo="http://epg.one/img/music2.png" tvg-rec="0",VIVA TV Russia
 https://goodgame.ru/viva_music
 
-#EXTINF:-1 tvg-id="tiurima" group-title="Новостные",РБК ТВ
+#EXTINF:0 group-title="Новостные" tvg-id="tiurima" tvg-logo="http://epg.one/img/tiurima.png" tvg-rec="0",РБК ТВ
 https://telik.live/rbk-tv.html
 
-#EXTINF:-1 tvg-id="monstr" group-title="Новостные",Россия 24
+#EXTINF:0 group-title="Новостные" tvg-id="monstr" tvg-logo="http://epg.one/img/monstr.png" tvg-rec="0",Россия 24
 https://telik.live/rossiya-24.html
 
-#EXTINF:-1 tvg-id="dreams" group-title="Новостные", Мир 24
+#EXTINF:0 group-title="Новостные" tvg-id="dreams" tvg-logo="http://epg.one/img/dreams.png" tvg-rec="0",Мир 24
 https://smotrettv.com/tv/news/26-mir-24.html
 
-#EXTINF:-1 tvg-id="1hd" group-title="Новостные", 1 HD
+#EXTINF:0 group-title="Новостные" tvg-id="1hd" tvg-logo="http://epg.one/img/1hd.png" tvg-rec="0",1 HD
 https://www.1tv.ru/live
-
-
