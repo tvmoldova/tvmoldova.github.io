@@ -1,6 +1,6 @@
 #EXTM3U x-tvg-url="http://epg.one/epg.xml.gz"
 
-#EXTINF:0 group-title="Спорт" tvg-id="2541" tvg-logo="http://epg.one/img/2541.png" tvg-rec="3",Беларусь 5
+#EXTINF:0 group-title="беларускія" tvg-id="2541" tvg-logo="http://epg.one/img/2541.png" tvg-rec="3",Беларусь 5
 https://tvmoldova.github.io/wallper/b5.txt
 
 #EXTINF:0 group-title="Спорт" tvg-id="eurosport1" tvg-logo="http://epg.one/img/eurosport1.png" tvg-rec="0",Eurosport 1
