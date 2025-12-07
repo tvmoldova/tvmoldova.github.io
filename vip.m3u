@@ -1,116 +1,156 @@
-#EXTM3U x-tvg-url="https://iptvx.one/epg/epg_lite.xml.gz"
-
-#EXTINF:0 group-title="беларускія"
-tvg-belarus5" tvg-logo="http://epg.one/img/2541.png" tvg-rec="3",Беларусь 5
+#EXTM3U
+#EXTINF:-1 tvg-id="b5" channel-id="1000" tvg-name="Беларусь 5" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Беларусь 5
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/b5.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="eurosport1" tvg-logo="http://epg.one/img/eurosport1.png" tvg-rec="0",Eurosport 1
+#EXTINF:-1 tvg-id="eurosport1" channel-id="1001" tvg-name="Eurosport 1" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Eurosport 1
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/eurosport1.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="eurosport2" tvg-logo="http://epg.one/img/eurosport2.png" tvg-rec="0",Eurosport 2
+#EXTINF:-1 tvg-id="eurosport2" channel-id="1002" tvg-name="Eurosport 2" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Eurosport 2
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/eurosport2.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="fotbalru" tvg-logo="http://epg.one/img/fotbalru.png" tvg-rec="0",Футбол
+#EXTINF:-1 tvg-id="fotbalru" channel-id="1003" tvg-name="Футбол" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Футбол
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/fotbalru.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="kazsport" tvg-logo="http://epg.one/img/kazsport.png" tvg-rec="0",Qazsport
+#EXTINF:-1 tvg-id="kazsport" channel-id="1004" tvg-name="Qazsport" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Qazsport
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/kazsport.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="khl" tvg-logo="http://epg.one/img/khl.png" tvg-rec="0",KHL HD
+#EXTINF:-1 tvg-id="khl" channel-id="1005" tvg-name="KHL HD" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",KHL HD
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/khl.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="khlprime" tvg-logo="http://epg.one/img/khlprime.png" tvg-rec="0",KHL Prime
+#EXTINF:-1 tvg-id="khlprime" channel-id="1006" tvg-name="KHL Prime" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",KHL Prime
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/khlprime.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="match" tvg-logo="http://epg.one/img/match.png" tvg-rec="0",Матч ТВ
+#EXTINF:-1 tvg-id="match" channel-id="1007" tvg-name="Матч ТВ" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч ТВ
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/match.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="matcharena" tvg-logo="http://epg.one/img/matcharena.png" tvg-rec="0",Матч Арена
+#EXTINF:-1 tvg-id="matcharena" channel-id="1008" tvg-name="Матч Арена" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч Арена
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/matcharena.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="matchboyets" tvg-logo="http://epg.one/img/matchboyets.png" tvg-rec="0",Матч Боец
+#EXTINF:-1 tvg-id="matchboyets" channel-id="1009" tvg-name="Матч Боец" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч Боец
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/matchboyets.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="mf1" tvg-logo="http://epg.one/img/mf1.png" tvg-rec="0",Матч Футбол
+#EXTINF:-1 tvg-id="mf1" channel-id="1010" tvg-name="Матч Футбол" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч Футбол
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/mf1.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="mf2" tvg-logo="http://epg.one/img/mf2.png" tvg-rec="0",Матч Футбол 2
+#EXTINF:-1 tvg-id="mf2" channel-id="1011" tvg-name="Матч Футбол 2" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч Футбол 2
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/mf2.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="mf3" tvg-logo="http://epg.one/img/mf3.png" tvg-rec="0",Матч Футбол 3
+#EXTINF:-1 tvg-id="mf3" channel-id="1012" tvg-name="Матч Футбол 3" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч Футбол 3
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/mf3.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="mpremier" tvg-logo="http://epg.one/img/mpremier.png" tvg-rec="0",Матч Премьер
+#EXTINF:-1 tvg-id="mpremier" channel-id="1013" tvg-name="Матч Премьер" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Матч Премьер
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/mpremier.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="okkosport" tvg-logo="http://epg.one/img/okkosport.png" tvg-rec="0",OKKO Sport
+#EXTINF:-1 tvg-id="okkosport" channel-id="1014" tvg-name="OKKO Sport" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",OKKO Sport
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/okkosport.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="setanta1" tvg-logo="http://epg.one/img/setanta1.png" tvg-rec="0",Setanta
+#EXTINF:-1 tvg-id="setanta1" channel-id="1015" tvg-name="Setanta" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Setanta
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/setanta1.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="setanta2" tvg-logo="http://epg.one/img/setanta2.png" tvg-rec="0",Setanta 2
+#EXTINF:-1 tvg-id="setanta2" channel-id="1016" tvg-name="Setanta 2" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Setanta 2
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/setanta2.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="setantakz" tvg-logo="http://epg.one/img/setantakz.png" tvg-rec="0",Setanta KZ
+#EXTINF:-1 tvg-id="setantakz" channel-id="1017" tvg-name="Setanta KZ" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Setanta KZ
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/setantakz.txt
 
-#EXTINF:0 group-title="Спорт" tvg-id="vijusport" tvg-logo="http://epg.one/img/vijusport.png" tvg-rec="0",Viju Sport
+#EXTINF:-1 tvg-id="vijusport" channel-id="1018" tvg-name="Viju Sport" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Viju Sport
+#EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/vijusport.txt
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="ru-tv" tvg-logo="http://epg.one/img/ru-tv.png" tvg-rec="0",РУ ТВ
+#EXTINF:-1 tvg-id="ru-tv" channel-id="1019" tvg-name="РУ ТВ" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",РУ ТВ
+#EXTGRP:Музыкальные
 https://smotret.tv/music/rutv
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="muz" tvg-logo="http://epg.one/img/muz.png" tvg-rec="0",Муз ТВ
+#EXTINF:-1 tvg-id="muz" channel-id="1020" tvg-name="Муз ТВ" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Муз ТВ
+#EXTGRP:Музыкальные
 http://vsetv.click/muz-tv
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="muztv" tvg-logo="http://epg.one/img/muztv.png" tvg-rec="0",MIXM TV
+#EXTINF:-1 tvg-id="muztv" channel-id="1021" tvg-name="MIXM TV" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",MIXM TV
+#EXTGRP:Музыкальные
 https://smotret.tv/music/mixm-tv
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="tntmusic" tvg-logo="http://epg.one/img/tntmusic.png" tvg-rec="0",ТНТ-Music
+#EXTINF:-1 tvg-id="tntmusic" channel-id="1022" tvg-name="ТНТ-Music" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",ТНТ-Music
+#EXTGRP:Музыкальные
 https://telik.live/tnt-music.html
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="karusel" tvg-logo="http://epg.one/img/karusel.png" tvg-rec="0",Карусель
+#EXTINF:-1 tvg-id="karusel" channel-id="1023" tvg-name="Карусель" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Карусель
+#EXTGRP:Мультфильмы
 https://smotru.tv/karusel.html
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="mult" tvg-logo="http://epg.one/img/mult.png" tvg-rec="0",Мульт HD
+#EXTINF:-1 tvg-id="mult" channel-id="1024" tvg-name="Мульт HD" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Мульт HD
+#EXTGRP:Мультфильмы
 http://smotrim.org/mult
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="mama" tvg-logo="http://epg.one/img/mama.png" tvg-rec="0",Мама ТВ
+#EXTINF:-1 tvg-id="mama" channel-id="1025" tvg-name="Мама ТВ" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Мама ТВ
+#EXTGRP:Мультфильмы
 https://stv.mediacdn.ru/live/cdn/mama/playlist.m3u8
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="ani" tvg-logo="http://epg.one/img/ani.png" tvg-rec="0",Ani ТВ
+#EXTINF:-1 tvg-id="ani" channel-id="1026" tvg-name="Ani ТВ" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Ani ТВ
+#EXTGRP:Мультфильмы
 http://vsetv.click/ani
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="mir" tvg-logo="http://epg.one/img/mir.png" tvg-rec="0",Детский Мир
+#EXTINF:-1 tvg-id="mir" channel-id="1027" tvg-name="Детский Мир" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Детский Мир
+#EXTGRP:Мультфильмы
 https://telik.live/detskij-mir.html
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="smile" tvg-logo="http://epg.one/img/smile.png" tvg-rec="0",Смайлик ТВ
+#EXTINF:-1 tvg-id="smile" channel-id="1028" tvg-name="Смайлик ТВ" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Смайлик ТВ
+#EXTGRP:Мультфильмы
 https://yootv.host/smaylik-tv.html
 
-#EXTINF:0 group-title="Мультфильмы" tvg-id="sovet" tvg-logo="http://epg.one/img/sovet.png" tvg-rec="0",Советские Мультфильмы
+#EXTINF:-1 tvg-id="sovet" channel-id="1029" tvg-name="Советские Мультфильмы" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Советские Мультфильмы
+#EXTGRP:Мультфильмы
 https://yootv.host/sovetskie-multfilmy-children-tv.html
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="russian box" tvg-logo="http://epg.one/img/russian_box.png" tvg-rec="0",Russian MUSICBOX
+#EXTINF:-1 tvg-id="russianbox" channel-id="1030" tvg-name="Russian MUSICBOX" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Russian MUSICBOX
+#EXTGRP:Музыкальные
 https://pervyi-tv.online/musicbox
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="europaplus1" tvg-logo="http://epg.one/img/europaplus1.png" tvg-rec="0",Europa Plus TV
+#EXTINF:-1 tvg-id="europaplus1" channel-id="1031" tvg-name="Europa Plus TV" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Europa Plus TV
+#EXTGRP:Музыкальные
 https://vk.ru/video_ext.php?oid=-22186156&id=456239617&hash=dfc9ce404aae4243%22
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="music1" tvg-logo="http://epg.one/img/music1.png" tvg-rec="0",Музыка Первого
+#EXTINF:-1 tvg-id="music1" channel-id="1032" tvg-name="Музыка Первого" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Музыка Первого
+#EXTGRP:Музыкальные
 https://tas-ix.tv/tv_tasix/86-muzyka-pervogo.html
 
-#EXTINF:0 group-title="Музыкальные" tvg-id="music2" tvg-logo="http://epg.one/img/music2.png" tvg-rec="0",VIVA TV Russia
+#EXTINF:-1 tvg-id="shanson" channel-id="1033" tvg-name="Шансон ТВ" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Шансон ТВ
+#EXTGRP:Музыкальные
+https://playercdn.cdnvideo.ru/aloha/players/shansontv_sd_player.html
+
+#EXTINF:-1 tvg-id="music2" channel-id="1034" tvg-name="VIVA TV Russia" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",VIVA TV Russia
+#EXTGRP:Музыкальные
 https://goodgame.ru/viva_music
 
-#EXTINF:0 group-title="Новостные" tvg-id="tiurima" tvg-logo="http://epg.one/img/tiurima.png" tvg-rec="0",РБК ТВ
+#EXTINF:-1 tvg-id="tiurima" channel-id="1035" tvg-name="РБК ТВ" tvg-logo="" group-title="Новостные" aspect-ratio="16:9",РБК ТВ
+#EXTGRP:Новостные
 https://telik.live/rbk-tv.html
 
-#EXTINF:0 group-title="Новостные" tvg-id="monstr" tvg-logo="http://epg.one/img/monstr.png" tvg-rec="0",Россия 24
+#EXTINF:-1 tvg-id="monstr" channel-id="1036" tvg-name="Россия 24" tvg-logo="" group-title="Новостные" aspect-ratio="16:9",Россия 24
+#EXTGRP:Новостные
 https://telik.live/rossiya-24.html
 
-#EXTINF:0 group-title="Новостные" tvg-id="dreams" tvg-logo="http://epg.one/img/dreams.png" tvg-rec="0",Мир 24
+#EXTINF:-1 tvg-id="dreams" channel-id="1037" tvg-name="Мир 24" tvg-logo="" group-title="Новостные" aspect-ratio="16:9",Мир 24
+#EXTGRP:Новостные
 https://smotrettv.com/tv/news/26-mir-24.html
 
-#EXTINF:0 group-title="Новостные" tvg-id="1hd" tvg-logo="http://epg.one/img/1hd.png" tvg-rec="0",1 HD
+#EXTINF:-1 tvg-id="1hd" channel-id="1038" tvg-name="1 HD" tvg-logo="" group-title="Новостные" aspect-ratio="16:9",1 HD
+#EXTGRP:Новостные
 https://www.1tv.ru/live
