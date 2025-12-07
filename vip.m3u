@@ -1,5 +1,5 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="b5" channel-id="1000" tvg-name="Беларусь 5" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Беларусь 5
+#EXTINF:-1 tvg-id="belarus5" channel-id="1000" tvg-name="Беларусь 5" tvg-logo="" group-title="Спорт" aspect-ratio="16:9",Беларусь 5
 #EXTGRP:Спорт
 https://tvmoldova.github.io/wallper/b5.txt
 
