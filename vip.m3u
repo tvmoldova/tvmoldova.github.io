@@ -137,7 +137,7 @@ https://playercdn.cdnvideo.ru/aloha/players/shansontv_sd_player.html
 
 #EXTINF:-1 tvg-id="music2" channel-id="1034" tvg-name="VIVA TV Russia" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",VIVA TV Russia
 #EXTGRP:Музыкальные
-https://goodgame.ru/viva_music
+https://rutube.ru/play/embed/f712ae5ff3db23ec09b3674133d44daa
 
 #EXTINF:-1 tvg-id="tiurima" channel-id="1035" tvg-name="РБК ТВ" tvg-logo="" group-title="Новостные" aspect-ratio="16:9",РБК ТВ
 #EXTGRP:Новостные
