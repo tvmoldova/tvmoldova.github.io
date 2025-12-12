@@ -81,11 +81,11 @@ https://smotret.tv/music/rutv
 
 #EXTINF:-1 tvg-id="muz" channel-id="1020" tvg-name="Муз ТВ" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Муз ТВ
 #EXTGRP:Музыкальные
-http://vsetv.click/muz-tv
+http://tvin.su/view-tv-online/muz-tv
 
 #EXTINF:-1 tvg-id="muztv" channel-id="1021" tvg-name="MIXM TV" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",MIXM TV
 #EXTGRP:Музыкальные
-http://tvin.su/view-tv-online/muz-tv
+https://smotret.tv/music/mixm-tv
 
 #EXTINF:-1 tvg-id="tntmusic" channel-id="1022" tvg-name="ТНТ-Music" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",ТНТ-Music
 #EXTGRP:Музыкальные
