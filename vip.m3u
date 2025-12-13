@@ -155,7 +155,7 @@ https://smotrettv.com/tv/news/26-mir-24.html
 #EXTGRP:Новостные
 https://www.1tv.ru/live
 
-EXTINF:-1 tvg-id="stranafm" channel-id="108" tvg-name="Страна FM" tvg-logo="" group-title="Новостные" aspect-ratio="16:9",1 HD
+EXTINF:-1 tvg-id="stranafm" channel-id="108" tvg-name="Страна FM" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Страна FM
 #EXTGRP:Музыкальные
 https://yootv.host/strana.html
 
