@@ -159,7 +159,7 @@ https://www.1tv.com/live
 #EXTGRP:Музыкальные
 https://smotret.tv/music/strana-fm
 
-#EXTINF:-1 tvg-id="shanson" channel-id="1033" tvg-name="Шансон ТВ" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Шансон ТВ
+#EXTINF:-1 tvg-id="europa" channel-id="1033" tvg-name="europa" tvg-logo="" group-title="Музыкальные" aspect-ratio="16:9",Europa Plus
 #EXTGRP:Музыкальные
-https://playercdn.cdnvideo.ru/aloha/players/shansontv_sd_player.html
+https://smotret-online.tv/evropa-plyus-tv.html
 
