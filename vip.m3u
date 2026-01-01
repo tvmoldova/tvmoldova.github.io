@@ -103,7 +103,7 @@ http://smotrim.org/mult
 #EXTGRP:Мультфильмы
 https://stv.mediacdn.ru/live/cdn/mama/playlist.m3u8
 
-#EXTINF:-1 tvg-id="ani" channel-id="1026" tvg-name="Ani ТВ" tvg-logo="" group-title="Мультфильмы" aspect-ratio="16:9",Ani ТВ
+#EXTINF:-1 tvg-id="ani" channel-id="1026" tvg-name="Ani ТВ" tvg-logo="https://yootv.host/icons/ANI.png" group-title="Мультфильмы" aspect-ratio="16:9",Ani ТВ
 #EXTGRP:Мультфильмы
 http://vsetv.click/ani
 
